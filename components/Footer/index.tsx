@@ -25,6 +25,7 @@ import {
 import { getStorePage } from "@/hooks/getStorePage"
 import { getSocialLink } from "@/hooks/getSocialLinks"
 import type { ReactElement } from "react"
+import axios from "axios"
 
 interface FooterProps {
   storeData: {
@@ -65,6 +66,48 @@ const Footer = async ({ storeData }: FooterProps) => {
 
   const { page } = await getStorePage(storeId, "about-us")
   const { socialLinks } = await getSocialLink(storeId)
+
+  // Fetch company contact details from ERPNext API
+  let companyContactDetails = {
+    email: storeData?.store_contact_detail?.email,
+    phone: storeData?.store_contact_detail?.phone,
+    address: storeData?.store_contact_detail?.address,
+  }
+
+  try {
+    const ERP_BASE_URL = `https://${process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN}/api/resource`
+    const API_KEY = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY
+    const API_SECRET = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET
+
+    if (API_KEY && API_SECRET) {
+      const companyName = storeData?.company_id || "Kral Laser"
+      const encodedName = encodeURIComponent(companyName)
+      const response = await axios.get(
+        `${ERP_BASE_URL}/Company/${encodedName}?fields=["email","phone_no"]`,
+        {
+          headers: {
+            Authorization: `token ${API_KEY}:${API_SECRET}`,
+          },
+        }
+      )
+
+      if (response.data?.data) {
+        companyContactDetails = {
+          email: response.data.data.email || companyContactDetails.email || "cnckral@gmail.com",
+          phone: response.data.data.phone_no || companyContactDetails.phone || "+923103339404",
+          address: "76 C Gulshan e Rehman Sultan Ahmad Road ichra, Lahore, Pakistan",
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching company contact details:", error)
+    // Use fallback values
+    companyContactDetails = {
+      email: companyContactDetails.email || "cnckral@gmail.com",
+      phone: companyContactDetails.phone || "+923103339404",
+      address: "76 C Gulshan e Rehman Sultan Ahmad Road ichra, Lahore, Pakistan",
+    }
+  }
 
   // Use the short description from the page or a fallback description
   const description =
@@ -276,7 +319,7 @@ const Footer = async ({ storeData }: FooterProps) => {
               </h3>
               
               <div className="space-y-4">
-                {storeData?.store_contact_detail?.email && (
+                {companyContactDetails.email && (
                   <div className="flex items-start gap-3 group">
                     <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
                       <Mail className="h-5 w-5 text-white" />
@@ -284,16 +327,16 @@ const Footer = async ({ storeData }: FooterProps) => {
                     <div>
                       <p className="text-white/70 text-sm font-medium">Email</p>
                       <a 
-                        href={`mailto:${storeData.store_contact_detail.email}`}
+                        href={`mailto:${companyContactDetails.email}`}
                         className="text-white hover:text-white/80 transition-colors duration-200"
                       >
-                        {storeData.store_contact_detail.email}
+                        {companyContactDetails.email}
                       </a>
                     </div>
                   </div>
                 )}
 
-                {storeData?.store_contact_detail?.phone && (
+                {companyContactDetails.phone && (
                   <div className="flex items-start gap-3 group">
                     <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
                       <Phone className="h-5 w-5 text-white" />
@@ -301,16 +344,16 @@ const Footer = async ({ storeData }: FooterProps) => {
                     <div>
                       <p className="text-white/70 text-sm font-medium">Phone</p>
                       <a 
-                        href={`tel:${storeData.store_contact_detail.phone}`}
+                        href={`tel:${companyContactDetails.phone}`}
                         className="text-white hover:text-white/80 transition-colors duration-200"
                       >
-                        {storeData.store_contact_detail.phone}
+                        {companyContactDetails.phone}
                       </a>
                     </div>
                   </div>
                 )}
 
-                {storeData?.store_contact_detail?.address && (
+                {companyContactDetails.address && (
                   <div className="flex items-start gap-3 group">
                     <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
                       <MapPin className="h-5 w-5 text-white" />
@@ -318,9 +361,7 @@ const Footer = async ({ storeData }: FooterProps) => {
                     <div>
                       <p className="text-white/70 text-sm font-medium">Address</p>
                       <p className="text-white leading-relaxed">
-                        {storeData.store_contact_detail.address}
-                        {storeData.store_contact_detail.city && `, ${storeData.store_contact_detail.city}`}
-                        {storeData.store_contact_detail.country && `, ${storeData.store_contact_detail.country}`}
+                        {companyContactDetails.address}
                       </p>
                     </div>
                   </div>

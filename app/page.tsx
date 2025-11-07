@@ -52,21 +52,37 @@ export default async function Home() {
   const { categories } = await getCategories(storeId);
   const { page } = await getStorePage(storeId, "home");
 
+  // Fetch one product for the hero section
+  let featuredProduct = null;
+  try {
+    const productsResponse = await fetch(`${fullStoreUrl}/api/products?page=1&limit=1`, {
+      cache: 'no-store'
+    });
+    if (productsResponse.ok) {
+      const productsData = await productsResponse.json();
+      if (productsData.products && productsData.products.length > 0) {
+        featuredProduct = productsData.products[0];
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching featured product:", error);
+  }
+
   return (
     <Layout>
       <Hero
         content={{
-          title: page?.title,
-          content: page?.content,
+          title: "Laser Technology That Defines Excellence",
+          content: "At Kral Laser, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more. From intricate custom designs to high-volume industrial production, we bring your ideas to life with speed, accuracy, and style.",
           heroImage: undefined,
         }}
         storeData={data?.store?.stores[0]}
         categories={categories}
-        products={[]}
+        products={featuredProduct ? [featuredProduct] : []}
         hideOnPage={false}
       />
       <div className="container mx-auto px-4 py-8">
-        <Categories categories={categories} hideOnPage={false} subcat={false} />
+        <Categories categories={categories?.slice(0, 4) || []} hideOnPage={false} subcat={false} />
         <HomeProducts
           companyId={companyId}
           storeId={storeId}

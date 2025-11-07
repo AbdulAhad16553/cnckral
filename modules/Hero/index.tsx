@@ -111,165 +111,107 @@ const Hero = async ({
         : products?.filter((product) => hasDiscount(product)).length || 0,
   };
 
-  // Get a single random product with an image for showcase
-  const getRandomProduct = () => {
-    const productsWithImages =
-      products?.filter(
-        (product) => product.product_images && product.product_images.length > 0
-      ) || [];
-    if (productsWithImages.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * productsWithImages.length);
-    return productsWithImages[randomIndex];
-  };
-
-  const featuredProduct = getRandomProduct();
+  // Get the first product from the products array (passed from page)
+  const featuredProduct = products && products.length > 0 ? products[0] : null;
   const featuredCategories = categories?.slice(0, 3) || [];
 
   return (
-    <section className="relative w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
-      {/* Enhanced background elements */}
+    <section className="relative w-full bg-white overflow-hidden">
+      {/* Background element - faint circular shape */}
       <div className="absolute inset-0">
         <div
-          className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-10"
+          className="absolute top-20 left-20 w-96 h-96 rounded-full opacity-5 blur-3xl"
           style={{ backgroundColor: primaryColor }}
-        ></div>
-        <div
-          className="absolute top-40 right-32 w-24 h-24 rounded-full opacity-10"
-          style={{ backgroundColor: secondaryColor }}
-        ></div>
-        <div
-          className="absolute bottom-32 left-1/3 w-20 h-20 rounded-full opacity-10"
-          style={{ backgroundColor: primaryColor }}
-        ></div>
-        <div
-          className="absolute top-1/2 right-1/4 w-16 h-16 rounded-full opacity-5"
-          style={{ backgroundColor: secondaryColor }}
         ></div>
       </div>
 
-      <div className="container mx-auto px-6 py-24 lg:py-32">
-        <div className="grid lg:grid-cols-2 gap-24 items-center">
-          {/* Left Content - Enhanced Text & CTAs */}
-          <div className="text-center lg:text-left space-y-12">
-            {/* Enhanced Main Heading */}
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+      <div className="container mx-auto px-6 py-16 lg:py-24">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left Content - Hero Text & CTAs */}
+          <div className="text-left space-y-8">
+            {/* Main Heading */}
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                   <span className="text-gray-900">
-                    {content?.title || `Welcome to`}
+                  {content?.title || "Laser Technology That Defines Excellence"}
                   </span>
                   <br />
                   <span
-                    className="text-transparent bg-clip-text"
-                    style={{
-                      background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-                      WebkitBackgroundClip: "text",
-                    }}
+                  className="text-4xl md:text-5xl lg:text-6xl"
+                  style={{ color: primaryColor }}
                   >
                     {storeName}
                   </span>
                 </h1>
-                <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-600 max-w-xl leading-relaxed">
                   {content?.content ||
-                    tagline ||
-                    (enhancedStats.totalProducts > 0
-                      ? `Discover ${enhancedStats.totalProducts} exceptional products across ${enhancedStats.totalCategories} categories. From cutting-edge laser technology to precision engineering, we deliver quality that exceeds expectations.`
-                      : `Discover extraordinary products that transform your world. Quality meets innovation at every turn.`)}
+                  "At Kral Laser, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more. From intricate custom designs to high-volume industrial production, we bring your ideas to life with speed, accuracy, and style."}
                 </p>
-              </div>
             </div>
 
-            {/* Enhanced CTA Buttons */}
+            {/* CTA Buttons */}
             {!hideOnPage && (
-              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/shop">
                   <Button
                     size="lg"
-                    className="group text-white px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-rotate-1"
+                    className="group text-white px-8 py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    <ShoppingBag className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                    <ShoppingBag className="w-5 h-5 mr-2" />
                     Start Shopping
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
                 <Link href="/category">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 px-8 py-4 text-lg font-semibold transition-all duration-500 transform hover:scale-105 hover:rotate-1 shadow-lg hover:shadow-xl"
+                    className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 px-8 py-6 text-base font-semibold transition-all duration-300"
                   >
                     <Eye className="w-5 h-5 mr-2" />
                     Explore Categories
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
               </div>
             )}
 
-            {/* Enhanced Quick Stats */}
-            <div className="space-y-8 pt-12">
-              {/* Primary Stats Row - 4 columns */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="text-center group">
-                  <div className="text-xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {enhancedStats.totalProducts > 0 ? (
-                      <>
-                        {enhancedStats.totalProducts}
-                        {enhancedStats.totalProducts >= 50 ? "+" : ""}
-                      </>
-                    ) : (
-                      <span className="text-gray-400">0</span>
-                    )}
+            {/* Quick Stats - Bottom Left */}
+            <div className="pt-8">
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-left">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {enhancedStats.totalProducts > 0 ? enhancedStats.totalProducts : "0"}
                   </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider font-medium">
+                  <div className="text-xs text-gray-600 uppercase tracking-wider font-medium">
                     Products
                   </div>
                 </div>
 
-                <div className="text-center group">
-                  <div className="text-xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {enhancedStats.totalCategories > 0 ? (
-                      <>
-                        {enhancedStats.totalCategories}
-                        {enhancedStats.totalCategories >= 10 ? "+" : ""}
-                      </>
-                    ) : (
-                      <span className="text-gray-400">0</span>
-                    )}
+                <div className="text-left">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {enhancedStats.totalCategories > 0 ? enhancedStats.totalCategories : "0"}
                   </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider font-medium">
+                  <div className="text-xs text-gray-600 uppercase tracking-wider font-medium">
                     Categories
                   </div>
                 </div>
 
-                <div className="text-center group">
-                  <div className="text-xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {enhancedStats.productsOnSale > 0 ? (
-                      <>
-                        {enhancedStats.productsOnSale}
-                        {enhancedStats.productsOnSale >= 20 ? "+" : ""}
-                      </>
-                    ) : (
-                      <span className="text-gray-400">0</span>
-                    )}
+                <div className="text-left">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {enhancedStats.productsOnSale > 0 ? enhancedStats.productsOnSale : "0"}
                   </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider font-medium">
+                  <div className="text-xs text-gray-600 uppercase tracking-wider font-medium">
                     On Sale
                   </div>
                 </div>
 
-                <div className="text-center group">
-                  <div className="text-xl font-bold text-gray-700 mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {enhancedStats.productsInStock > 0 ? (
-                      <>
-                        {enhancedStats.productsInStock}
-                        {enhancedStats.productsInStock >= 50 ? "+" : ""}
-                      </>
-                    ) : (
-                      <span className="text-gray-400">0</span>
-                    )}
+                <div className="text-left">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {enhancedStats.productsInStock > 0 ? enhancedStats.productsInStock : "0"}
                   </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider font-medium">
+                  <div className="text-xs text-gray-600 uppercase tracking-wider font-medium">
                     Available
                   </div>
                 </div>
@@ -277,34 +219,15 @@ const Hero = async ({
             </div>
           </div>
 
-          {/* Right Content - Modern Single Product Card */}
+          {/* Right Content - Single Product Card */}
           <div className="relative">
             {featuredProduct ? (
               <div className="relative group">
                 {/* Card container */}
-                <div
-                  className="relative w-[22rem] md:w-[24rem] mx-auto bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-500 group-hover:shadow-3xl focus-within:ring-2 focus-within:ring-offset-2"
-                  style={{ boxShadow: "0 20px 40px rgba(0,0,0,0.08)" }}
-                >
-                  {/* Gradient border glow on hover */}
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                      background: `linear-gradient(135deg, ${primaryColor}33, ${secondaryColor}33)`,
-                      mixBlendMode: "multiply",
-                    }}
-                  />
-                  {/* Decorative gradient ring */}
-                  <div
-                    className="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-10 blur-2xl"
-                    style={{
-                      background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-                    }}
-                  />
-
+                <div className="relative w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                   {/* Image */}
-                  <div className="relative w-full aspect-[4/3]">
+                  <div className="relative w-full aspect-[4/3] bg-gray-100">
+                    {featuredProduct.product_images && featuredProduct.product_images.length > 0 ? (
                     <Image
                       src={getOptimizedImageUrl(
                         featuredProduct.product_images.find(
@@ -319,96 +242,36 @@ const Hero = async ({
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
                     />
-
-                    {/* Sale/Discount badge */}
-                    {hasDiscount(featuredProduct) && (
-                      <div className="absolute top-4 left-4 flex items-center gap-2">
-                        <div className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-                          SALE
-                        </div>
-                        <div className="bg-white/90 text-red-600 text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-white/50">
-                          -
-                          {calculateDiscountPercent(
-                            getBasePriceForDisplay(featuredProduct),
-                            getEffectivePrice(featuredProduct)
-                          )}
-                          %
-                        </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                        <ShoppingBag className="w-16 h-16 text-gray-300" />
                       </div>
                     )}
 
                     {/* Price badge */}
-                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-white/30">
-                      {hasDiscount(featuredProduct) ? (
-                        <div className="flex items-baseline gap-2">
-                          <div className="text-lg font-bold text-gray-900">
-                            {formatPrice(
-                              getEffectivePrice(featuredProduct),
-                              currency
-                            )}
-                          </div>
-                          <div className="text-xs text-gray-400 line-through">
-                            {formatPrice(
-                              getBasePriceForDisplay(featuredProduct),
-                              currency
-                            )}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-lg font-bold text-gray-900">
+                    <div className="absolute top-4 right-4 bg-gray-800/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
+                      <div className="text-base font-bold text-white">
                           {formatPrice(
                             getEffectivePrice(featuredProduct),
                             currency
                           )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Hover actions */}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="flex gap-3">
-                        <Button
-                          size="icon"
-                          className="rounded-full w-11 h-11 shadow-xl"
-                          style={{ backgroundColor: primaryColor }}
-                          aria-label="Add to wishlist"
-                        >
-                          <Heart className="w-5 h-5" />
-                        </Button>
-                        <Link href={`/product/${featuredProduct.slug}`}>
-                          <Button
-                            size="icon"
-                            className="rounded-full w-11 h-11 shadow-xl"
-                            style={{ backgroundColor: primaryColor }}
-                            aria-label="View product"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </Button>
-                        </Link>
-                        <Button
-                          size="icon"
-                          className="rounded-full w-11 h-11 shadow-xl"
-                          style={{ backgroundColor: primaryColor }}
-                          aria-label="Add to cart"
-                        >
-                          <ShoppingBag className="w-5 h-5" />
-                        </Button>
                       </div>
                     </div>
                   </div>
 
                   {/* Info */}
-                  <div className="p-6 flex flex-col justify-between relative">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 line-clamp-2">
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
                         {featuredProduct.name}
                       </h3>
-                      <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                         {featuredProduct.short_description ||
                           featuredProduct.description ||
-                          "Experience quality and performance in every detail."}
+                        "High-performance laser source designed for fiber laser machines."}
                       </p>
-                      <div className="mt-3 flex items-center gap-2">
+                    
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-4">
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
                             <Star
@@ -418,46 +281,39 @@ const Hero = async ({
                           ))}
                         </div>
                         <span className="text-xs text-gray-500">
-                          4.9 • Popular choice
+                        4.9 Popular choice
                         </span>
+                    </div>
+
+                    {/* Features */}
+                    <div className="flex items-center gap-4 mb-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-blue-500" />
+                        Fast checkout
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Shield className="w-4 h-4 text-green-500" />
+                        Secure
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Zap className="w-4 h-4 text-blue-500" />
-                        Fast checkout
-                        <Shield className="w-4 h-4 text-green-500 ml-3" />
-                        Secure
-                      </div>
-                      <Link href={`/product/${featuredProduct.slug}`}>
+                    {/* View Product Button */}
+                    <Link href={`/product/${featuredProduct.slug || featuredProduct.sku}`}>
                         <Button
-                          className="group px-5 py-2 font-semibold text-white transition-transform hover:scale-[1.02]"
+                        className="w-full group px-5 py-2.5 font-semibold text-white transition-all hover:opacity-90"
                           style={{ backgroundColor: primaryColor }}
                         >
                           View Product
-                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                         </Button>
                       </Link>
-                    </div>
-
-                    {/* Animated bottom accent */}
-                    <div
-                      aria-hidden
-                      className="absolute left-6 right-6 bottom-2 h-1.5 rounded-full transition-all duration-500 group-hover:opacity-100"
-                      style={{
-                        background: `linear-gradient(90deg, ${primaryColor}, ${secondaryColor})`,
-                        opacity: 0.7,
-                      }}
-                    />
                   </div>
                 </div>
               </div>
             ) : (
               // Fallback when no products available
               <div className="relative">
-                <div className="w-80 h-80 mx-auto">
-                  <div className="relative w-full h-full bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-gray-200">
+                <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200 p-12 flex items-center justify-center">
                     <div className="text-center">
                       <div
                         className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center"
@@ -469,51 +325,17 @@ const Hero = async ({
                         />
                       </div>
                       <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        Add Products
+                      No Products Available
                       </h3>
                       <p className="text-sm text-gray-600">
-                        Upload products to see them here
+                      Products will appear here once added
                       </p>
-                    </div>
                   </div>
                 </div>
               </div>
             )}
           </div>
         </div>
-
-        {/* Enhanced Bottom category navigation */}
-        {featuredCategories.length > 0 && (
-          <div className="mt-20 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8">
-              Quick Categories
-            </h2>
-            <div className="flex flex-wrap justify-center gap-6">
-              {featuredCategories.map((category, index) => (
-                <Link
-                  key={category.id || index}
-                  href={`/category/${category.slug}`}
-                  className="group bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                      style={{ backgroundColor: primaryColor + "20" }}
-                    >
-                      <ShoppingBag
-                        className="w-5 h-5"
-                        style={{ color: primaryColor }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-200">
-                      {category.name}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

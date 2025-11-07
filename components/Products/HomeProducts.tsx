@@ -71,9 +71,9 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
         setLoading(true);
         setError(null);
 
-        console.log('🔄 Fetching 10 products for home page...');
+        console.log('🔄 Fetching 8 products for home page...');
         
-        const response = await fetch(`/api/products?page=1&limit=10`);
+        const response = await fetch(`/api/products?page=1&limit=8`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -206,8 +206,8 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
         </Link>
       </div>
 
-      {/* Products Grid - 5 columns for home page */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      {/* Products Grid - 4 columns to match categories */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product: any, index: number) => {
           const featuredImage = product?.product_images?.find(
             (image: any) => image.position === "featured"

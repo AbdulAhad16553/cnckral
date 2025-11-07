@@ -22,6 +22,7 @@ import { getCategories } from "@/hooks/getCategories";
 import { productService } from "@/lib/erpnext/services/productService";
 import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/imageUtils";
 import { formatPrice, getEffectivePrice } from "@/lib/currencyUtils";
+import { getErpnextImageUrl } from "@/lib/erpnextImageUtils";
 
 interface StoreData {
   store_name?: string;
@@ -33,6 +34,7 @@ interface StoreData {
   };
   id?: string;
   company_id?: string;
+  company_logo?: string;
   store_contact_detail?: {
     phone?: string;
     email?: string;
@@ -63,11 +65,11 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const storeName = storeData?.store_name || "Your Store";
   const tagline = storeData?.store_detail?.tagline;
   const headerLogoId = storeData?.store_detail?.header_logo_id;
+  const companyLogo = storeData?.company_logo;
   const primaryColor = storeData?.store_detail?.primary_color || "#3B82F6";
   const storeId = storeData?.id;
   const companyId = storeData?.company_id;
   const storeCurrency = storeData?.store_detail?.currency || "Rs.";
-  console.log("storeData", headerLogoId);
 
   // Debounce search term
   useEffect(() => {
@@ -262,12 +264,21 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex-shrink-0 group">
                 <div className="flex items-center space-x-3">
-                  {headerLogoId ? (
+                  {companyLogo ? (
+                    <Image
+                      src={getErpnextImageUrl(companyLogo)}
+                      alt={`${storeName} Logo`}
+                      width={90}
+                      height={60}
+                      className="transition-transform duration-300 group-hover:scale-105 object-contain"
+                      unoptimized
+                    />
+                  ) : headerLogoId ? (
                     <Image
                       src={`${process.env.NEXT_PUBLIC_NHOST_STORAGE_URL}/files/${headerLogoId}`}
                       alt="Header Logo"
                       width={90}
-                      height={60} // Next.js requires height, but it will adjust with CSS
+                      height={60}
                       className="transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (

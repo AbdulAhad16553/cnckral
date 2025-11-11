@@ -78,12 +78,8 @@ export default async function RootLayout({
           <style>
             {`
               :root {
-                --primary-color: ${
-                  storeData?.store_detail?.primary_color || "Blue"
-                };
-                --secondary-color: ${
-                  storeData?.store_detail?.secondary_color || "Black"
-                };
+                --primary-color: #EF4444;
+                --secondary-color: #374151;
               }
             `}
           </style>

@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
 import { AddToCart } from "@/sub/cart/addToCart";
 import { CartAnimationDialog } from "@/common/CartAnimationDialog";
+import ProductImagePreview from "@/components/ProductImagePreview";
+import { useBatchItemImages } from "@/hooks/useBatchItemImages";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface HomeProductsProps {
@@ -30,7 +32,7 @@ interface HomeProductsProps {
 // Home Products Skeleton
 const HomeProductsSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-    {[...Array(10)].map((_, i) => (
+    {[...Array(8)].map((_, i) => (
       <Card key={i} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
         <CardContent className="p-0">
           <Skeleton className="aspect-square w-full" />
@@ -64,6 +66,17 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
   const [selectedProductImage, setSelectedProductImage] = useState<any>(null);
 
+  // Prepare batch image loading like /shop
+  const itemNames = React.useMemo(() => products.map(p => p.sku).filter(Boolean), [products]);
+  const {
+    isLoading: isImageLoading,
+    getImageUrl,
+    hasImage,
+  } = useBatchItemImages({
+    itemNames,
+    enabled: products.length > 0
+  });
+
   // Fetch products on component mount
   useEffect(() => {
     const fetchProducts = async () => {
@@ -81,8 +94,8 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
         }
 
         console.log(`✅ Loaded ${data.products.length} products for home page`);
-        
-        setProducts(data.products);
+        // Ensure we only keep 8 items even if API returns more
+        setProducts((data.products || []).slice(0, 8));
       } catch (err) {
         console.error('Error loading products:', err);
         setError(err instanceof Error ? err.message : 'Failed to load products');
@@ -196,7 +209,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
         <div>
           <h2 className="text-2xl font-bold">Featured Products</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Showing {products.length} of our best products
+            Showing {Math.min(products.length, 8)} of our best products
           </p>
         </div>
         <Link href="/shop">
@@ -208,10 +221,10 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
 
       {/* Products Grid - 4 columns to match categories */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product: any, index: number) => {
-          const featuredImage = product?.product_images?.find(
-            (image: any) => image.position === "featured"
-          );
+        {products.slice(0, 8).map((product: any, index: number) => {
+          // Resolve image via batch image loader (same approach as /shop)
+          const imageUrl = getImageUrl(product.sku);
+          const productHasImage = hasImage(product.sku);
 
           const productStock = calculateProductStock(product);
           const isOutOfStock = product.type === "variable" ? false : productStock <= 0;
@@ -267,12 +280,16 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                   </div>
 
                   <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <ProgressiveImage
-                      src={featuredImage?.image_id || '/placeholder.svg'}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                    <ProductImagePreview
+                      itemName={product.sku}
+                      productName={product.name}
+                      imageUrl={imageUrl}
+                      hasImage={productHasImage}
+                      isLoading={isImageLoading}
+                      width={400}
+                      height={400}
+                      className="w-full h-full"
+                      showPreview={true}
                     />
                   </Link>
 

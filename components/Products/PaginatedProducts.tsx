@@ -104,7 +104,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
 
   // Load all products at once - no pagination
   const paginatedProducts = usePaginatedProducts({
-    pageSize: 1000, // Load all products
+    pageSize, // Respect provided page size
     autoLoad: true
   });
 

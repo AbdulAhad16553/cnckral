@@ -5,6 +5,9 @@ import { headers } from "next/headers";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import { getAllCategories } from "@/hooks/getCategories";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Shop | Elegant Emporium",
   description: "Discover our curated collection of premium products",
@@ -19,7 +22,7 @@ export default async function ShopPage() {
 
   const fullStoreUrl = getUrlWithScheme(host);
 
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
+  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { cache: "no-store" });
   const data = await response.json();
 
   const storeId = data?.store?.stores[0].id;

@@ -70,6 +70,9 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const storeId = storeData?.id;
   const companyId = storeData?.company_id;
   const storeCurrency = storeData?.store_detail?.currency || "Rs.";
+  // Contact fallbacks
+  const topBarPhone = storeData?.store_contact_detail?.phone || "+923103339404";
+  const topBarEmail = storeData?.store_contact_detail?.email || "cnckral@gmail.com";
 
   // Debounce search term
   useEffect(() => {
@@ -236,18 +239,14 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-2">
         <div className="container mx-auto px-4 flex items-center justify-between text-sm">
           <div className="flex items-center space-x-4">
-            {storeData?.store_contact_detail?.phone && (
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4" />
-                <span>{storeData.store_contact_detail.phone}</span>
-              </div>
-            )}
-            {storeData?.store_contact_detail?.email && (
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4" />
-                <span>{storeData.store_contact_detail.email}</span>
-              </div>
-            )}
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4" />
+              <span>{topBarPhone}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Mail className="w-4 h-4" />
+              <span>{topBarEmail}</span>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             {tagline && <span className="text-gray-300 italic">{tagline}</span>}
@@ -495,6 +494,17 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-4">
+              {/* Contact quick info visible on md+ */}
+              <div className="hidden md:flex items-center gap-4 text-sm text-gray-600">
+                {/* <div className="flex items-center gap-1">
+                  <Phone className="w-4 h-4" />
+                  <span>{topBarPhone}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Mail className="w-4 h-4" />
+                  <span>{topBarEmail}</span>
+                </div> */}
+              </div>
               {/* Search Icon for Mobile */}
               <button
                 className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"

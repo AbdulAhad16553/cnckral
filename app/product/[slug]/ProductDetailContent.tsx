@@ -1,3 +1,4 @@
+
 // "use client";
 
 // import { useState, useEffect, useMemo } from 'react';
@@ -24,6 +25,9 @@
 //   currency?: string;
 //   image?: string;
 //   custom_quotation_item?: number;
+//   stock?: {
+//     totalStock: number;
+//   };
 //   variants?: Array<{
 //     name: string;
 //     item_name: string;
@@ -50,7 +54,6 @@
 //   const [error, setError] = useState<string | null>(null);
 //   const router = useRouter();
 
-  
 //   // New attribute filter state
 //   const [selectedAttributes, setSelectedAttributes] = useState<Array<{attribute: string, attribute_value: string}>>([]);
   
@@ -102,6 +105,7 @@
 
 //   const handleAddToCart = () => {
 //     if (selectedVariation) {
+//       // For template product variations
 //       const cartItem = {
 //         id: product?.name || selectedVariation.name,
 //         name: selectedVariation.item_name,
@@ -123,6 +127,54 @@
 //       // Reset states after adding to cart
 //       setSelectedVariation(null);
 //       setShowAddToCart(false);
+//       setQuantity(1);
+//     } else if (product && !isTemplate && product.stock && product.stock.totalStock > 0) {
+//       // For simple products
+//       const cartItem = {
+//         id: product.name,
+//         name: product.item_name,
+//         description: product.description || "",
+//         type: "item",
+//         basePrice: product.price || 0,
+//         salePrice: product.price || 0,
+//         category: product.item_group || "product",
+//         currency: product.currency || "PKR",
+//         bundleItems: [],
+//         quantity: quantity,
+//         image: product.image,
+//         sku: product.name,
+//         variationId: product.name,
+//         filterConds: [],
+//       };
+
+//       AddToCart(cartItem, quantity);
+//       // Reset quantity after adding to cart
+//       setQuantity(1);
+//     }
+//   };
+
+//   // Handle adding simple product to cart
+//   const handleSimpleProductAddToCart = () => {
+//     if (product && !isTemplate && product.stock && product.stock.totalStock > 0) {
+//       const cartItem = {
+//         id: product.name,
+//         name: product.item_name,
+//         description: product.description || "",
+//         type: "item",
+//         basePrice: product.price || 0,
+//         salePrice: product.price || 0,
+//         category: product.item_group || "product",
+//         currency: product.currency || "PKR",
+//         bundleItems: [],
+//         quantity: quantity,
+//         image: product.image,
+//         sku: product.name,
+//         variationId: product.name,
+//         filterConds: [],
+//       };
+
+//       AddToCart(cartItem, quantity);
+//       // Optionally show a success message or toast here
 //       setQuantity(1);
 //     }
 //   };
@@ -153,6 +205,7 @@
 //   }, [slug]);
 
 //   const isTemplate = product?.variants && product?.variants.length > 0;
+//   const isSimpleProductInStock = product && !isTemplate && product.stock && product.stock.totalStock > 0;
 
 //   // Filter and sort variations - now using ERPNext API attributes
 //   const filteredVariations = useMemo(() => {
@@ -179,7 +232,6 @@
 //       });
 //     });
 //   }, [product?.variants, selectedAttributes]);
-
 
 //   if (loading) {
 //     return (
@@ -288,11 +340,22 @@
 //                   Template Product
 //                 </Badge>
 //               )}
+//               {!isTemplate && product.stock && product.stock.totalStock > 0 && (
+//                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+//                   <Info className="h-3 w-3 mr-1" />
+//                   In Stock: {product.stock.totalStock}
+//                 </Badge>
+//               )}
+//               {!isTemplate && product.stock && product.stock.totalStock === 0 && (
+//                 <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+//                   <Info className="h-3 w-3 mr-1" />
+//                   Out of Stock
+//                 </Badge>
+//               )}
 //             </div>
 //             <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.item_name}</h1>
 //             <p className="text-gray-600 text-lg">Item Code: {product.name}</p>
 //           </div>
-
 
 //           {/* Price */}
 //           {product.price && (
@@ -308,7 +371,47 @@
 
 //           <Separator />
 
-        
+//           {/* Simple Product Add to Cart Section */}
+//           {!isTemplate && isSimpleProductInStock && (
+//             <div className="space-y-4">
+//               <h3 className="text-lg font-semibold">Add to Cart</h3>
+//               <div className="flex items-center gap-4">
+//                 <div className="flex items-center border rounded-md">
+//                   <Button
+//                     variant="ghost"
+//                     size="icon"
+//                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
+//                     disabled={quantity <= 1}
+//                   >
+//                     <Minus className="h-4 w-4" />
+//                   </Button>
+//                   <span className="px-4 py-2 min-w-[60px] text-center">
+//                     {quantity}
+//                   </span>
+//                   <Button
+//                     variant="ghost"
+//                     size="icon"
+//                     onClick={() => setQuantity(quantity + 1)}
+//                     disabled={quantity >= (product.stock?.totalStock || 0)}
+//                   >
+//                     <Plus className="h-4 w-4" />
+//                   </Button>
+//                 </div>
+                
+//                 <Button 
+//                   onClick={handleSimpleProductAddToCart}
+//                   className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+//                 >
+//                   <ShoppingCart className="mr-2 h-4 w-4" />
+//                   Add to Cart
+//                 </Button>
+//               </div>
+              
+//               <div className="text-sm text-gray-600">
+//                 Total: {product.currency} {(product.price !== undefined ? (product.price * quantity).toLocaleString() : "-")}
+//               </div>
+//             </div>
+//           )}
 
 //           {/* Variations */}
 //           {isTemplate && product.variants && product.variants.length > 0 && (
@@ -473,19 +576,18 @@
 //             </div>
 //           )}
 
-
 //           {/* Actions */}
 //           <div className="space-y-4">
-//           {product?.custom_quotation_item === 1 && (
-//   <Button 
-//     size="lg" 
-//     className="w-full"
-//     onClick={() => setShowQuotationDialog(true)}
-//   >
-//     Request Quote
-//   </Button>
-// )}
-
+//             {/* Show Request Quote button for custom quotation items OR when simple product is out of stock */}
+//             {product?.custom_quotation_item === 1 || (!isTemplate && product.stock && product.stock.totalStock === 0) ? (
+//               <Button 
+//                 size="lg" 
+//                 className="w-full"
+//                 onClick={() => setShowQuotationDialog(true)}
+//               >
+//                 Request Quote
+//               </Button>
+//             ) : null}
             
 //             <Button 
 //               variant="outline" 
@@ -514,6 +616,14 @@
 //                 <span className="text-gray-600">UOM:</span>
 //                 <span className="font-medium">{product.stock_uom}</span>
 //               </div>
+//               {!isTemplate && product.stock && (
+//                 <div className="flex justify-between">
+//                   <span className="text-gray-600">Stock Available:</span>
+//                   <span className={`font-medium ${product.stock.totalStock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+//                     {product.stock.totalStock} {product.stock_uom}
+//                   </span>
+//                 </div>
+//               )}
 //               {isTemplate && (
 //                 <div className="flex justify-between">
 //                   <span className="text-gray-600">Variations:</span>
@@ -563,6 +673,10 @@
 //     </div>
 //   );
 // }
+
+
+
+
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -633,6 +747,9 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   // Quotation dialog state
   const [showQuotationDialog, setShowQuotationDialog] = useState(false);
 
+  // Check if product is custom quotation item
+  const isCustomQuotationItem = product?.custom_quotation_item === 1;
+
   // Helper function to generate full image URL
   const getFullImageUrl = (imagePath: string | undefined): string | null => {
     if (!imagePath) return null;
@@ -659,61 +776,18 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
     setSelectedAttributes(attributes);
   };
 
-  // Handle variation selection and cart functionality
+  // Handle variation selection for custom quotation items
   const handleVariationClick = (variant: any) => {
-    if ((variant as any).stock && (variant as any).stock.totalStock > 0) {
+    // For custom quotation items, always allow selection regardless of stock
+    if (isCustomQuotationItem) {
+      setSelectedVariation(variant);
+      // For custom quotation items, show request quote dialog directly
+      setShowQuotationDialog(true);
+    } 
+    // For non-custom items, only allow if in stock
+    else if ((variant as any).stock && (variant as any).stock.totalStock > 0) {
       setSelectedVariation(variant);
       setShowAddToCart(true);
-    }
-  };
-
-  const handleAddToCart = () => {
-    if (selectedVariation) {
-      // For template product variations
-      const cartItem = {
-        id: product?.name || selectedVariation.name,
-        name: selectedVariation.item_name,
-        description: product?.description || "",
-        type: "item",
-        basePrice: selectedVariation.price || 0,
-        salePrice: selectedVariation.price || 0,
-        category: product?.item_group || "product",
-        currency: selectedVariation.currency || "PKR",
-        bundleItems: [],
-        quantity: quantity,
-        image: selectedVariation.image,
-        sku: selectedVariation.name,
-        variationId: selectedVariation.name,
-        filterConds: [],
-      };
-
-      AddToCart(cartItem, quantity);
-      // Reset states after adding to cart
-      setSelectedVariation(null);
-      setShowAddToCart(false);
-      setQuantity(1);
-    } else if (product && !isTemplate && product.stock && product.stock.totalStock > 0) {
-      // For simple products
-      const cartItem = {
-        id: product.name,
-        name: product.item_name,
-        description: product.description || "",
-        type: "item",
-        basePrice: product.price || 0,
-        salePrice: product.price || 0,
-        category: product.item_group || "product",
-        currency: product.currency || "PKR",
-        bundleItems: [],
-        quantity: quantity,
-        image: product.image,
-        sku: product.name,
-        variationId: product.name,
-        filterConds: [],
-      };
-
-      AddToCart(cartItem, quantity);
-      // Reset quantity after adding to cart
-      setQuantity(1);
     }
   };
 
@@ -738,7 +812,6 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
       };
 
       AddToCart(cartItem, quantity);
-      // Optionally show a success message or toast here
       setQuantity(1);
     }
   };
@@ -771,25 +844,20 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   const isTemplate = product?.variants && product?.variants.length > 0;
   const isSimpleProductInStock = product && !isTemplate && product.stock && product.stock.totalStock > 0;
 
-  // Filter and sort variations - now using ERPNext API attributes
+  // Filter and sort variations
   const filteredVariations = useMemo(() => {
     if (!product?.variants) return [];
     
-    // If no attributes are selected, return all variants
     if (selectedAttributes.length === 0) {
       return product.variants;
     }
     
-    // Filter variants based on selected attributes
     return product.variants.filter(variant => {
-      // Check if this variant matches all selected attributes
       return selectedAttributes.every(selectedAttr => {
-        // Find the variant's attributes that match the selected attribute name
         const matchingAttributes = variant.attributes?.filter((attr: any) => 
           attr.attribute === selectedAttr.attribute
         ) || [];
         
-        // Check if any of the matching attributes has the selected value
         return matchingAttributes.some((attr: any) => 
           attr.attribute_value === selectedAttr.attribute_value
         );
@@ -904,13 +972,19 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
                   Template Product
                 </Badge>
               )}
-              {!isTemplate && product.stock && product.stock.totalStock > 0 && (
+              {isCustomQuotationItem && (
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                  <Info className="h-3 w-3 mr-1" />
+                  Request Quote
+                </Badge>
+              )}
+              {!isTemplate && !isCustomQuotationItem && product.stock && product.stock.totalStock > 0 && (
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                   <Info className="h-3 w-3 mr-1" />
                   In Stock: {product.stock.totalStock}
                 </Badge>
               )}
-              {!isTemplate && product.stock && product.stock.totalStock === 0 && (
+              {!isTemplate && !isCustomQuotationItem && product.stock && product.stock.totalStock === 0 && (
                 <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
                   <Info className="h-3 w-3 mr-1" />
                   Out of Stock
@@ -936,7 +1010,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           <Separator />
 
           {/* Simple Product Add to Cart Section */}
-          {!isTemplate && isSimpleProductInStock && (
+          {!isTemplate && isSimpleProductInStock && !isCustomQuotationItem && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Add to Cart</h3>
               <div className="flex items-center gap-4">
@@ -993,73 +1067,90 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
                 selectedAttributes={selectedAttributes}
               />
 
-              {/* Price List for Filtered Variations - Only show when attributes are selected */}
+              {/* Price List for Filtered Variations */}
               {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                       <DollarSign className="h-5 w-5 mr-2 text-green-600" />
-                      Available Prices ({filteredVariations.length} options)
+                      Available {isCustomQuotationItem ? "Configurations" : "Prices"} ({filteredVariations.length} options)
                     </h3>
                     
                     <div className="space-y-2">
-                      {filteredVariations.map((variant, index) => (
-                        <div 
-                          key={variant.name}
-                          className={`flex items-center justify-between p-3 bg-white rounded-lg border transition-all ${
-                            (variant as any).stock && (variant as any).stock.totalStock > 0 
-                              ? 'hover:shadow-md cursor-pointer hover:border-green-300' 
-                              : 'opacity-60 cursor-not-allowed'
-                          }`}
-                          onClick={() => handleVariationClick(variant)}
-                        >
-                          <div className="flex-1 flex items-center space-x-3">
-                            {variant.image && (
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden group cursor-pointer" onClick={(e) => {
-                                e.stopPropagation();
-                                openImagePreview(variant.image, variant.item_name);
-                              }}>
-                                <Image
-                                  src={getErpnextImageUrl(variant.image)}
-                                  alt={variant.item_name}
-                                  width={48}
-                                  height={48}
-                                  className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
-                                  <ZoomIn className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      {filteredVariations.map((variant, index) => {
+                        const variantInStock = (variant as any).stock && (variant as any).stock.totalStock > 0;
+                        const isSelectable = isCustomQuotationItem || variantInStock;
+                        
+                        return (
+                          <div 
+                            key={variant.name}
+                            className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                              isSelectable 
+                                ? 'bg-white hover:shadow-md cursor-pointer hover:border-green-300' 
+                                : 'bg-gray-50 opacity-60 cursor-not-allowed'
+                            } ${selectedVariation?.name === variant.name ? 'border-green-400 ring-1 ring-green-200' : ''}`}
+                            onClick={() => isSelectable && handleVariationClick(variant)}
+                          >
+                            <div className="flex-1 flex items-center space-x-3">
+                              {variant.image && (
+                                <div className="relative w-12 h-12 rounded-lg overflow-hidden group cursor-pointer" onClick={(e) => {
+                                  e.stopPropagation();
+                                  openImagePreview(variant.image, variant.item_name);
+                                }}>
+                                  <Image
+                                    src={getErpnextImageUrl(variant.image)}
+                                    alt={variant.item_name}
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                                    <ZoomIn className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                  </div>
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <h4 className="font-medium text-sm text-gray-900 line-clamp-1">
+                                  {variant.item_name}
+                                </h4>
+                                <div className="text-xs text-gray-600">
+                                  {variant.attributes?.map((attr, idx) => (
+                                    <span key={idx}>
+                                      {attr.attribute_value}
+                                      {idx < (variant.attributes?.length || 0) - 1 ? ' • ' : ''}
+                                    </span>
+                                  ))}
                                 </div>
                               </div>
+                            </div>
+                            {variant.price && (
+                              <div className="flex items-center space-x-2">
+                                <span className="text-lg font-bold text-green-600">
+                                  {variant.currency} {variant.price.toLocaleString()}
+                                </span>
+                                {isCustomQuotationItem ? (
+                                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                    Request Quote
+                                  </Badge>
+                                ) : variantInStock ? (
+                                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                    {(variant as any).stock.totalStock} in stock
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+                                    Out of stock
+                                  </Badge>
+                                )}
+                              </div>
                             )}
-                            <div className="flex-1">
-                              <h4 className="font-medium text-sm text-gray-900 line-clamp-1">
-                                {variant.item_name}
-                              </h4>
-                            </div>
                           </div>
-                          {variant.price && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-lg font-bold text-green-600">
-                                {variant.currency} {variant.price.toLocaleString()}
-                              </span>
-                              {(variant as any).stock && (variant as any).stock.totalStock > 0 ? (
-                                <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                  {(variant as any).stock.totalStock} in stock
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
-                                  Out of stock
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                   
-                  {/* Add to Cart Section - Shows when variation is selected */}
-                  {showAddToCart && selectedVariation && (
+                  {/* Add to Cart Section - Only for non-custom items */}
+                  {!isCustomQuotationItem && showAddToCart && selectedVariation && (
                     <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -1134,7 +1225,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
                 <div className="text-center py-8">
                   <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Select variations to see prices</h3>
-                  <p className="text-gray-600 mb-4">Choose your preferred specifications above to view available prices.</p>
+                  <p className="text-gray-600 mb-4">Choose your preferred specifications above to view available {isCustomQuotationItem ? "configurations" : "prices"}.</p>
                 </div>
               )}
             </div>
@@ -1143,15 +1234,28 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           {/* Actions */}
           <div className="space-y-4">
             {/* Show Request Quote button for custom quotation items OR when simple product is out of stock */}
-            {product?.custom_quotation_item === 1 || (!isTemplate && product.stock && product.stock.totalStock === 0) ? (
+            {(isCustomQuotationItem || (!isTemplate && product.stock && product.stock.totalStock === 0)) ? (
               <Button 
                 size="lg" 
-                className="w-full"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={() => setShowQuotationDialog(true)}
+                disabled={isTemplate && isCustomQuotationItem && !selectedVariation}
               >
                 Request Quote
               </Button>
             ) : null}
+            
+            {/* Add to Cart button for simple products in stock */}
+            {!isTemplate && isSimpleProductInStock && !isCustomQuotationItem && (
+              <Button 
+                size="lg"
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                onClick={handleSimpleProductAddToCart}
+              >
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Add to Cart
+              </Button>
+            )}
             
             <Button 
               variant="outline" 
@@ -1180,7 +1284,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
                 <span className="text-gray-600">UOM:</span>
                 <span className="font-medium">{product.stock_uom}</span>
               </div>
-              {!isTemplate && product.stock && (
+              {!isTemplate && product.stock && !isCustomQuotationItem && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Stock Available:</span>
                   <span className={`font-medium ${product.stock.totalStock > 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1192,6 +1296,12 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
                 <div className="flex justify-between">
                   <span className="text-gray-600">Variations:</span>
                   <span className="font-medium">{product.variants?.length || 0}</span>
+                </div>
+              )}
+              {isCustomQuotationItem && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Type:</span>
+                  <span className="font-medium text-blue-600">Custom Quotation Item</span>
                 </div>
               )}
             </CardContent>
@@ -1232,6 +1342,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           open={showQuotationDialog}
           onClose={() => setShowQuotationDialog(false)}
           product={product}
+          selectedVariation={selectedVariation}
         />
       )}
     </div>

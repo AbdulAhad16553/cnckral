@@ -199,30 +199,59 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
       );
 
       // 3️⃣ Process all items
-      // IMPORTANT PERFORMANCE CHANGE:
-      // For listing pages we avoid per-template variant lookups (which caused many extra ERPNext calls).
-      // Variants and full pricing are still resolved by dedicated single-product APIs when needed.
-      const detailedItems = visibleItems.map((item) => {
-        const groupInfo = groupMap[item.item_group] || {};
+      const detailedItems = await Promise.all(
+        visibleItems.map(async (item) => {
+          const groupInfo = groupMap[item.item_group] || {};
 
-        if (item.has_variants) {
-          return {
-            ...item,
-            item_group_name: groupInfo.item_group_name,
-            item_group_image: groupInfo.image,
-            // Variants will be resolved lazily on product detail views
-            variants: [],
-          };
-        }
+          if (item.has_variants) {
+            // Fetch variant items
+            const { data: variants } = await this.getList<any>(
+              "Item",
+              { variant_of: item.name },
+              [
+                "name",
+                "item_name",
+                "image",
+                "stock_uom",
+                "description",
+                "attributes",
+                "standard_rate",
+                "custom_is_website_item",
+                // also expose quotation flag on variants
+                "custom_quotation_item",
+              ],
+              500
+            );
 
-        return {
-          ...item,
-          item_group_name: groupInfo.item_group_name,
-          item_group_image: groupInfo.image,
-          price: item.standard_rate || null,
-          currency: "PKR", // Default currency
-        };
-      });
+            // Add prices to variants using standard_rate
+            const variantsWithPrices = (variants || [])
+              .filter((variant) => Number(variant.custom_is_website_item) !== 1)
+              .map((variant) => {
+              return {
+                ...variant,
+                price: variant.standard_rate || null,
+                currency: "PKR", // Default currency
+              };
+            });
+
+            return {
+              ...item,
+              item_group_name: groupInfo.item_group_name,
+              item_group_image: groupInfo.image,
+              variants: variantsWithPrices,
+            };
+          } else {
+            // Use standard_rate for single item
+            return {
+              ...item,
+              item_group_name: groupInfo.item_group_name,
+              item_group_image: groupInfo.image,
+              price: item.standard_rate || null,
+              currency: "PKR", // Default currency
+            };
+          }
+        })
+      );
 
       return { data: detailedItems };
     } catch (error: any) {

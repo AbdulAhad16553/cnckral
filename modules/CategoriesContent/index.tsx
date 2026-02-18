@@ -42,28 +42,24 @@ const CategoriesContent = ({
 
     const safeCatProducts = Array.isArray(catProducts) ? catProducts : [];
 
-    // Initialize price range from catProducts
+    // Initialize price range from catProducts (stable deps to avoid React #185 infinite loop on client nav)
     useEffect(() => {
-        if (safeCatProducts.length > 0 && !userChangedPrice.current) {
-            const prices = safeCatProducts.flatMap((product: any) => {
-                const prices: number[] = [];
-                // Get price from main product
-                if (product.sale_price) prices.push(product.sale_price);
-                if (product.base_price) prices.push(product.base_price);
-                // Get prices from variations if they exist
-                if (product.product_variations) {
-                    product.product_variations.forEach((variation: any) => {
-                        if (variation.sale_price) prices.push(variation.sale_price);
-                        if (variation.base_price) prices.push(variation.base_price);
-                    });
-                }
-                return prices;
-            }).filter((price: number) => price > 0);
-            
-            const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-            setPriceRange([0, maxPrice]);
-        }
-    }, [safeCatProducts]);
+        if (safeCatProducts.length === 0 || userChangedPrice.current) return;
+        const prices = safeCatProducts.flatMap((product: any) => {
+            const list: number[] = [];
+            if (product.sale_price) list.push(product.sale_price);
+            if (product.base_price) list.push(product.base_price);
+            if (product.product_variations) {
+                product.product_variations.forEach((variation: any) => {
+                    if (variation.sale_price) list.push(variation.sale_price);
+                    if (variation.base_price) list.push(variation.base_price);
+                });
+            }
+            return list;
+        }).filter((p: number) => p > 0);
+        const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+        setPriceRange((prev) => (prev[0] === 0 && prev[1] === maxPrice ? prev : [0, maxPrice]));
+    }, [catName, safeCatProducts.length]);
 
     const handlePriceRangeChange = (newRange: [number, number]) => {
         userChangedPrice.current = true;
@@ -223,11 +219,11 @@ const CategoriesContent = ({
                                 {sortedProducts.map((product: any) => {
                                     const imageUrl = getImageUrl(product.sku);
                                     const productHasImage = hasImage(product.sku);
-                                    const productSlug = product.slug || product.sku || product.name;
+                                    const productCode = product.sku || product.id || product.name;
                                     return (
                                         <Link
                                             key={product.id || product.sku}
-                                            href={`/product/${encodeURIComponent(productSlug)}`}
+                                            href={`/product/${encodeURIComponent(productCode)}`}
                                             className="group block"
                                         >
                                             <div className="bg-slate-50 rounded-lg overflow-hidden border border-slate-200/80 hover:border-slate-300 hover:shadow-md transition-all duration-200 aspect-[260/185] flex items-center justify-center p-4">

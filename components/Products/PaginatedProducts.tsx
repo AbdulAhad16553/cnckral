@@ -33,6 +33,7 @@ interface PaginatedProductsProps {
   selectedCategory?: string;
   searchTerm?: string;
   sortBy?: "newest" | "oldest" | "price-low" | "price-high" | "name" | "name-desc";
+  quoteFilter?: "all" | "machine" | "parts";
 }
 
 const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
@@ -46,7 +47,8 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
   className = "",
   selectedCategory = "all",
   searchTerm = "",
-  sortBy = "newest"
+  sortBy = "newest",
+  quoteFilter = "all",
 }) => {
   const router = useRouter();
   const [performanceMetrics, setPerformanceMetrics] = useState({
@@ -89,6 +91,24 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
         : true;
       return matchesCategory && matchesSearch;
     });
+
+    // Helper: interpret custom_quotation_item from ERP
+    const isCustomQuotationOn = (product: any) => {
+      const flag = product.custom_quotation_item;
+      return (
+        flag === 1 ||
+        flag === "1" ||
+        flag === true ||
+        flag === "Yes"
+      );
+    };
+
+    // Filter by quote mode (machine vs parts) using custom_quotation_item
+    if (quoteFilter === "machine") {
+      filtered = filtered.filter((product: any) => isCustomQuotationOn(product));
+    } else if (quoteFilter === "parts") {
+      filtered = filtered.filter((product: any) => !isCustomQuotationOn(product));
+    }
 
     // Remove duplicates based on stable key
     filtered = filtered.filter((product: any, index: number, array: any[]) => {

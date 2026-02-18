@@ -105,6 +105,16 @@ export async function GET(request: NextRequest) {
 
     // Transform ERPNext products to match frontend interface
     const transformedProducts = products.map((product, index) => {
+      // Use ERPNext custom field "custom_quotation_item" as the source
+      const rawEnableQuote =
+        (product as any).custom_quotation_item ??
+        (product as any).custom_custom_quotation_item ??
+        0;
+      const enableQuoteRequest =
+        rawEnableQuote === true ||
+        rawEnableQuote === "1" ||
+        rawEnableQuote === 1 ||
+        rawEnableQuote === "Yes";
       // Get price from lookup map (O(1) access)
       const priceData = priceMap.get(product.name) || { price_list_rate: product.standard_rate || 0, currency: 'PKR' };
       const itemPrice = Number(priceData.price_list_rate) || 0;
@@ -179,7 +189,9 @@ export async function GET(request: NextRequest) {
         sale_price: displayPrice,
         sku: product.item_code || product.name || `item-${index}`,
         slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
-        enable_quote_request: true,
+        // expose both the raw ERP flag and a normalized boolean
+        custom_quotation_item: rawEnableQuote,
+        enable_quote_request: enableQuoteRequest,
         product_images: (product.website_image || product.image) ? [{
           id: `img-${index}`,
           image_id: product.website_image || product.image,

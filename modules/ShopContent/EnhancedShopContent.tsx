@@ -20,13 +20,15 @@ interface EnhancedShopContentProps {
   };
   categories?: any[];
   hideOnPage?: boolean;
+  mode?: "all" | "machine" | "parts";
 }
 
 const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({ 
   storeCurrency, 
   necessary, 
   categories = [],
-  hideOnPage = false 
+  hideOnPage = false,
+  mode = "all",
 }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [paginationMode, setPaginationMode] = useState<'pagination' | 'infinite' | 'load-more'>('pagination');
@@ -37,6 +39,20 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'price-low' | 'price-high' | 'name' | 'name-desc'>('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
+
+  const headingTitle =
+    mode === "machine"
+      ? "Machines"
+      : mode === "parts"
+      ? "Parts & Accessories"
+      : "Shop";
+
+  const headingSubtitle =
+    mode === "machine"
+      ? "Browse all machines that can be requested as a quote."
+      : mode === "parts"
+      ? "All spare parts and accessories for your machines."
+      : "Discover our curated collection of premium products";
 
   // Debounced search
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -77,8 +93,8 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Shop</h1>
-          <p className="text-slate-600 mt-1">Discover our curated collection of premium products</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{headingTitle}</h1>
+          <p className="text-slate-600 mt-1">{headingSubtitle}</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -330,6 +346,9 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
             searchTerm={debouncedSearchTerm}
             sortBy={sortBy}
             className="w-full"
+            quoteFilter={
+              mode === "machine" ? "machine" : mode === "parts" ? "parts" : "all"
+            }
           />
         </div>
       </div>

@@ -60,7 +60,7 @@ const Hero = async ({
             Welcome to the {storeName}
           </h1>
           {!hideOnPage && (
-            <Link href="/shop">
+            <Link href="/machine">
               <Button
                 size="lg"
                 className="group px-8 py-6 text-base font-semibold text-white gradient-blue hover:opacity-95 transition-opacity"

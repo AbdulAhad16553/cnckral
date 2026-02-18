@@ -306,10 +306,10 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                         All Categories
                       </Link>
                       <Link
-                        href="/shop"
+                        href="/machine"
                         className="block py-2 px-3 rounded-md hover:bg-slate-50 transition-colors font-medium text-slate-700"
                       >
-                        Shop All
+                        Machines
                       </Link>
                       {categories.length > 0 && (
                         <>
@@ -336,10 +336,16 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 )}
               </div>
               <Link
-                href="/shop"
+                href="/machine"
                 className="text-white/90 hover:text-white font-medium transition-colors"
               >
-                Shop
+                Machines
+              </Link>
+              <Link
+                href="/parts"
+                className="text-white/90 hover:text-white font-medium transition-colors"
+              >
+                Parts & Accessories
               </Link>
               <Link
                 href="/about-us"
@@ -565,10 +571,16 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                   Categories
                 </Link>
                 <Link
-                  href="/shop"
+                  href="/machine"
                   className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
                 >
-                  Shop
+                  Machines
+                </Link>
+                <Link
+                  href="/parts"
+                  className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
+                >
+                  Parts & Accessories
                 </Link>
                 <Link
                   href="/about-us"

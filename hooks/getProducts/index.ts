@@ -42,30 +42,43 @@ export const getProducts = async (storeId: string) => {
     const erpnextProducts = await productService.getProducts({ disabled: 0 });
     
     // Transform ERPNext products to match our interface
-    const products: Product[] = erpnextProducts.map((product, index) => ({
-      id: product.name,
-      name: product.item_name,
-      short_description: product.description,
-      detailed_desc: product.description,
-      type: 'simple',
-      currency: 'PKR',
-      base_price: product.standard_rate,
-      status: product.disabled ? 'inactive' : 'active',
-      sale_price: product.standard_rate,
-      sku: product.item_code || product.name || `item-${index}`,
-      slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
-      enable_quote_request: true,
-      product_images: product.website_image ? [{
-        id: `img-${index}`,
-        image_id: product.website_image,
-        position: 1
-      }] : [],
-      product_variations: product.has_variants ? [{
-        sale_price: product.standard_rate,
+    const products: Product[] = erpnextProducts.map((product, index) => {
+      // Use ERPNext custom field "custom_quotation_item" as the source
+      const rawEnableQuote =
+        (product as any).custom_quotation_item ??
+        (product as any).custom_custom_quotation_item ??
+        0;
+      const enableQuoteRequest =
+        rawEnableQuote === true ||
+        rawEnableQuote === "1" ||
+        rawEnableQuote === 1 ||
+        rawEnableQuote === "Yes";
+
+      return {
+        id: product.name,
+        name: product.item_name,
+        short_description: product.description,
+        detailed_desc: product.description,
+        type: 'simple',
+        currency: 'PKR',
         base_price: product.standard_rate,
-        sku: product.item_code
-      }] : []
-    }));
+        status: product.disabled ? 'inactive' : 'active',
+        sale_price: product.standard_rate,
+        sku: product.item_code || product.name || `item-${index}`,
+        slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
+        enable_quote_request: enableQuoteRequest,
+        product_images: product.website_image ? [{
+          id: `img-${index}`,
+          image_id: product.website_image,
+          position: 1
+        }] : [],
+        product_variations: product.has_variants ? [{
+          sale_price: product.standard_rate,
+          base_price: product.standard_rate,
+          sku: product.item_code
+        }] : []
+      };
+    });
 
     // Fetch stock information
     const stockData = await productService.getStockBalance();

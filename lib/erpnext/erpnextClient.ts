@@ -166,18 +166,20 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
         "Item",
         {},
         [
-        "name",
-        "item_name",
-        "item_group",
-        "image",
-        "description",
-        "stock_uom",
-        "has_variants",
-        "variant_of",
-        "attributes",
-        "disabled",
-        "standard_rate",
-        "custom_is_website_item",
+          "name",
+          "item_name",
+          "item_group",
+          "image",
+          "description",
+          "stock_uom",
+          "has_variants",
+          "variant_of",
+          "attributes",
+          "disabled",
+          "standard_rate",
+          "custom_is_website_item",
+          // needed to classify Machines vs Parts
+          "custom_quotation_item",
         ],
         1000
       );
@@ -214,7 +216,9 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
                 "description",
                 "attributes",
                 "standard_rate",
-              "custom_is_website_item",
+                "custom_is_website_item",
+                // also expose quotation flag on variants
+                "custom_quotation_item",
               ],
               500
             );

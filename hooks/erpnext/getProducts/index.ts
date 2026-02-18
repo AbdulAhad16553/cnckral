@@ -177,7 +177,18 @@ export const useProduct = (productSlug: string, storeId?: string) => {
 
       // Fetch single product from ERPNext
       const erpnextProduct = await productService.getProduct(productSlug);
-      
+
+      // Use ERPNext custom field "custom_quotation_item" as the source
+      const rawEnableQuote =
+        (erpnextProduct as any).custom_quotation_item ??
+        (erpnextProduct as any).custom_custom_quotation_item ??
+        0;
+      const enableQuoteRequest =
+        rawEnableQuote === true ||
+        rawEnableQuote === "1" ||
+        rawEnableQuote === 1 ||
+        rawEnableQuote === "Yes";
+
       // Transform ERPNext product to match our interface
       const transformedProduct: Product = {
         id: erpnextProduct.name,
@@ -189,9 +200,9 @@ export const useProduct = (productSlug: string, storeId?: string) => {
         base_price: erpnextProduct.standard_rate,
         status: erpnextProduct.disabled ? 'inactive' : 'active',
         sale_price: erpnextProduct.standard_rate,
-      sku: erpnextProduct.item_code || erpnextProduct.name || 'item',
-      slug: (erpnextProduct.item_code || erpnextProduct.name || 'item').toLowerCase().replace(/\s+/g, '-'),
-        enable_quote_request: true,
+        sku: erpnextProduct.item_code || erpnextProduct.name || 'item',
+        slug: (erpnextProduct.item_code || erpnextProduct.name || 'item').toLowerCase().replace(/\s+/g, '-'),
+        enable_quote_request: enableQuoteRequest,
         product_images: erpnextProduct.website_image ? [{
           id: 'img-1',
           image_id: erpnextProduct.website_image,
@@ -259,31 +270,44 @@ export const useSearchProducts = (searchTerm: string, storeId?: string) => {
       setError(null);
 
       const erpnextProducts = await productService.searchProducts(term);
-      
-      const transformedProducts: Product[] = erpnextProducts.map((product, index) => ({
-        id: product.name,
-        name: product.item_name,
-        short_description: product.description,
-        detailed_desc: product.description,
-        type: 'simple',
-        currency: 'USD',
-        base_price: product.standard_rate,
-        status: product.disabled ? 'inactive' : 'active',
-        sale_price: product.standard_rate,
-        sku: product.item_code || product.name || `item-${index}`,
-        slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
-        enable_quote_request: true,
-        product_images: product.website_image ? [{
-          id: `img-${index}`,
-          image_id: product.website_image,
-          position: 1
-        }] : [],
-        product_variations: product.has_variants ? [{
-          sale_price: product.standard_rate,
+
+      const transformedProducts: Product[] = erpnextProducts.map((product, index) => {
+        // Use ERPNext custom field "custom_quotation_item" as the source
+        const rawEnableQuote =
+          (product as any).custom_quotation_item ??
+          (product as any).custom_custom_quotation_item ??
+          0;
+        const enableQuoteRequest =
+          rawEnableQuote === true ||
+          rawEnableQuote === "1" ||
+          rawEnableQuote === 1 ||
+          rawEnableQuote === "Yes";
+
+        return {
+          id: product.name,
+          name: product.item_name,
+          short_description: product.description,
+          detailed_desc: product.description,
+          type: 'simple',
+          currency: 'USD',
           base_price: product.standard_rate,
-          sku: product.item_code
-        }] : []
-      }));
+          status: product.disabled ? 'inactive' : 'active',
+          sale_price: product.standard_rate,
+          sku: product.item_code || product.name || `item-${index}`,
+          slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
+          enable_quote_request: enableQuoteRequest,
+          product_images: product.website_image ? [{
+            id: `img-${index}`,
+            image_id: product.website_image,
+            position: 1
+          }] : [],
+          product_variations: product.has_variants ? [{
+            sale_price: product.standard_rate,
+            base_price: product.standard_rate,
+            sku: product.item_code
+          }] : []
+        };
+      });
 
       setProducts(transformedProducts);
     } catch (err) {

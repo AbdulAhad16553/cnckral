@@ -61,7 +61,7 @@ const AllCategories = async () => {
                 Browse all products or contact our team for assistance.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/shop">
+                <Link href="/machine">
                   <Button
                     className="text-white px-8 py-3 rounded-lg shadow-soft hover:shadow-soft-lg transition-all"
                     style={{ backgroundColor: "var(--primary-color)" }}

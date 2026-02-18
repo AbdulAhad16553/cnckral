@@ -23,6 +23,7 @@ import { AddToCart } from '@/sub/cart/addToCart';
 import { getErpnextImageUrl } from '@/lib/erpnextImageUtils';
 import ProductDescription from '@/components/ProductDescription';
 import QuotationDialog from '@/components/QuotationDialog';
+import { ProductSkeleton } from '@/components/ui/product-skeleton';
 
 interface Product {
   name: string;

@@ -1,4 +1,5 @@
 import { erpnextClient } from '../erpnextClient';
+import { productCache } from '@/lib/cache';
 
 export interface ERPNextProduct {
   name: string;
@@ -66,13 +67,24 @@ export class ProductService {
     disabled?: 0 | 1;
   }, limit?: number, offset?: number): Promise<ERPNextProduct[]> {
     try {
-      // Get all items (both templates and single items) using getDetailedProducts
-      const response = await erpnextClient.getDetailedProducts();
-      const allItems = (response.data || []).filter(
-        (item: any) => Number(item.custom_is_website_item) !== 1
-      );
-      
-      console.log('🔍 ProductService - All items from getDetailedProducts:', allItems.length, 'items');
+      const cacheKey = 'erpnext-detailed-products';
+
+      // Try to reuse previously fetched detailed products from in-memory cache
+      let allItems: any[] | null = productCache.get(cacheKey);
+
+      if (!allItems) {
+        // Get all items (both templates and single items) using getDetailedProducts
+        const response = await erpnextClient.getDetailedProducts();
+        allItems = (response.data || []).filter(
+          (item: any) => Number(item.custom_is_website_item) !== 1
+        );
+
+        // Cache the full detailed product list for faster subsequent requests
+        // 30 minutes TTL to balance freshness vs. performance
+        productCache.set(cacheKey, allItems, 30 * 60 * 1000);
+      }
+
+      console.log('🔍 ProductService - All items from getDetailedProducts (after cache):', allItems.length, 'items');
       
       // Filter to show ONLY template products (has_variants = 1) and single products (has_variants = 0 AND variant_of is null/empty)
       // This excludes individual variations of template products

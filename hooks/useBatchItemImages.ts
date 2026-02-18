@@ -63,7 +63,7 @@ export const useBatchItemImages = ({
 
     try {
       // Create cache key for this batch of items
-      const cacheKey = `batch-images-${itemNames.sort().join('-')}`;
+      const cacheKey = `batch-images-${[...itemNames].sort().join('-')}`;
       
       // Check client-side cache first
       const cachedData = imagesCache.get(cacheKey);

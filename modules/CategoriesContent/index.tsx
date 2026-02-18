@@ -1,313 +1,280 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import PriceRangeFilter from "../../common/PriceRangeFilter";
+import React, { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import Categories from "../Categories";
 import ProductImagePreview from "@/components/ProductImagePreview";
 import { useBatchItemImages } from "@/hooks/useBatchItemImages";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Filter, SortAsc, Wrench, Shield } from "lucide-react";
+import { SortAsc, Wrench, Shield, Package } from "lucide-react";
 import Link from "next/link";
 
 interface NecessaryProps {
-    storeId: string;
-    companyId: string;
+  storeId: string;
+  companyId: string;
 }
 
 interface CategoriesContentProps {
-    catProducts: any;
-    catName: string;
-    catSubCats: any;
-    currentStock?: any[];
-    storeCurrency: string;
-    necessary: NecessaryProps;
+  catProducts: any;
+  catName: string;
+  catSubCats: any;
+  currentStock?: any[];
+  storeCurrency: string;
+  necessary: NecessaryProps;
 }
 
-type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'newest';
+type SortOption = "name-asc" | "name-desc" | "price-asc" | "price-desc" | "newest";
+
+const container = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.08 },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
 
 const CategoriesContent = ({
-    catProducts,
-    catName,
-    catSubCats,
-    currentStock = [],
-    storeCurrency,
-    necessary,
+  catProducts,
+  catName,
+  catSubCats,
+  storeCurrency,
+  necessary,
 }: CategoriesContentProps) => {
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
 
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
-    const [sortBy, setSortBy] = useState<SortOption>('newest');
-    const [showFilters, setShowFilters] = useState(false);
-    const userChangedPrice = useRef(false);
+  const safeCatProducts = Array.isArray(catProducts) ? catProducts : [];
 
-    const safeCatProducts = Array.isArray(catProducts) ? catProducts : [];
-
-    // Initialize price range from catProducts (stable deps to avoid React #185 infinite loop on client nav)
-    useEffect(() => {
-        if (safeCatProducts.length === 0 || userChangedPrice.current) return;
-        const prices = safeCatProducts.flatMap((product: any) => {
-            const list: number[] = [];
-            if (product.sale_price) list.push(product.sale_price);
-            if (product.base_price) list.push(product.base_price);
-            if (product.product_variations) {
-                product.product_variations.forEach((variation: any) => {
-                    if (variation.sale_price) list.push(variation.sale_price);
-                    if (variation.base_price) list.push(variation.base_price);
-                });
-            }
-            return list;
-        }).filter((p: number) => p > 0);
-        const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-        setPriceRange((prev) => (prev[0] === 0 && prev[1] === maxPrice ? prev : [0, maxPrice]));
-    }, [catName, safeCatProducts.length]);
-
-    const handlePriceRangeChange = (newRange: [number, number]) => {
-        userChangedPrice.current = true;
-        setPriceRange(newRange);
-    };
-
-    const sortProducts = (products: any[], sortOption: SortOption) => {
-        if (!products || products.length === 0) return products;
-        
-        const sortedProducts = [...products];
-        
-        switch (sortOption) {
-            case 'name-asc':
-                return sortedProducts.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-            case 'name-desc':
-                return sortedProducts.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
-            case 'price-asc':
-                return sortedProducts.sort((a, b) => {
-                    const priceA = a.sale_price || a.base_price || 0;
-                    const priceB = b.sale_price || b.base_price || 0;
-                    return priceA - priceB;
-                });
-            case 'price-desc':
-                return sortedProducts.sort((a, b) => {
-                    const priceA = a.sale_price || a.base_price || 0;
-                    const priceB = b.sale_price || b.base_price || 0;
-                    return priceB - priceA;
-                });
-            case 'newest':
-                return sortedProducts.sort((a, b) => {
-                    const dateA = a.created_at || a.creation || 0;
-                    const dateB = b.created_at || b.creation || 0;
-                    return new Date(dateB).getTime() - new Date(dateA).getTime();
-                });
-            default:
-                return sortedProducts;
-        }
-    };
-
-    // Filter products by price range
-    const filterByPriceRange = (products: any[]) => {
-        if (!products || products.length === 0) return products;
-        if (priceRange[0] === 0 && priceRange[1] === 0) return products;
-        
-        return products.filter((product: any) => {
-            const productPrice = product.sale_price || product.base_price || 0;
-            // For variable products, check if any variation is in range
-            if (product.product_variations && product.product_variations.length > 0) {
-                return product.product_variations.some((variation: any) => {
-                    const variationPrice = variation.sale_price || variation.base_price || 0;
-                    return variationPrice >= priceRange[0] && variationPrice <= priceRange[1];
-                });
-            }
-            return productPrice >= priceRange[0] && productPrice <= priceRange[1];
+  const sortProducts = (products: any[], sortOption: SortOption) => {
+    if (!products || products.length === 0) return products;
+    const sorted = [...products];
+    switch (sortOption) {
+      case "name-asc":
+        return sorted.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      case "name-desc":
+        return sorted.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+      case "price-asc":
+        return sorted.sort((a, b) => {
+          const pa = a.sale_price || a.base_price || 0;
+          const pb = b.sale_price || b.base_price || 0;
+          return pa - pb;
         });
-    };
+      case "price-desc":
+        return sorted.sort((a, b) => {
+          const pa = a.sale_price || a.base_price || 0;
+          const pb = b.sale_price || b.base_price || 0;
+          return pb - pa;
+        });
+      case "newest":
+      default:
+        return sorted.sort((a, b) => {
+          const da = a.created_at || a.creation || 0;
+          const db = b.created_at || b.creation || 0;
+          return new Date(db).getTime() - new Date(da).getTime();
+        });
+    }
+  };
 
-    // Use catProducts directly (already fetched on server)
-    const filteredProducts = filterByPriceRange(safeCatProducts);
-    const sortedProducts = sortProducts(filteredProducts, sortBy);
-    const hasProducts = sortedProducts.length > 0;
-    const hasSubCategories = Array.isArray(catSubCats) && catSubCats.length > 0;
-    const showPriceFilter = !hasSubCategories && hasProducts;
+  const sortedProducts = useMemo(
+    () => sortProducts(safeCatProducts, sortBy),
+    [safeCatProducts, sortBy]
+  );
+  const hasProducts = sortedProducts.length > 0;
+  const hasSubCategories = Array.isArray(catSubCats) && catSubCats.length > 0;
 
-    // Batch image loading for CNC-style product grid
-    const itemNames = React.useMemo(() => sortedProducts?.map((p: any) => p.sku).filter(Boolean) || [], [sortedProducts]);
-    const { isLoading: isImageLoading, getImageUrl, hasImage } = useBatchItemImages({
-        itemNames,
-        enabled: hasProducts && !hasSubCategories
-    });
+  const itemNamesKey =
+    (sortedProducts ?? []).map((p: any) => p.sku).filter(Boolean).join(",") || "";
+  const itemNames = useMemo(
+    () => (sortedProducts ?? []).map((p: any) => p.sku).filter(Boolean) || [],
+    [itemNamesKey]
+  );
+  const { isLoading: isImageLoading, getImageUrl, hasImage } = useBatchItemImages({
+    itemNames,
+    enabled: hasProducts && !hasSubCategories,
+  });
 
-    return (
-        <div className="min-h-screen bg-white">
-            {/* Breadcrumb - CNC-STEP style */}
-            <nav className="mb-4">
-                <p className="text-sm text-slate-500">
-                    You are here:{" "}
-                    <Link href="/" className="text-slate-600 hover:text-slate-900 transition-colors">Home</Link>
-                    <span className="mx-1">»</span>
-                    <Link href="/category" className="text-slate-600 hover:text-slate-900 transition-colors">Categories</Link>
-                    <span className="mx-1">»</span>
-                    <span className="text-slate-900 font-medium">{catName || "Category"}</span>
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Breadcrumb */}
+      <motion.nav
+        className="mb-6"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <p className="text-sm text-slate-500">
+          <Link href="/" className="text-slate-600 hover:text-slate-900 transition-colors">
+            Home
+          </Link>
+          <span className="mx-1.5 text-slate-400">/</span>
+          <Link href="/category" className="text-slate-600 hover:text-slate-900 transition-colors">
+            Categories
+          </Link>
+          <span className="mx-1.5 text-slate-400">/</span>
+          <span className="text-slate-900 font-medium">{catName || "Category"}</span>
+        </p>
+      </motion.nav>
+
+      {/* Title */}
+      <motion.div
+        className="mb-8"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.05 }}
+      >
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+          {catName || "Category"}
+          <span className="text-slate-500 font-normal text-xl md:text-2xl ml-2">
+            {hasSubCategories ? "— Sub-categories" : `— ${sortedProducts.length} product${sortedProducts.length !== 1 ? "s" : ""}`}
+          </span>
+        </h1>
+        <div className="h-px bg-gradient-to-r from-slate-200 to-transparent mt-4 max-w-2xl" />
+      </motion.div>
+
+      {/* Intro */}
+      <motion.p
+        className="text-slate-600 leading-relaxed max-w-2xl mb-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        {hasSubCategories ? (
+          <>Browse sub-categories below to find products in <strong className="text-slate-800">{catName}</strong>.</>
+        ) : (
+          <>Precision tools and accessories for milling, engraving, and machining—matched for quality and reliability.</>
+        )}
+      </motion.p>
+
+      {/* Main content — full width */}
+      <div className="w-full">
+        {hasSubCategories ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Categories subcat={true} categories={catSubCats} hideOnPage={true} />
+          </motion.div>
+        ) : hasProducts ? (
+          <>
+            {/* Sort bar */}
+            <motion.div
+              className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200/80"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+            >
+              <span className="text-sm text-slate-500 tabular-nums">
+                {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
+              </span>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                  className="appearance-none bg-slate-50/80 border border-slate-200 rounded-lg pl-3 pr-9 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-300 transition-shadow"
+                >
+                  <option value="newest">Newest first</option>
+                  <option value="name-asc">Name A–Z</option>
+                  <option value="name-desc">Name Z–A</option>
+                  <option value="price-asc">Price: Low to high</option>
+                  <option value="price-desc">Price: High to low</option>
+                </select>
+                <SortAsc className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+              </div>
+            </motion.div>
+
+            {/* Product grid with stagger animation */}
+            <motion.div
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6 mb-20"
+              variants={container}
+              initial="hidden"
+              animate="visible"
+            >
+              {sortedProducts.map((product: any) => {
+                const imageUrl = getImageUrl(product.sku);
+                const productHasImage = hasImage(product.sku);
+                const productCode = product.sku || product.id || product.name;
+                return (
+                  <motion.div key={product.id || product.sku} variants={item}>
+                    <Link
+                      href={`/product/${encodeURIComponent(productCode)}`}
+                      className="group block"
+                    >
+                      <div className="bg-slate-50/80 rounded-xl overflow-hidden border border-slate-200/80 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 aspect-[260/185] flex items-center justify-center p-4">
+                        <ProductImagePreview
+                          itemName={product.sku}
+                          productName={product.name}
+                          imageUrl={imageUrl}
+                          hasImage={productHasImage}
+                          isLoading={isImageLoading}
+                          width={260}
+                          height={185}
+                          className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                          showPreview={false}
+                        />
+                      </div>
+                      <h3 className="mt-3 text-sm font-medium text-slate-800 group-hover:text-slate-900 transition-colors line-clamp-2 text-center leading-snug">
+                        {product.name}
+                      </h3>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+
+            {/* Trust / info section */}
+            <motion.section
+              className="bg-slate-50/60 rounded-2xl p-8 md:p-10 border border-slate-100"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-slate-600" />
+                Matched accessories
+              </h2>
+              <p className="text-slate-600 leading-relaxed mb-4 max-w-2xl">
+                Parts and tools in this category are matched for performance and durability, with high-quality materials for long-term reliability.
+              </p>
+              <div className="flex items-start gap-2 text-slate-600">
+                <Shield className="h-5 w-5 text-slate-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm leading-relaxed">
+                  From milling cutters to clamping tools and accessories—everything you need to complement your machines.
                 </p>
-            </nav>
-
-            {/* Page Title with separator - CNC-STEP style */}
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-                {catName || "Category"} – {hasSubCategories ? "Sub-Categories" : "Products"}
-            </h1>
-            <div className="h-px bg-slate-200 mb-8" />
-
-            {/* Intro paragraph - CNC-STEP style */}
-            <div className="mb-10 max-w-4xl">
-                <p className="text-slate-700 leading-relaxed">
-                    {hasSubCategories ? (
-                        <>Browse our <strong>{catName}</strong> sub-categories. Select a category to explore products.</>
-                    ) : (
-                        <>
-                            Our shop with accessories, parts, and tools. You will find a wide range of products in this category. 
-                            Whether for milling, engraving, or general machining—all parts are matched for top quality and reliability.
-                        </>
-                    )}
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left Sidebar - Filters */}
-                {showPriceFilter && (
-                    <div className="lg:col-span-3 xl:col-span-2">
-                        <Card className="sticky top-4 border-slate-200">
-                            <CardHeader className="pb-4">
-                                <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                                    <Filter className="h-4 w-4 text-slate-600" />
-                                    Filters
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <PriceRangeFilter 
-                                    priceRange={priceRange} 
-                                    onPriceRangeChange={handlePriceRangeChange}
-                                    currency={storeCurrency}
-                                />
-                            </CardContent>
-                        </Card>
-                    </div>
-                )}
-
-                {/* Main Content */}
-                <div className={showPriceFilter ? "lg:col-span-9 xl:col-span-10" : "lg:col-span-12"}>
-                    {hasSubCategories ? (
-                        <Categories subcat={true} categories={catSubCats} hideOnPage={true} />
-                    ) : hasProducts ? (
-                        <>
-                            {/* Sort bar */}
-                            <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
-                                <span className="text-sm text-slate-600">
-                                    {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
-                                </span>
-                                <div className="relative">
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                                        className="appearance-none bg-white border border-slate-200 rounded-lg pl-3 pr-9 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-300"
-                                    >
-                                        <option value="newest">Newest First</option>
-                                        <option value="name-asc">Name A–Z</option>
-                                        <option value="name-desc">Name Z–A</option>
-                                        <option value="price-asc">Price: Low to High</option>
-                                        <option value="price-desc">Price: High to Low</option>
-                                    </select>
-                                    <SortAsc className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                                </div>
-                            </div>
-
-                            {/* CNC-STEP style product grid - clean image + title cards */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6 mb-16">
-                                {sortedProducts.map((product: any) => {
-                                    const imageUrl = getImageUrl(product.sku);
-                                    const productHasImage = hasImage(product.sku);
-                                    const productCode = product.sku || product.id || product.name;
-                                    return (
-                                        <Link
-                                            key={product.id || product.sku}
-                                            href={`/product/${encodeURIComponent(productCode)}`}
-                                            className="group block"
-                                        >
-                                            <div className="bg-slate-50 rounded-lg overflow-hidden border border-slate-200/80 hover:border-slate-300 hover:shadow-md transition-all duration-200 aspect-[260/185] flex items-center justify-center p-4">
-                                                <ProductImagePreview
-                                                    itemName={product.sku}
-                                                    productName={product.name}
-                                                    imageUrl={imageUrl}
-                                                    hasImage={productHasImage}
-                                                    isLoading={isImageLoading}
-                                                    width={260}
-                                                    height={185}
-                                                    className="w-full h-full object-contain"
-                                                    showPreview={false}
-                                                />
-                                            </div>
-                                            <h3 className="mt-3 text-sm font-medium text-slate-800 group-hover:text-slate-900 transition-colors line-clamp-2 text-center leading-snug">
-                                                {product.name}
-                                            </h3>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-
-                            {/* CNC-STEP style info section */}
-                            <div className="bg-slate-50 rounded-xl p-8 md:p-10 border border-slate-100">
-                                <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <Wrench className="h-5 w-5 text-slate-600" />
-                                    Perfectly matched accessories
-                                </h2>
-                                <h3 className="text-base font-semibold text-slate-800 mb-3">High-quality parts</h3>
-                                <p className="text-slate-600 leading-relaxed mb-4">
-                                    All parts and tools in our range are precisely matched for performance and durability. 
-                                    We work with high-quality materials to ensure long-term reliability for your CNC machining applications.
-                                </p>
-                                <h3 className="text-base font-semibold text-slate-800 mb-3">Wide selection</h3>
-                                <p className="text-slate-600 leading-relaxed flex items-start gap-2">
-                                    <Shield className="h-5 w-5 text-slate-500 flex-shrink-0 mt-0.5" />
-                                    From milling cutters to clamping tools, controls, and accessories—we offer everything 
-                                    you need to expand and complement the versatility of your machines.
-                                </p>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="text-center py-16 bg-slate-50 rounded-xl border border-slate-100">
-                            <div className="text-slate-300 mb-4">
-                                <Filter className="h-16 w-16 mx-auto" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">No products found</h3>
-                            <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                                {safeCatProducts.length > 0
-                                    ? "No products match your current filters. Try adjusting your price range."
-                                    : "This category doesn't have any products yet. Check back later for new products."}
-                            </p>
-                            {safeCatProducts.length > 0 && (
-                                <Button
-                                    variant="outline"
-                                    className="border-slate-300"
-                                    onClick={() => {
-                                        const allPrices = safeCatProducts.flatMap((product: any) => {
-                                            const prs: number[] = [];
-                                            if (product.sale_price) prs.push(product.sale_price);
-                                            if (product.base_price) prs.push(product.base_price);
-                                            if (product.product_variations) {
-                                                product.product_variations.forEach((v: any) => {
-                                                    if (v.sale_price) prs.push(v.sale_price);
-                                                    if (v.base_price) prs.push(v.base_price);
-                                                });
-                                            }
-                                            return prs;
-                                        }).filter((p: number) => p > 0);
-                                        const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) : 0;
-                                        setPriceRange([0, maxPrice]);
-                                        userChangedPrice.current = false;
-                                    }}
-                                >
-                                    Clear Filters
-                                </Button>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
+              </div>
+            </motion.section>
+          </>
+        ) : (
+          <motion.div
+            className="text-center py-20 bg-slate-50/60 rounded-2xl border border-slate-100"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Package className="h-14 w-14 mx-auto text-slate-300 mb-4" />
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">No products in this category</h3>
+            <p className="text-slate-600 max-w-md mx-auto">
+              This category is empty. Check back later or browse other categories.
+            </p>
+            <Link
+              href="/category"
+              className="inline-block mt-6 text-sm font-medium text-slate-700 hover:text-slate-900 underline underline-offset-2 transition-colors"
+            >
+              View all categories
+            </Link>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default CategoriesContent;

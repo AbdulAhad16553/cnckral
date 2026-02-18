@@ -115,9 +115,15 @@ export default async function Home() {
       Number(product?.sale_price) ||
       0;
 
-    const product_images =
+    let product_images =
       normalizeImages(product?.product_images) ||
       [];
+    if (product_images.length === 0 && (product?.website_image || product?.image)) {
+      const singlePath = normalizeImagePath(product.website_image || product.image);
+      if (singlePath) {
+        product_images = [{ image_id: singlePath, position: "featured" }];
+      }
+    }
 
     return {
       ...product,

@@ -180,9 +180,9 @@ export async function GET(request: NextRequest) {
         sku: product.item_code || product.name || `item-${index}`,
         slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
         enable_quote_request: true,
-        product_images: product.website_image ? [{
+        product_images: (product.website_image || product.image) ? [{
           id: `img-${index}`,
-          image_id: product.website_image,
+          image_id: product.website_image || product.image,
           position: 1
         }] : [],
         product_variations: variations,

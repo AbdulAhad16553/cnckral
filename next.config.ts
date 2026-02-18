@@ -48,6 +48,11 @@ const nextConfig: NextConfig = {
         hostname: "erp.cnckral.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
     dangerouslyAllowSVG: true,
     formats: ["image/webp", "image/avif"],

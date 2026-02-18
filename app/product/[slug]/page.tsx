@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import ProductDetailContent from './ProductDetailContent';
-import ProductSkeleton from '@/common/Skeletons/Products';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -12,7 +11,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <Suspense fallback={<ProductSkeleton />}>
+        <Suspense fallback={<div className="py-16 text-center text-slate-500">Loading…</div>}>
           <ProductDetailContent slug={slug} />
         </Suspense>
       </div>

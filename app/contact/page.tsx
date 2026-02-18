@@ -4,8 +4,9 @@ import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Mail, Phone, MapPin, Clock, Send, MessageSquare } from "lucide-react";
+import Link from "next/link";
 
 const ContactPage = async () => {
   const Headers = await headers();
@@ -16,184 +17,215 @@ const ContactPage = async () => {
   }
 
   const fullStoreUrl = getUrlWithScheme(host);
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
+  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
   const data = await response.json();
   const storeData = data?.store?.stores[0];
 
+  const contact = storeData?.store_contact_detail;
+
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have questions or need assistance? We're here to help! Reach out to us through any of the channels below.
-          </p>
-        </div>
+      <div className="min-h-screen bg-slate-50/50">
+        <div className="page-container py-12 lg:py-16">
+          {/* Breadcrumb */}
+          <nav className="breadcrumb">
+            <Link href="/" className="breadcrumb-link">Home</Link>
+            <span className="breadcrumb-separator">/</span>
+            <span className="text-slate-900 font-medium">Contact</span>
+          </nav>
 
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          {/* Contact Information */}
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle className="text-2xl">Get in Touch</CardTitle>
-              <CardDescription>
-                We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Email</h3>
-                  <p className="text-gray-600">{storeData?.store_contact_detail?.email || "info@example.com"}</p>
-                </div>
-              </div>
+          {/* Page Header */}
+          <div className="page-header text-center">
+            <h1 className="page-title">Contact Us</h1>
+            <p className="page-description mx-auto">
+              Get in touch with our team. We typically respond within 24 hours.
+            </p>
+          </div>
 
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Phone</h3>
-                  <p className="text-gray-600">{storeData?.store_contact_detail?.phone || "+1 (555) 123-4567"}</p>
-                </div>
-              </div>
+          {/* Contact Cards & Form */}
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+            {/* Contact Info Cards */}
+            <div className="lg:col-span-1 space-y-4">
+              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-6 h-6 text-slate-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">Email</h3>
+                      <a
+                        href={`mailto:${contact?.email || "cnckral@gmail.com"}`}
+                        className="text-slate-600 hover:text-slate-900 transition-colors mt-1 block"
+                      >
+                        {contact?.email || "cnckral@gmail.com"}
+                      </a>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Address</h3>
-                  <p className="text-gray-600">
-                    {storeData?.store_contact_detail?.address && (
-                      <>
-                        {storeData.store_contact_detail.address}<br />
-                        {storeData.store_contact_detail.city}, {storeData.store_contact_detail.state}<br />
-                        {storeData.store_contact_detail.country}
-                      </>
-                    )}
-                    {!storeData?.store_contact_detail?.address && "123 Business Street, City, State 12345"}
+              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-6 h-6 text-slate-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">Phone</h3>
+                      <a
+                        href={`tel:${contact?.phone || "+923103339404"}`}
+                        className="text-slate-600 hover:text-slate-900 transition-colors mt-1 block"
+                      >
+                        {contact?.phone || "+92 310 3339404"}
+                      </a>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-slate-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">Address</h3>
+                      <p className="text-slate-600 mt-1 leading-relaxed">
+                        {contact?.address || "76 C Gulshan e Rehman, Sultan Ahmad Road, Ichra, Lahore, Pakistan"}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-6 h-6 text-slate-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">Business Hours</h3>
+                      <p className="text-slate-600 mt-1 text-sm">
+                        Mon – Fri: 9:00 AM – 6:00 PM<br />
+                        Sat: 10:00 AM – 4:00 PM<br />
+                        Sun: Closed
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Contact Form */}
+            <div className="lg:col-span-2">
+              <Card className="border-slate-200 shadow-sm">
+                <CardHeader>
+                  <h2 className="text-xl font-semibold text-slate-900">Send a Message</h2>
+                  <p className="text-slate-600 text-sm mt-1">
+                    Fill out the form and we&apos;ll get back to you within 24 hours.
                   </p>
+                </CardHeader>
+                <CardContent>
+                  <form className="space-y-5">
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <label htmlFor="firstName" className="block text-sm font-medium text-slate-700">
+                          First Name
+                        </label>
+                        <Input id="firstName" placeholder="John" className="border-slate-200" required />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="lastName" className="block text-sm font-medium text-slate-700">
+                          Last Name
+                        </label>
+                        <Input id="lastName" placeholder="Doe" className="border-slate-200" required />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+                        Email
+                      </label>
+                      <Input id="email" type="email" placeholder="john@example.com" className="border-slate-200" required />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+                        Phone
+                      </label>
+                      <Input id="phone" type="tel" placeholder="+92 300 1234567" className="border-slate-200" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="subject" className="block text-sm font-medium text-slate-700">
+                        Subject
+                      </label>
+                      <Input id="subject" placeholder="How can we help?" className="border-slate-200" required />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="message" className="block text-sm font-medium text-slate-700">
+                        Message
+                      </label>
+                      <Textarea
+                        id="message"
+                        placeholder="Describe your inquiry in detail..."
+                        rows={5}
+                        className="border-slate-200 resize-none"
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full sm:w-auto px-8 py-6 text-base font-medium"
+                      style={{ backgroundColor: "var(--primary-color)" }}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Send Message
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Trust Section */}
+          <div className="mt-16 pt-12 border-t border-slate-200">
+            <div className="text-center mb-10">
+              <h2 className="text-xl font-semibold text-slate-900">Why Contact Us</h2>
+              <p className="text-slate-600 mt-1 max-w-xl mx-auto">
+                Expert support, quick response, and a commitment to helping you find the right solution.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-6">
+              <div className="text-center p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
+                <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-7 h-7 text-slate-600" />
                 </div>
+                <h3 className="font-semibold text-slate-900">Quick Response</h3>
+                <p className="text-slate-600 text-sm mt-1">We respond within 24 hours</p>
               </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-orange-600" />
+              <div className="text-center p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
+                <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <Mail className="w-7 h-7 text-slate-600" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Business Hours</h3>
-                  <p className="text-gray-600">
-                    Monday - Friday: 9:00 AM - 6:00 PM<br />
-                    Saturday: 10:00 AM - 4:00 PM<br />
-                    Sunday: Closed
-                  </p>
-                </div>
+                <h3 className="font-semibold text-slate-900">Expert Support</h3>
+                <p className="text-slate-600 text-sm mt-1">Technical team ready to help</p>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Contact Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Send Message</CardTitle>
-              <CardDescription>
-                Fill out the form below and we'll get back to you as soon as possible.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
-                    </label>
-                    <Input id="firstName" placeholder="John" required />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
-                    </label>
-                    <Input id="lastName" placeholder="Doe" required />
-                  </div>
+              <div className="text-center p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
+                <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-7 h-7 text-slate-600" />
                 </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <Input id="email" type="email" placeholder="john@example.com" required />
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                    Subject
-                  </label>
-                  <Input id="subject" placeholder="How can we help you?" required />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                    Message
-                  </label>
-                  <Textarea 
-                    id="message" 
-                    placeholder="Please describe your inquiry in detail..."
-                    rows={4}
-                    required 
-                  />
-                </div>
-
-                <Button type="submit" className="w-full">
-                  <Send className="w-4 h-4 mr-2" />
-                  Send Message
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Additional Information */}
-        <Card className="bg-gray-50">
-          <CardContent className="py-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Why Choose Us?</h2>
-              <div className="grid md:grid-cols-3 gap-6 mt-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Mail className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Quick Response</h3>
-                  <p className="text-gray-600">We typically respond to all inquiries within 24 hours.</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Phone className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Expert Support</h3>
-                  <p className="text-gray-600">Our team of experts is here to help with any questions.</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MapPin className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Local Presence</h3>
-                  <p className="text-gray-600">We're proud to serve our local community and beyond.</p>
-                </div>
+                <h3 className="font-semibold text-slate-900">Visit Us</h3>
+                <p className="text-slate-600 text-sm mt-1">Lahore, Pakistan</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </Layout>
   );

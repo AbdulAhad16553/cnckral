@@ -1,5 +1,7 @@
-import { ProductSkeleton } from "@/components/ui/product-skeleton";
-
 export default function ProductLoading() {
-    return <ProductSkeleton />;
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <p className="text-slate-500">Loading…</p>
+    </div>
+  );
 }

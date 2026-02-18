@@ -1,5 +1,5 @@
-import { ProductSkeleton } from "@/components/ui/product-skeleton";
+import { CncBitLoader } from "@/components/CncBitLoader";
 
 export default function ProductSlugLoading() {
-  return <ProductSkeleton />;
+  return <CncBitLoader />;
 }

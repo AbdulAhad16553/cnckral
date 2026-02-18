@@ -22,7 +22,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     }
 
     const fullStoreUrl = getUrlWithScheme(host);
-    const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
+    const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
     const data = await response.json();
     const contact = data?.store?.stores?.[0]?.store_contact_detail?.phone;
     const whatsappLink = contact ? `https://wa.me/${normalizePhoneNumber(contact).replace('+', '')}` : null

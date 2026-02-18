@@ -4,12 +4,11 @@ import { getAllCategories } from "@/hooks/getCategories";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import { headers } from "next/headers";
 import React from "react";
-import { FolderOpen, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const AllCategories = async () => {
-
   const Headers = await headers();
   const host = Headers.get("host");
 
@@ -18,8 +17,7 @@ const AllCategories = async () => {
   }
 
   const fullStoreUrl = getUrlWithScheme(host);
-
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
+  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
   const data = await response.json();
   const storeId = data?.store?.stores[0].id;
 
@@ -27,49 +25,53 @@ const AllCategories = async () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-        <div className="container mx-auto px-4 py-12">
-          {/* Page Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6">
-              <FolderOpen className="h-10 w-10 text-primary" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Product Categories
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+      <div className="min-h-screen bg-white">
+        <div className="page-container py-12 lg:py-16">
+          <nav className="mb-4">
+            <p className="text-sm text-slate-500">
+              You are here:{" "}
+              <Link href="/" className="text-slate-600 hover:text-slate-900 transition-colors">Home</Link>
+              <span className="mx-1">»</span>
+              <span className="text-slate-900 font-medium">Product Categories</span>
+            </p>
+          </nav>
+
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            Product Categories – Browse
+          </h1>
+          <div className="h-px bg-slate-200 mb-8" />
+
+          <div className="mb-10 max-w-4xl">
+            <p className="text-slate-700 leading-relaxed">
               Explore our comprehensive range of products organized into convenient categories. 
-              Find exactly what you're looking for with our intuitive navigation.
+              Find exactly what you&apos;re looking for with our intuitive navigation.
             </p>
           </div>
 
-          {/* Categories Grid */}
           <div className="mb-12">
-            <Categories
-              subcat={false}
-              categories={categories}
-              hideOnPage={true}
-            />
+            <Categories subcat={false} categories={categories} hideOnPage={true} />
           </div>
 
-          {/* Call to Action */}
           <div className="text-center">
-            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Can't find what you're looking for?
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 max-w-2xl mx-auto">
+              <h2 className="text-xl font-semibold text-slate-900 mb-3">
+                Can&apos;t find what you need?
               </h2>
-              <p className="text-gray-600 mb-6">
-                Browse our complete product catalog or contact our support team for assistance.
+              <p className="text-slate-600 mb-6">
+                Browse all products or contact our team for assistance.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/shop">
-                  <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:shadow-lg">
+                  <Button
+                    className="text-white px-8 py-3 rounded-lg shadow-soft hover:shadow-soft-lg transition-all"
+                    style={{ backgroundColor: "var(--primary-color)" }}
+                  >
                     Browse All Products
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/contact">
-                  <Button variant="outline" className="px-8 py-3 rounded-lg border-2 hover:bg-gray-50 transition-all duration-200">
+                  <Button variant="outline" className="px-8 py-3 rounded-lg border-slate-300 hover:bg-slate-50">
                     Contact Support
                   </Button>
                 </Link>

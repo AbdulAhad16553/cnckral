@@ -19,7 +19,6 @@ import {
 } from "@/lib/currencyUtils";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface PaginatedProductsProps {
   companyId: string;
@@ -34,52 +33,6 @@ interface PaginatedProductsProps {
   searchTerm?: string;
   sortBy?: "newest" | "oldest" | "price-low" | "price-high" | "name" | "name-desc";
 }
-
-// Enhanced Product Skeleton
-const ProductSkeleton = ({ viewMode = "grid" }: { viewMode?: "grid" | "list" }) => {
-  if (viewMode === "list") {
-    return (
-      <Card className="flex flex-row h-32 overflow-hidden">
-        <Skeleton className="w-32 h-32 flex-shrink-0" />
-        <div className="flex-1 p-4 space-y-2">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
-          <Skeleton className="h-4 w-1/4" />
-        </div>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-      <CardContent className="p-0">
-        <Skeleton className="aspect-square w-full" />
-        <div className="p-4 space-y-3">
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-3 w-3" />
-            ))}
-          </div>
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-3 w-1/3" />
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Product Grid Skeleton
-const ProductsGridSkeleton = ({ count = 12, viewMode = "grid" }: { count?: number; viewMode?: "grid" | "list" }) => (
-  <div className={viewMode === "grid" 
-    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-    : "space-y-4"
-  }>
-    {[...Array(count)].map((_, i) => (
-      <ProductSkeleton key={i} viewMode={viewMode} />
-    ))}
-  </div>
-);
 
 const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
   companyId,
@@ -261,9 +214,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     return (
       <div className={className}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Products</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Products</h2>
         </div>
-        <ProductsGridSkeleton count={pageSize} viewMode={viewMode} />
+        <div className="py-12 text-center text-slate-500">Loading products…</div>
       </div>
     );
   }

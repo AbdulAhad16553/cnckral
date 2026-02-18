@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { getUrlWithScheme } from '@/lib/getUrlWithScheme';
 import { getCatProducts } from '@/hooks/getCatProducts';
 import CategoriesContent from '@/modules/CategoriesContent';
+import Link from 'next/link';
 
 type Params = Promise<{ slug: string }>;
 
@@ -16,8 +17,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
     }
 
     const fullStoreUrl = getUrlWithScheme(host);
-
-    const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
+    const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
     const data = await response.json();
     const storeId = data?.store?.stores[0].id;
     const companyId = data?.store?.stores[0].company_id;
@@ -27,8 +27,16 @@ export default async function CategoryPage({ params }: { params: Params }) {
 
     return (
         <Layout>
-            <div className="container mx-auto px-4 py-8">
-                <CategoriesContent
+            <div className="min-h-screen bg-white">
+                <div className="page-container py-8 lg:py-10">
+                    <nav className="breadcrumb">
+                        <Link href="/" className="breadcrumb-link">Home</Link>
+                        <span className="breadcrumb-separator">/</span>
+                        <Link href="/category" className="breadcrumb-link">Categories</Link>
+                        <span className="breadcrumb-separator">/</span>
+                        <span className="text-slate-900 font-medium">{catName || "Category"}</span>
+                    </nav>
+                    <CategoriesContent
                     catProducts={catProducts}
                     catName={catName}
                     catSubCats={catSubCats}
@@ -39,6 +47,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
                         companyId
                     }}
                 />
+                </div>
             </div>
         </Layout>
     );

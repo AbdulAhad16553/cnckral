@@ -1,22 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import CacheInitializer from "@/components/CacheInitializer";
 
-// Configure Inter font with fallbacks and error handling
-const inter = Inter({
+// Plus Jakarta Sans - professional, clean, excellent readability
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
-  fallback: [
-    "system-ui",
-    "-apple-system",
-    "BlinkMacSystemFont",
-    "Segoe UI",
-    "Roboto",
-    "Helvetica Neue",
-    "Arial",
-    "sans-serif",
-  ],
+  variable: "--font-sans",
   adjustFontFallback: true,
   preload: true,
 });
@@ -61,13 +52,16 @@ export default async function RootLayout({
           <style>
             {`
               :root {
-                --primary-color: #EF4444;
-                --secondary-color: #374151;
+                --primary-color: #0368E5;
+                --primary-gradient: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
+                --grey-gradient: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+                --secondary-color: #363E47;
+                --primary-hover: #0256c7;
               }
             `}
           </style>
         </head>
-        <body className={inter.className} cz-shortcut-listen="true">
+        <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
           {children}
         </body>
@@ -93,7 +87,7 @@ export default async function RootLayout({
             crossOrigin="anonymous"
           />
         </head>
-        <body className={inter.className} cz-shortcut-listen="true">
+        <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
           {children}
         </body>

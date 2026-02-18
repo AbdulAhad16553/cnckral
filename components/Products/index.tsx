@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import ProductSkeleton from "@/common/Skeletons/Products";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";

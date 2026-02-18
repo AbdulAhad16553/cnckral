@@ -71,9 +71,9 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const companyId = storeData?.company_id;
   const storeCurrency = storeData?.store_detail?.currency || "Rs.";
   // Contact fallbacks
-  const topBarPhone =  "+923103339404";
+  const topBarPhone = "+923103339404";
   const topBarEmail = "cnckral@gmail.com";
-console.log("storeData", storeData,topBarPhone,topBarEmail);
+
   // Debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -235,28 +235,29 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
 
   return (
     <>
-      {/* Top Bar */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-2">
-        <div className="container mx-auto px-4 flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Phone className="w-4 h-4" />
+      {/* Top Bar - International style */}
+      <div className="gradient-blue-grey text-slate-300 py-2 text-sm hidden md:block border-b border-white/20">
+        <div className="page-container flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5" />
               <span>{topBarPhone}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Mail className="w-4 h-4" />
+            </a>
+            <a href={`mailto:${topBarEmail}`} className="hover:text-white transition-colors flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5" />
               <span>{topBarEmail}</span>
-            </div>
+            </a>
           </div>
-          <div className="flex items-center space-x-4">
-            {tagline && <span className="text-gray-300 italic">{tagline}</span>}
+          <div className="flex items-center gap-6">
+            <span className="text-slate-400">Free shipping on orders over Rs. 10,000</span>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
           </div>
         </div>
       </div>
 
       {/* Main Header */}
-      <header className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50">
-        <div className="container mx-auto px-4">
+      <header className="gradient-blue-grey border-b border-white/20 sticky top-0 z-50 shadow-sm">
+        <div className="page-container">
           {/* Main Header Content */}
           <div className="flex items-center justify-between py-4">
             {/* Logo Section */}
@@ -269,7 +270,7 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                       alt={`${storeName} Logo`}
                       width={90}
                       height={60}
-                      className="transition-transform duration-300 group-hover:scale-105 object-contain"
+                      className="transition-transform duration-300 group-hover:scale-105 object-contain brightness-0 invert"
                       unoptimized
                     />
                   ) : headerLogoId ? (
@@ -278,13 +279,10 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                       alt="Header Logo"
                       width={90}
                       height={60}
-                      className="transition-transform duration-300 group-hover:scale-105"
+                      className="transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
                     />
                   ) : (
-                    <div
-                      className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl"
-                      style={{ backgroundColor: primaryColor }}
-                    >
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl bg-white/20">
                       {storeName?.charAt(0) || "S"}
                     </div>
                   )}
@@ -296,14 +294,14 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
             <nav className="hidden lg:flex items-center space-x-8">
               <Link
                 href="/"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
+                className="text-white/90 hover:text-white font-medium transition-colors"
               >
                 Home
               </Link>
               <div className="relative group">
                 <button
                   ref={categoryButtonRef}
-                  className="flex items-center space-x-1 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
+                  className="flex items-center space-x-1 text-white/90 hover:text-white font-medium transition-colors"
                   onMouseEnter={handleCategoryMouseEnter}
                   onMouseLeave={handleCategoryMouseLeave}
                 >
@@ -313,31 +311,31 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                 {isCategoryMenuOpen && (
                   <div
                     ref={categoryMenuRef}
-                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-soft-lg border border-slate-200 py-2 z-50"
                     onMouseEnter={handleCategoryMouseEnter}
                     onMouseLeave={handleCategoryMouseLeave}
                   >
                     <div className="px-4 py-2">
                       <Link
                         href="/category"
-                        className="block py-2 px-3 rounded-md hover:bg-gray-50 transition-colors duration-200 font-medium"
+                        className="block py-2 px-3 rounded-md hover:bg-slate-50 transition-colors font-medium text-slate-700"
                       >
                         All Categories
                       </Link>
                       <Link
                         href="/shop"
-                        className="block py-2 px-3 rounded-md hover:bg-gray-50 transition-colors duration-200 font-medium"
+                        className="block py-2 px-3 rounded-md hover:bg-slate-50 transition-colors font-medium text-slate-700"
                       >
                         Shop All
                       </Link>
                       {categories.length > 0 && (
                         <>
-                          <div className="border-t border-gray-200 my-2"></div>
+                          <div className="border-t border-slate-200 my-2"></div>
                           {categories.map((category) => (
                             <Link
                               key={category.id}
                               href={`/category/${category.slug}`}
-                              className="block py-2 px-3 rounded-md hover:bg-gray-50 transition-colors duration-200"
+                              className="block py-2 px-3 rounded-md hover:bg-slate-50 transition-colors text-slate-700"
                               onClick={() => setIsCategoryMenuOpen(false)}
                             >
                               {category.name}
@@ -346,7 +344,7 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                         </>
                       )}
                       {isLoadingCategories && (
-                        <div className="px-3 py-2 text-sm text-gray-500">
+                        <div className="px-3 py-2 text-sm text-slate-500">
                           Loading categories...
                         </div>
                       )}
@@ -356,19 +354,19 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
               </div>
               <Link
                 href="/shop"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
+                className="text-white/90 hover:text-white font-medium transition-colors"
               >
                 Shop
               </Link>
               <Link
                 href="/about-us"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
+                className="text-white/90 hover:text-white font-medium transition-colors"
               >
                 About
               </Link>
               <Link
                 href="/contact"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200"
+                className="text-white/90 hover:text-white font-medium transition-colors"
               >
                 Contact
               </Link>
@@ -377,12 +375,12 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
             {/* Search Section */}
             <div className="hidden md:block flex-1 max-w-md mx-8">
               <div className="relative" ref={searchDropdownRef}>
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
                 <Input
                   ref={searchInputRef}
                   type="search"
-                  placeholder="Search for products..."
-                  className="w-full pl-10 pr-4 py-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-full transition-all duration-200"
+                  placeholder="Search products..."
+                  className="w-full pl-10 pr-4 py-2 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-2 focus:ring-white/20 rounded-lg transition-all"
                   value={searchTerm}
                   onChange={handleSearchChange}
                   onKeyDown={handleKeyDown}
@@ -398,14 +396,14 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                 {/* Search Dropdown */}
                 {isSearchDropdownOpen && (
                   <div
-                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto"
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-soft-lg border border-slate-200 z-50 max-h-96 overflow-y-auto"
                     role="listbox"
                     aria-label="Search results"
                   >
                     {isSearchLoading ? (
                       <div className="p-4 text-center">
-                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-gray-400" />
-                        <p className="text-sm text-gray-500 mt-2">
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-slate-400" />
+                        <p className="text-sm text-slate-500 mt-2">
                           Searching...
                         </p>
                       </div>
@@ -440,8 +438,8 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                                 key={product.id}
                                 className={`flex items-center gap-3 p-3 cursor-pointer transition-colors ${
                                   isSelected
-                                    ? "bg-blue-50 border-l-4 border-blue-500"
-                                    : "hover:bg-gray-50"
+                                    ? "bg-slate-100 border-l-4 border-slate-900"
+                                    : "hover:bg-slate-50"
                                 }`}
                                 onClick={() =>
                                   handleSearchResultClick(product.slug)
@@ -462,11 +460,11 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-sm text-gray-900 truncate">
+                                  <h4 className="font-medium text-sm text-slate-900 truncate">
                                     {product.name}
                                   </h4>
                                   {product.short_description && (
-                                    <p className="text-xs text-gray-500 truncate">
+                                    <p className="text-xs text-slate-500 truncate">
                                       {product.short_description}
                                     </p>
                                   )}
@@ -478,11 +476,11 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
                       </div>
                     ) : debouncedSearchTerm.length >= 2 ? (
                       <div className="p-4 text-center">
-                        <Search className="h-8 w-8 mx-auto text-gray-300 mb-2" />
-                        <p className="text-sm text-gray-500">
+                        <Search className="h-8 w-8 mx-auto text-slate-300 mb-2" />
+                        <p className="text-sm text-slate-500">
                           No products found
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-slate-400">
                           Try different keywords
                         </p>
                       </div>
@@ -507,7 +505,7 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
               </div>
               {/* Search Icon for Mobile */}
               <button
-                className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                className="md:hidden p-2 text-white/90 hover:text-white transition-colors duration-200"
                 onClick={() => setIsSearchVisible(true)}
               >
                 <Search className="w-5 h-5" />
@@ -515,7 +513,7 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
 
               {/* Mobile Menu Button */}
               <button
-                className="lg:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                className="lg:hidden p-2 text-white/90 hover:text-white transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 <Menu className="w-5 h-5" />
@@ -527,9 +525,9 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
   href="/wishlist"
   className="
     relative p-2
-    text-gray-600 
+    text-white/90
     transition-all duration-300 
-    hover:text-red-500 
+    hover:text-red-300 
     hover:scale-110 
     active:scale-95
     group
@@ -552,7 +550,7 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
     className="
       w-6 h-6 relative z-10 
       transition-all duration-300
-      group-hover:fill-red-500 group-hover:text-red-600 
+      group-hover:fill-red-300 group-hover:text-red-300 
       group-hover:animate-pulse
     "
   />
@@ -567,46 +565,42 @@ console.log("storeData", storeData,topBarPhone,topBarEmail);
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="lg:hidden border-t border-gray-200 bg-white"
-          >
-            <div className="container mx-auto px-4 py-4">
-              <nav className="space-y-2">
+          <div id="mobile-menu" className="lg:hidden border-t border-slate-200 bg-slate-50">
+            <div className="page-container py-4">
+              <nav className="space-y-1">
                 <Link
                   href="/"
-                  className="block py-2 px-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                  className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
                 >
                   Home
                 </Link>
                 <Link
                   href="/category"
-                  className="block py-2 px-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                  className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
                 >
                   Categories
                 </Link>
                 <Link
                   href="/shop"
-                  className="block py-2 px-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                  className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
                 >
                   Shop
                 </Link>
                 <Link
                   href="/about-us"
-                  className="block py-2 px-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                  className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
                 >
                   About
                 </Link>
                 <Link
                   href="/contact"
-                  className="block py-2 px-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                  className="block py-2.5 px-3 text-slate-700 hover:text-slate-900 hover:bg-white rounded-md transition-colors"
                 >
                   Contact
                 </Link>
               </nav>
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-slate-200">
                 <div className="flex items-center space-x-3">
                   <Link
                     href="/wishlist"

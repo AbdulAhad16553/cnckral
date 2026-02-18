@@ -3,19 +3,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import PriceRangeFilter from "../../common/PriceRangeFilter";
 import Categories from "../Categories";
-import Products from "@/components/Products";
+import ProductImagePreview from "@/components/ProductImagePreview";
+import { useBatchItemImages } from "@/hooks/useBatchItemImages";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { 
-    Grid3X3, 
-    List, 
-    Filter, 
-    SortAsc,
-    ChevronRight,
-    Home
-} from "lucide-react";
+import { Filter, SortAsc, Wrench, Shield } from "lucide-react";
 import Link from "next/link";
 
 interface NecessaryProps {
@@ -44,7 +36,6 @@ const CategoriesContent = ({
 }: CategoriesContentProps) => {
 
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [showFilters, setShowFilters] = useState(false);
     const userChangedPrice = useRef(false);
@@ -135,88 +126,55 @@ const CategoriesContent = ({
     const hasSubCategories = catSubCats && catSubCats.length > 0;
     const showPriceFilter = !hasSubCategories && hasProducts;
 
+    // Batch image loading for CNC-style product grid
+    const itemNames = React.useMemo(() => sortedProducts?.map((p: any) => p.sku).filter(Boolean) || [], [sortedProducts]);
+    const { isLoading: isImageLoading, getImageUrl, hasImage } = useBatchItemImages({
+        itemNames,
+        enabled: hasProducts && !hasSubCategories
+    });
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-            {/* Breadcrumb Navigation */}
-            <nav className="mb-6">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Link href="/" className="flex items-center hover:text-primary transition-colors">
-                        <Home className="h-4 w-4 mr-1" />
-                        Home
-                    </Link>
-                    <ChevronRight className="h-4 w-4" />
-                    <Link href="/category" className="hover:text-primary transition-colors">
-                        Categories
-                    </Link>
-                    <ChevronRight className="h-4 w-4" />
-                    <span className="text-gray-900 font-medium">{catName}</span>
-                </div>
+        <div className="min-h-screen bg-white">
+            {/* Breadcrumb - CNC-STEP style */}
+            <nav className="mb-4">
+                <p className="text-sm text-slate-500">
+                    You are here:{" "}
+                    <Link href="/" className="text-slate-600 hover:text-slate-900 transition-colors">Home</Link>
+                    <span className="mx-1">»</span>
+                    <Link href="/category" className="text-slate-600 hover:text-slate-900 transition-colors">Categories</Link>
+                    <span className="mx-1">»</span>
+                    <span className="text-slate-900 font-medium">{catName || "Category"}</span>
+                </p>
             </nav>
 
-            {/* Page Header */}
-            <div className="mb-8">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">{catName}</h1>
-                        <p className="text-gray-600">
-                            {hasSubCategories 
-                                ? `${catSubCats.length} sub-categories available`
-                                : `${sortedProducts.length} products found`
-                            }
-                        </p>
-                    </div>
-                    
-                    {/* View Toggle and Sort Controls */}
-                    {!hasSubCategories && hasProducts && (
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center bg-white rounded-lg border p-1">
-                                <Button
-                                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setViewMode('grid')}
-                                    className="h-8 w-8 p-0"
-                                >
-                                    <Grid3X3 className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setViewMode('list')}
-                                    className="h-8 w-8 p-0"
-                                >
-                                    <List className="h-4 w-4" />
-                                </Button>
-                            </div>
-                            
-                            <div className="relative">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                                    className="appearance-none bg-white border rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                >
-                                    <option value="newest">Newest First</option>
-                                    <option value="name-asc">Name A-Z</option>
-                                    <option value="name-desc">Name Z-A</option>
-                                    <option value="price-asc">Price Low to High</option>
-                                    <option value="price-desc">Price High to Low</option>
-                                </select>
-                                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <SortAsc className="h-4 w-4 text-gray-400" />
-                                </div>
-                            </div>
-                        </div>
+            {/* Page Title with separator - CNC-STEP style */}
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+                {catName || "Category"} – {hasSubCategories ? "Sub-Categories" : "Products"}
+            </h1>
+            <div className="h-px bg-slate-200 mb-8" />
+
+            {/* Intro paragraph - CNC-STEP style */}
+            <div className="mb-10 max-w-4xl">
+                <p className="text-slate-700 leading-relaxed">
+                    {hasSubCategories ? (
+                        <>Browse our <strong>{catName}</strong> sub-categories. Select a category to explore products.</>
+                    ) : (
+                        <>
+                            Our shop with accessories, parts, and tools. You will find a wide range of products in this category. 
+                            Whether for milling, engraving, or general machining—all parts are matched for top quality and reliability.
+                        </>
                     )}
-                </div>
+                </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Sidebar - Filters */}
-                <div className="lg:col-span-1">
-                    {showPriceFilter && (
-                        <Card className="sticky top-4">
+                {showPriceFilter && (
+                    <div className="lg:col-span-3 xl:col-span-2">
+                        <Card className="sticky top-4 border-slate-200">
                             <CardHeader className="pb-4">
-                                <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Filter className="h-5 w-5" />
+                                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                                    <Filter className="h-4 w-4 text-slate-600" />
                                     Filters
                                 </CardTitle>
                             </CardHeader>
@@ -226,100 +184,127 @@ const CategoriesContent = ({
                                     onPriceRangeChange={handlePriceRangeChange}
                                     currency={storeCurrency}
                                 />
-                                
-                                {/* Active Filters Display */}
-                                {userChangedPrice.current && (
-                                    <div className="space-y-3">
-                                        <Separator />
-                                        <div className="space-y-2">
-                                            <h4 className="text-sm font-medium text-gray-700">Active Filters</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                <Badge variant="secondary" className="flex items-center gap-1">
-                                                    Price: {storeCurrency}{priceRange[0]} - {storeCurrency}{priceRange[1]}
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-4 w-4 p-0 ml-1 hover:bg-gray-200"
-                                                        onClick={() => {
-                                                            setPriceRange([0, Math.max(...catProducts.flatMap(({ sale_price, base_price }: any) => [
-                                                                sale_price || 0,
-                                                                base_price || 0,
-                                                            ]))]);
-                                                            userChangedPrice.current = false;
-                                                        }}
-                                                    >
-                                                        ×
-                                                    </Button>
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
-                    )}
-                </div>
+                    </div>
+                )}
 
-                {/* Right Content Area */}
-                <div className="lg:col-span-3">
+                {/* Main Content */}
+                <div className={showPriceFilter ? "lg:col-span-9 xl:col-span-10" : "lg:col-span-12"}>
                     {hasSubCategories ? (
                         <Categories subcat={true} categories={catSubCats} hideOnPage={true} />
                     ) : hasProducts ? (
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-2xl font-semibold text-gray-900">Products</h2>
-                                <Badge variant="outline" className="text-sm">
-                                    {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'}
-                                </Badge>
-                            </div>
-                            
-                            <Products
-                                products={sortedProducts}
-                                currentStock={currentStock}
-                                hideOnPage={true}
-                                storeCurrency={storeCurrency}
-                                necessary={necessary}
-                                viewMode={viewMode}
-                            />
-                        </div>
-                    ) : (
-                        <Card className="text-center py-16">
-                            <CardContent>
-                                <div className="text-gray-400 mb-4">
-                                    <Filter className="h-16 w-16 mx-auto" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-                                <p className="text-gray-600 mb-4">
-                                    {catProducts && catProducts.length > 0
-                                        ? "No products match your current filters. Try adjusting your price range."
-                                        : "This category doesn't have any products yet. Check back later for new products."}
-                                </p>
-                                {catProducts && catProducts.length > 0 && (
-                                    <Button 
-                                        variant="outline"
-                                        onClick={() => {
-                                            const prices = catProducts.flatMap((product: any) => {
-                                                const prices: number[] = [];
-                                                if (product.sale_price) prices.push(product.sale_price);
-                                                if (product.base_price) prices.push(product.base_price);
-                                                if (product.product_variations) {
-                                                    product.product_variations.forEach((variation: any) => {
-                                                        if (variation.sale_price) prices.push(variation.sale_price);
-                                                        if (variation.base_price) prices.push(variation.base_price);
-                                                    });
-                                                }
-                                                return prices;
-                                            }).filter((price: number) => price > 0);
-                                            const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-                                            setPriceRange([0, maxPrice]);
-                                            userChangedPrice.current = false;
-                                        }}
+                        <>
+                            {/* Sort bar */}
+                            <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+                                <span className="text-sm text-slate-600">
+                                    {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
+                                </span>
+                                <div className="relative">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value as SortOption)}
+                                        className="appearance-none bg-white border border-slate-200 rounded-lg pl-3 pr-9 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-300"
                                     >
-                                        Clear Filters
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
+                                        <option value="newest">Newest First</option>
+                                        <option value="name-asc">Name A–Z</option>
+                                        <option value="name-desc">Name Z–A</option>
+                                        <option value="price-asc">Price: Low to High</option>
+                                        <option value="price-desc">Price: High to Low</option>
+                                    </select>
+                                    <SortAsc className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                </div>
+                            </div>
+
+                            {/* CNC-STEP style product grid - clean image + title cards */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6 mb-16">
+                                {sortedProducts.map((product: any) => {
+                                    const imageUrl = getImageUrl(product.sku);
+                                    const productHasImage = hasImage(product.sku);
+                                    const productSlug = product.slug || product.sku || product.name;
+                                    return (
+                                        <Link
+                                            key={product.id || product.sku}
+                                            href={`/product/${encodeURIComponent(productSlug)}`}
+                                            className="group block"
+                                        >
+                                            <div className="bg-slate-50 rounded-lg overflow-hidden border border-slate-200/80 hover:border-slate-300 hover:shadow-md transition-all duration-200 aspect-[260/185] flex items-center justify-center p-4">
+                                                <ProductImagePreview
+                                                    itemName={product.sku}
+                                                    productName={product.name}
+                                                    imageUrl={imageUrl}
+                                                    hasImage={productHasImage}
+                                                    isLoading={isImageLoading}
+                                                    width={260}
+                                                    height={185}
+                                                    className="w-full h-full object-contain"
+                                                    showPreview={false}
+                                                />
+                                            </div>
+                                            <h3 className="mt-3 text-sm font-medium text-slate-800 group-hover:text-slate-900 transition-colors line-clamp-2 text-center leading-snug">
+                                                {product.name}
+                                            </h3>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+
+                            {/* CNC-STEP style info section */}
+                            <div className="bg-slate-50 rounded-xl p-8 md:p-10 border border-slate-100">
+                                <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                    <Wrench className="h-5 w-5 text-slate-600" />
+                                    Perfectly matched accessories
+                                </h2>
+                                <h3 className="text-base font-semibold text-slate-800 mb-3">High-quality parts</h3>
+                                <p className="text-slate-600 leading-relaxed mb-4">
+                                    All parts and tools in our range are precisely matched for performance and durability. 
+                                    We work with high-quality materials to ensure long-term reliability for your CNC machining applications.
+                                </p>
+                                <h3 className="text-base font-semibold text-slate-800 mb-3">Wide selection</h3>
+                                <p className="text-slate-600 leading-relaxed flex items-start gap-2">
+                                    <Shield className="h-5 w-5 text-slate-500 flex-shrink-0 mt-0.5" />
+                                    From milling cutters to clamping tools, controls, and accessories—we offer everything 
+                                    you need to expand and complement the versatility of your machines.
+                                </p>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="text-center py-16 bg-slate-50 rounded-xl border border-slate-100">
+                            <div className="text-slate-300 mb-4">
+                                <Filter className="h-16 w-16 mx-auto" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">No products found</h3>
+                            <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                                {catProducts && catProducts.length > 0
+                                    ? "No products match your current filters. Try adjusting your price range."
+                                    : "This category doesn't have any products yet. Check back later for new products."}
+                            </p>
+                            {catProducts && catProducts.length > 0 && (
+                                <Button
+                                    variant="outline"
+                                    className="border-slate-300"
+                                    onClick={() => {
+                                        const allPrices = catProducts.flatMap((product: any) => {
+                                            const prs: number[] = [];
+                                            if (product.sale_price) prs.push(product.sale_price);
+                                            if (product.base_price) prs.push(product.base_price);
+                                            if (product.product_variations) {
+                                                product.product_variations.forEach((v: any) => {
+                                                    if (v.sale_price) prs.push(v.sale_price);
+                                                    if (v.base_price) prs.push(v.base_price);
+                                                });
+                                            }
+                                            return prs;
+                                        }).filter((p: number) => p > 0);
+                                        const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) : 0;
+                                        setPriceRange([0, maxPrice]);
+                                        userChangedPrice.current = false;
+                                    }}
+                                >
+                                    Clear Filters
+                                </Button>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>

@@ -74,12 +74,11 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
   ].filter(Boolean).length;
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Header */}
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Shop</h1>
-          <p className="text-gray-600 mt-1">Discover our curated collection of premium products</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Shop</h1>
+          <p className="text-slate-600 mt-1">Discover our curated collection of premium products</p>
         </div>
         
         <div className="flex items-center gap-4">

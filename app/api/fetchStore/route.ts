@@ -5,6 +5,28 @@ const ERP_BASE_URL = `https://${process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN}/api/reso
 const API_KEY = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY!;
 const API_SECRET = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET!;
 
+// Minimal store shape to keep existing pages working while using ERPNext
+const getFallbackStorePayload = () => {
+  return {
+    store: {
+      stores: [
+        {
+          id: "default-store",
+          store_name: "Kral Laser",
+          company_id: "Kral Laser",
+          store_detail: {
+            currency: "PKR",
+          },
+          store_contact_detail: {
+            phone: "",
+          },
+          store_components: [],
+        },
+      ],
+    },
+  };
+};
+
 // ---- Fetch Template Items ----
 async function getTemplateItems(limit = 100) {
   let templates: any[] = [];
@@ -64,12 +86,21 @@ export async function GET(req: NextRequest) {
       success: true,
       total_templates: templatesWithVariants.length,
       templates: templatesWithVariants,
+      ...getFallbackStorePayload(),
     });
   } catch (error: any) {
-    console.error("❌ Error fetching products with images:", error.response?.data || error.message);
-    return NextResponse.json(
-      { success: false, error: "Failed to fetch template items with images" },
-      { status: 500 }
+    console.error(
+      "❌ Error fetching products with images:",
+      error.response?.data || error.message
     );
+
+    // Even on failure, keep the legacy store shape so pages don't break
+    return NextResponse.json({
+      success: false,
+      error: "Failed to fetch template items with images",
+      templates: [],
+      total_templates: 0,
+      ...getFallbackStorePayload(),
+    });
   }
 }

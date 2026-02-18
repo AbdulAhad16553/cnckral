@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Skeleton } from './skeleton';
-import { getOptimizedImageUrl, IMAGE_SIZES } from '@/lib/imageUtils';
+import { getOptimizedImageUrl } from '@/lib/imageUtils';
 
 interface ProgressiveImageProps {
   src: string;
@@ -151,11 +150,9 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
     return (
       <div 
         ref={imgRef}
-        className={`${className}`}
+        className={`bg-slate-100 ${className}`}
         style={fill ? {} : { width, height }}
-      >
-        <Skeleton className="w-full h-full" />
-      </div>
+      />
     );
   }
 

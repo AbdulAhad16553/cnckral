@@ -11,6 +11,18 @@ export default {
 	],
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+			},
+			boxShadow: {
+				'soft': '0 2px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.04)',
+				'soft-lg': '0 10px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04)',
+				'card': '0 1px 3px rgb(0 0 0 / 0.05)',
+				'card-hover': '0 12px 24px -8px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.06)',
+			},
+			transitionDuration: {
+				'250': '250ms',
+			},
 			colors: {
 				primary: "var(--primary-color)",
 				secondary: "var(--secondary-color)",

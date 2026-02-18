@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import HeaderSkeleton from './HeaderSkeleton';
 import Header from './index';
 
 interface ClientHeaderProps {
@@ -16,7 +15,7 @@ const ClientHeader = ({ storeData }: ClientHeaderProps) => {
     }, []);
 
     if (!mounted) {
-        return <HeaderSkeleton />;
+        return null;
     }
 
     return <Header storeData={storeData} />;

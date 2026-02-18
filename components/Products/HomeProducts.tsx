@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -17,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
 import ProductImagePreview from "@/components/ProductImagePreview";
 import { useBatchItemImages } from "@/hooks/useBatchItemImages";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface HomeProductsProps {
   companyId: string;
@@ -27,29 +27,6 @@ interface HomeProductsProps {
   className?: string;
   initialProducts?: any[];
 }
-
-// Home Products Skeleton
-const HomeProductsSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-    {[...Array(8)].map((_, i) => (
-      <Card key={i} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-        <CardContent className="p-0">
-          <Skeleton className="aspect-square w-full" />
-          <div className="p-4 space-y-3">
-            <div className="flex gap-0.5">
-              {[...Array(5)].map((_, j) => (
-                <Skeleton key={j} className="h-3 w-3" />
-              ))}
-            </div>
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-3 w-1/3" />
-          </div>
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-);
 
 const HomeProducts: React.FC<HomeProductsProps> = ({
   companyId,
@@ -75,50 +52,36 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
     enabled: products.length > 0
   });
 
-  // Fetch products on component mount
+  // Use server-provided initialProducts; only fetch if empty (avoids duplicate API call)
   useEffect(() => {
     let isCancelled = false;
+    const hasInitialData = initialProducts && initialProducts.length > 0;
+
+    if (hasInitialData) {
+      setProducts(initialProducts);
+      setLoading(false);
+      return;
+    }
+
     const fetchProducts = async () => {
       try {
-        // If we already have server-provided products, don't flash loading skeleton
-        if (!products.length) {
-          setLoading(true);
-        }
+        setLoading(true);
         setError(null);
-
-        console.log('🔄 Fetching 8 products for home page...');
-
         const response = await fetch(`/api/products?page=1&limit=8`);
         const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch products');
-        }
-
-        console.log(`✅ Loaded ${data.products.length} products for home page`);
-        // Ensure we only keep 8 items even if API returns more
-        if (!isCancelled) {
-          setProducts((data.products || []).slice(0, 8));
-        }
+        if (!response.ok) throw new Error(data.error || 'Failed to fetch products');
+        if (!isCancelled) setProducts((data.products || []).slice(0, 8));
       } catch (err) {
-        console.error('Error loading products:', err);
-        // Only surface the error if we have no fallback data
-        if (!products.length) {
-          setError(err instanceof Error ? err.message : 'Failed to load products');
-        } else {
-          console.warn('Using initial products fallback for home page');
-        }
+        if (!isCancelled) setError(err instanceof Error ? err.message : 'Failed to load products');
       } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
+        if (!isCancelled) setLoading(false);
       }
     };
 
     fetchProducts();
-    return () => {
-      isCancelled = true;
-    };
+    return () => { isCancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only use initialProducts on mount
   }, []);
 
   // Calculate product stock
@@ -151,9 +114,9 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
     return (
       <div className={className}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Featured Products</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Featured Products</h2>
         </div>
-        <HomeProductsSkeleton />
+        <div className="py-12 text-center text-slate-500">Loading products…</div>
       </div>
     );
   }
@@ -198,22 +161,41 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
   return (
     <div className={className}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div
+        className="flex items-center justify-between mb-6"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <div>
-          <h2 className="text-2xl font-bold">Featured Products</h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Featured Products</h2>
+          <p className="text-sm text-slate-600 mt-0.5">
             Showing {Math.min(products.length, 8)} of our best products
           </p>
         </div>
         <Link href="/shop">
-          <Button className="text-white animated-button">
+          <Button className="text-white shadow-soft hover:shadow-soft-lg transition-all duration-250" style={{ backgroundColor: 'var(--primary-color)' }}>
             View All Products
           </Button>
         </Link>
-      </div>
+      </motion.div>
 
-      {/* Products Grid - 4 columns to match categories */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {/* Products Grid with stagger animation */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.07,
+              delayChildren: 0.1,
+            },
+          },
+        }}
+      >
         {products.slice(0, 8).map((product: any, index: number) => {
           // Resolve image via batch image loader (same approach as /shop)
           const imageUrl = getImageUrl(product.sku);
@@ -231,9 +213,23 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
           const uniqueKey = `${product.id || product.sku || product.name}-${index}-${product.type || 'simple'}`;
 
           return (
-            <Card
+            <motion.div
               key={uniqueKey}
-              className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
+              variants={{
+                hidden: { opacity: 0, y: 24 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+                },
+              }}
+            >
+            <motion.div
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            >
+            <Card
+              className="group overflow-hidden border border-slate-200/80 shadow-card hover:shadow-card-hover transition-shadow duration-300"
             >
               <CardContent className="p-0">
                 {/* Product Image */}
@@ -419,14 +415,16 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* View All Button - Bottom */}
       <div className="flex justify-center mt-8">
         <Link href="/shop">
-          <Button size="lg" className="px-8 py-3 text-white animated-button">
+          <Button size="lg" className="px-8 py-3 text-white shadow-soft hover:shadow-soft-lg transition-all duration-250 hover:-translate-y-0.5" style={{ backgroundColor: 'var(--primary-color)' }}>
             View All Products
           </Button>
         </Link>

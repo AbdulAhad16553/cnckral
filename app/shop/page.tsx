@@ -35,8 +35,9 @@ export default async function ShopPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <EnhancedShopContent
+      <div className="min-h-screen bg-slate-50/50">
+        <div className="page-container py-8 lg:py-10">
+          <EnhancedShopContent
           categories={categories}
           hideOnPage={true}
           storeCurrency={storeCurrency}
@@ -45,6 +46,7 @@ export default async function ShopPage() {
             companyId,
           }}
         />
+        </div>
       </div>
     </Layout>
   );

@@ -1,6 +1,11 @@
 import Hero from "@/modules/Hero";
-import Categories from "@/modules/Categories";
 import HomeProducts from "@/components/Products/HomeProducts";
+import HeroAnimationWrapper from "@/components/HeroAnimationWrapper";
+import AnimatedSection from "@/components/AnimatedSection";
+import { CategoryStrip } from "@/components/CategoryStrip";
+import { NeedHelpSection } from "@/components/NeedHelpSection";
+import { ResourceLinks } from "@/components/ResourceLinks";
+import { NewsletterSection } from "@/components/NewsletterSection";
 import { headers } from "next/headers";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import Layout from "@/components/Layout";
@@ -39,9 +44,8 @@ export default async function Home() {
 
   const fullStoreUrl = getUrlWithScheme(host);
 
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
+  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
   const data = await response.json();
-  console.log("data", data);
   const storeId = data?.store?.stores[0].id;
   const companyId = data?.store?.stores[0].company_id;
 
@@ -139,7 +143,7 @@ export default async function Home() {
   try {
     const firstResponse = await fetch(
       `${fullStoreUrl}/api/products?page=1&limit=${limit}`,
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
 
     if (firstResponse.ok) {
@@ -163,7 +167,7 @@ export default async function Home() {
         // Fetch the target page to pick that product
         const pageResponse = await fetch(
           `${fullStoreUrl}/api/products?page=${targetPage}&limit=${limit}`,
-          { cache: "no-store" }
+          { next: { revalidate: 60 } }
         );
         if (pageResponse.ok) {
           const pageData = await pageResponse.json();
@@ -206,26 +210,59 @@ export default async function Home() {
 
   return (
     <Layout>
-      <Hero
-        content={{
-          title: "Laser Technology That Defines Excellence",
-          content: "At Kral Laser, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more. From intricate custom designs to high-volume industrial production, we bring your ideas to life with speed, accuracy, and style.",
-          heroImage: undefined,
-        }}
-        storeData={data?.store?.stores[0]}
-        categories={categories}
-        products={featuredProduct ? [featuredProduct] : []}
-        hideOnPage={false}
-      />
-      <div className="container mx-auto px-4 py-8">
-        <Categories categories={categories?.slice(0, 4) || []} hideOnPage={false} subcat={false} />
-        <HomeProducts
-          companyId={companyId}
-          storeId={storeId}
-          storeCurrency={storeCurrency}
-          initialProducts={initialHomeProducts}
-          className="w-full"
+      <HeroAnimationWrapper>
+        <Hero
+          content={{
+            title: "Laser Technology That Defines Excellence",
+            content: "At Kral Laser, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
+            heroImage: undefined,
+          }}
+          storeData={data?.store?.stores[0]}
+          categories={categories}
+          products={featuredProduct ? [featuredProduct] : []}
+          hideOnPage={false}
         />
+      </HeroAnimationWrapper>
+
+      {/* Category strip - CNC Tooling Shop style */}
+      <div className="bg-white page-container py-12 lg:py-14">
+        <AnimatedSection delay={0.05}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Shop by Category</h2>
+          </div>
+          <CategoryStrip categories={categories || []} />
+        </AnimatedSection>
+      </div>
+
+      {/* Need help + Resource links */}
+      <div className="bg-slate-50/50 page-container py-12 lg:py-14">
+        <AnimatedSection delay={0.08}>
+          <NeedHelpSection />
+        </AnimatedSection>
+        <AnimatedSection delay={0.1}>
+          <div className="mt-12">
+            <h2 className="text-xl font-bold text-slate-900 mb-6">Resources</h2>
+            <ResourceLinks />
+          </div>
+        </AnimatedSection>
+      </div>
+
+      {/* Featured Products */}
+      <div className="bg-white page-container py-12 lg:py-14">
+        <AnimatedSection delay={0.12}>
+          <HomeProducts
+            companyId={companyId}
+            storeId={storeId}
+            storeCurrency={storeCurrency}
+            initialProducts={initialHomeProducts}
+            className="w-full"
+          />
+        </AnimatedSection>
+      </div>
+
+      {/* Newsletter */}
+      <div className="page-container py-12 lg:py-14">
+        <NewsletterSection />
       </div>
     </Layout>
   );

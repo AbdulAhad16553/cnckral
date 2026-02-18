@@ -26,8 +26,6 @@ import { getStorePage } from "@/hooks/getStorePage"
 import { getSocialLink } from "@/hooks/getSocialLinks"
 import type { ReactElement } from "react"
 import axios from "axios"
-import { getErpnextImageUrl } from "@/lib/erpnextImageUtils"
-
 interface FooterProps {
   storeData: {
     store_detail?: {
@@ -78,23 +76,24 @@ const Footer = async ({ storeData }: FooterProps) => {
   }
 
   try {
-    const ERP_BASE_URL = `https://${process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN}/api/resource`
+    const ERP_BASE_URL = process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN
+      ? `https://${process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN}/api/resource`
+      : null
     const API_KEY = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY
     const API_SECRET = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET
 
-    if (API_KEY && API_SECRET) {
+    if (ERP_BASE_URL && API_KEY && API_SECRET) {
       const companyName = "Kral Laser"
       const encodedName = encodeURIComponent(companyName)
       const response = await axios.get(
         `${ERP_BASE_URL}/Company/${encodedName}?fields=["email","phone_no"]`,
         {
-          headers: {
-            Authorization: `token ${API_KEY}:${API_SECRET}`,
-          },
+          headers: { Authorization: `token ${API_KEY}:${API_SECRET}` },
+          validateStatus: () => true,
         }
       )
 
-      if (response.data?.data) {
+      if (response.status === 200 && response.data?.data) {
         companyContactDetails = {
           email: response.data.data.email || companyContactDetails.email || "cnckral@gmail.com",
           phone: response.data.data.phone_no || companyContactDetails.phone || "+923103339404",
@@ -103,8 +102,7 @@ const Footer = async ({ storeData }: FooterProps) => {
       }
     }
   } catch (error) {
-    console.error("Error fetching company contact details:", error)
-    // Use fallback values
+    // Use fallback values; do not throw so layout still renders
     companyContactDetails = {
       email: companyContactDetails.email || "cnckral@gmail.com",
       phone: companyContactDetails.phone || "+923103339404",
@@ -150,24 +148,15 @@ const Footer = async ({ storeData }: FooterProps) => {
             
             <div className="lg:col-span-4">
               <div className="mb-8">
-                {companyLogo || footerLogoId ? (
-                  <div className="mb-6">
-                    <Image
-                      src={
-                        companyLogo
-                          ? getErpnextImageUrl(companyLogo)
-                          : `${process.env.NEXT_PUBLIC_NHOST_STORAGE_URL}/files/${footerLogoId}`
-                      }
-                      alt={`${storeName || "Store"} Logo`}
-                      width={160}
-                      height={50}
-                      className="max-h-12 object-contain brightness-0 invert opacity-90"
-                      unoptimized={!!companyLogo}
-                    />
-                  </div>
-                ) : (
-                  <h2 className="text-2xl font-bold text-white mb-4">{storeName}</h2>
-                )}
+                <div className="mb-6">
+                  <Image
+                    src="/HORIZONTAL Logo CNC KRAL.png"
+                    alt={`${storeName || "Store"} Logo`}
+                    width={160}
+                    height={50}
+                    className="max-h-12 object-contain brightness-0 invert opacity-90"
+                  />
+                </div>
                 <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
                   {description}
                 </p>

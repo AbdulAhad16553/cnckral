@@ -76,27 +76,34 @@
 
 /**
  * Generate fully qualified ERPNext URL for image or attachment
- * @param filePath - The path from ERPNext e.g. /files/a.png or /private/files/a.png
+ * @param filePath - The path from ERPNext e.g. /files/a.png or /private/files/a.png (must be a string)
  * @returns Full URL e.g. https://yourdomain.com/files/a.png
  */
-export const getErpnextFileUrl = (filePath?: string): string => {
-  if (!filePath) return '/placeholder.svg';
+export const getErpnextFileUrl = (filePath?: unknown): string => {
+  // Only accept string or number; never call string methods on objects
+  if (filePath == null || (typeof filePath !== 'string' && typeof filePath !== 'number')) {
+    return '/placeholder.svg';
+  }
+  const path = typeof filePath === 'string' ? filePath : String(filePath);
+  const trimmed = path.trim();
+  if (!trimmed) return '/placeholder.svg';
 
   const domain = process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN;
   if (!domain) return '/placeholder.svg';
 
-  // If ERPNext returns a full URL already (rare), don't double-prepend
-  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-    return filePath;
+  // Check for full URL using slice (no .startsWith in case path is ever non-string)
+  if (trimmed.slice(0, 7) === 'http://' || trimmed.slice(0, 8) === 'https://') {
+    return trimmed;
   }
 
-  return `https://${domain}${filePath}`;
+  const pathPart = trimmed.charAt(0) === '/' ? trimmed : `/${trimmed}`;
+  return `https://${domain}${pathPart}`;
 };
 
 /**
  * Generate complete image URL handlers for items and attachments
  */
-export const getErpnextImageUrl = (imagePath?: string): string => {
+export const getErpnextImageUrl = (imagePath?: string | number | null): string => {
   return getErpnextFileUrl(imagePath);
 };
 

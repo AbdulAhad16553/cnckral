@@ -19,6 +19,7 @@ import {
 } from "@/lib/currencyUtils";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
+import ProductSkeleton from "@/common/Skeletons/Products";
 
 interface PaginatedProductsProps {
   companyId: string;
@@ -209,14 +210,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     }
   }, [products]);
 
-  // Loading state
+  // Loading state – show skeleton instead of loader
   if (loading && products.length === 0) {
     return (
       <div className={className}>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Products</h2>
-        </div>
-        <div className="py-12 text-center text-slate-500">Loading products…</div>
+        <ProductSkeleton />
       </div>
     );
   }

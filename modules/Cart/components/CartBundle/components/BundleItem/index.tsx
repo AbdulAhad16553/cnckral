@@ -1,87 +1,79 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Minus, Plus, Trash2 } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface BundleItemProps {
-    item: any;
-    storeCurrency: string;
-    showBundleInfo: boolean;
+  item: any;
+  storeCurrency: string;
+  showBundleInfo: boolean;
 }
 
 const BundleItem = ({ item, storeCurrency, showBundleInfo }: BundleItemProps) => {
-
-    const getItemDetail = (item: any) => {
-        if (item?.product_variation) {
-            return {
-                name: item?.product_variation?.product?.name || "Unnamed Product",
-                imageId: item?.product_variation?.product?.product_images?.find((image: any) => image?.position === "featured")?.image_id,
-                sku: item?.product_variation?.sku || "N/A",
-                attributes: item?.product_variation?.product_variation_attributes || [],
-            };
-        } else {
-            return {
-                name: item?.product?.name || "Unnamed Product",
-                imageId: item?.image?.image_id,
-                sku: item?.sku || "N/A",
-                attributes: [],
-            };
-        }
+  const getItemDetail = (item: any) => {
+    if (item?.product_variation) {
+      return {
+        name: item?.product_variation?.product?.name || 'Unnamed Product',
+        imageId: item?.product_variation?.product?.product_images?.find(
+          (img: any) => img?.position === 'featured'
+        )?.image_id,
+        sku: item?.product_variation?.sku || 'N/A',
+        attributes: item?.product_variation?.product_variation_attributes || [],
+      };
+    }
+    return {
+      name: item?.product?.name || 'Unnamed Product',
+      imageId: item?.image?.image_id,
+      sku: item?.sku || 'N/A',
+      attributes: [],
     };
+  };
 
-    const itemDetails = getItemDetail(item);
+  const details = getItemDetail(item);
+  const productSlug = item?.product_id ?? item?.sku ?? '';
+  const productUrl = productSlug ? `/product/${encodeURIComponent(productSlug)}` : '/shop';
+  const imageSrc = details.imageId
+    ? `${process.env.NEXT_PUBLIC_NHOST_STORAGE_URL}/files/${details.imageId}?w=128&h=128`
+    : '/placeholder.svg';
 
-    return (
-        <div
-            className={`flex flex-col sm:flex-row items-stretch gap-4 p-4 rounded-md ${showBundleInfo ? "bg-muted/30" : "border"}`}
+  return (
+    <div
+      className={`flex flex-col sm:flex-row items-stretch gap-3 p-3 rounded-lg ${
+        showBundleInfo ? 'bg-slate-50/80' : 'border border-slate-200'
+      }`}
+    >
+      <div className="relative w-16 h-16 sm:w-20 sm:h-20 overflow-hidden rounded-lg bg-slate-100 shrink-0 mx-auto sm:mx-0">
+        <Image
+          src={imageSrc}
+          alt={details.name}
+          fill
+          className="object-cover"
+          sizes="72px"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/placeholder.svg';
+          }}
+        />
+      </div>
+      <div className="flex-1 min-w-0 flex flex-col gap-1 text-center sm:text-left">
+        <Link
+          href={productUrl}
+          className="font-medium text-slate-900 truncate hover:text-[var(--primary-color)] transition-colors"
         >
-            {/* Image */}
-            <div className="relative w-20 h-20 overflow-hidden rounded-md shrink-0 mx-auto sm:mx-0">
-                <Image
-                    src={itemDetails.imageId
-                        ? `${process.env.NEXT_PUBLIC_NHOST_STORAGE_URL}/files/${itemDetails.imageId}?w=128&h=128`
-                        : "/placeholder.svg"}
-                    alt={itemDetails.name}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                />
-            </div>
-
-            {/* Product Details */}
-            <div className="flex-1 min-w-0 w-full sm:w-auto flex flex-col gap-2">
-                {/* Product Name */}
-                <Link href={`/products/${item.product_id}`} className="hover:underline">
-                    <h3 className="font-medium text-base truncate text-center sm:text-left">
-                        {itemDetails.name}
-                    </h3>
-                </Link>
-
-                {/* SKU */}
-                <p className="text-xs text-muted-foreground text-center sm:text-left">
-                    SKU: {itemDetails.sku}
-                </p>
-
-                {/* Quantity */}
-                <p className="text-xs text-muted-foreground text-center sm:text-left">
-                    Quantity: {item?.quantity || 1}
-                </p>
-
-                {/* Attributes */}
-                {itemDetails.attributes.length > 0 && (
-                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                        {itemDetails.attributes.map((attribute: any, index: number) => (
-                            <Badge key={index} className="px-2 py-1 text-xs">
-                                {attribute?.product_attribute?.name}: {attribute?.product_attributes_value?.value}
-                            </Badge>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
+          {details.name}
+        </Link>
+        <p className="text-xs text-slate-500 font-mono">SKU: {details.sku}</p>
+        <p className="text-xs text-slate-500">Qty: {item?.quantity ?? 1}</p>
+        {details.attributes?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start mt-1">
+            {details.attributes.map((attr: any, idx: number) => (
+              <Badge key={idx} variant="secondary" className="text-xs font-normal px-2 py-0">
+                {attr?.product_attribute?.name}: {attr?.product_attributes_value?.value}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default BundleItem;

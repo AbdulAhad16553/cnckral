@@ -1,106 +1,107 @@
-"use client"
+'use client';
 
-import React, { useEffect, useState } from 'react'
-import CartItem from './components/CartItem'
-import CartBundle from './components/CartBundle'
-import { useRouter } from 'next/navigation'
-import { Separator } from "@/components/ui/separator"
-import { Card } from '@/components/ui/card'
+import React, { useEffect, useState } from 'react';
+import CartItem from './components/CartItem';
+import CartBundle from './components/CartBundle';
+import { Separator } from '@/components/ui/separator';
+import Link from 'next/link';
+import { ShoppingBag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CartProps {
-    storeCurrency: string
+  storeCurrency: string;
 }
 
 const Cart = ({ storeCurrency }: CartProps) => {
+  const [cart, setCart] = useState<any[]>([]);
 
-    const [cart, setCart] = useState<any>([]);
-    const router = useRouter();
+  useEffect(() => {
+    const syncCart = () => {
+      try {
+        const cartDataString = localStorage.getItem('cart');
+        const cartData = cartDataString ? JSON.parse(cartDataString) : [];
+        setCart(Array.isArray(cartData) ? cartData : []);
+      } catch {
+        setCart([]);
+      }
+    };
 
-    useEffect(() => {
-        const handleWindowLoad = () => {
-            const cartDataString = localStorage.getItem("cart");
-            const cartData = cartDataString ? JSON.parse(cartDataString) : [];
-            if (cartData.length > 0) {
-                setCart(cartData);
-            }
-        };
+    syncCart();
+    window.addEventListener('load', syncCart);
+    window.addEventListener('storage', syncCart);
+    window.addEventListener('cartUpdated', syncCart);
 
-        // Load cart data immediately
-        handleWindowLoad();
+    return () => {
+      window.removeEventListener('load', syncCart);
+      window.removeEventListener('storage', syncCart);
+      window.removeEventListener('cartUpdated', syncCart);
+    };
+  }, []);
 
-        window.addEventListener("load", handleWindowLoad);
+  const items = cart.filter((item: any) => item.type === 'item');
+  const bundles = cart.filter((item: any) => item.type === 'bundle');
+  const isEmpty = items.length === 0 && bundles.length === 0;
 
-        return () => {
-            window.removeEventListener("load", handleWindowLoad);
-        };
-    }, []);
-
-    // Listen for cart updates from localStorage
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const cartDataString = localStorage.getItem("cart");
-            const cartData = cartDataString ? JSON.parse(cartDataString) : [];
-            setCart(cartData);
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        
-        // Also listen for custom cart update events
-        window.addEventListener("cartUpdated", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-            window.removeEventListener("cartUpdated", handleStorageChange);
-        };
-    }, []);
-
-    const items = cart.filter((item: any) => item.type === "item");
-    const bundles = cart.filter((item: any) => item.type === "bundle");
-
+  if (isEmpty) {
     return (
-        <div className="container mx-auto w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-3">
-                <div className="lg:col-span-3">
-                    <Card className="bg-white rounded-lg border p-4 sm:p-6 space-y-6">
-                        {/* Regular Items */}
-                        {items.length > 0 && (
-                            <div className="space-y-4">
-                                <h2 className="text-lg font-semibold">Items</h2>
-                                {items.map((item: any, index: number) => (
-                                    <CartItem
-                                        key={index}
-                                        item={item}
-                                        storeCurrency={storeCurrency}
-                                        showBundleInfo={false}
-                                    />
-                                ))}
-                            </div>
-                        )}
-
-                        {items.length > 0 && bundles.length > 0 && <Separator className="my-6" />}
-
-                        {/* Bundles */}
-                        {bundles.length > 0 && (
-                            <div className="space-y-6">
-                                <h2 className="text-lg font-semibold flex items-center gap-2">
-                                    Bundles
-                                </h2>
-                                {bundles.map((bundle: any, index: number) => (
-                                    <CartBundle
-                                        key={index}
-                                        bundle={bundle}
-                                        storeCurrency={storeCurrency}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </Card>
-                </div>
-
-
-            </div>
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 mb-6">
+            <ShoppingBag className="h-10 w-10 text-slate-400" />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Your cart is empty</h2>
+          <p className="text-slate-600 max-w-sm mb-8">
+            Add items from the shop to get started. When you&apos;re ready, come back here to checkout.
+          </p>
+          <Button asChild className="rounded-lg bg-[var(--primary-color)] hover:bg-[var(--primary-hover)]">
+            <Link href="/shop">Continue shopping</Link>
+          </Button>
         </div>
-    )
-}
+      </div>
+    );
+  }
 
-export default Cart
+  return (
+    <div className="space-y-6">
+      {/* Cart items card */}
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+            Cart items
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {items.length + bundles.length} item{items.length + bundles.length !== 1 ? 's' : ''} in your cart
+          </p>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {items.length > 0 &&
+            items.map((item: any, index: number) => (
+              <CartItem
+                key={`${item.id}-${index}`}
+                item={item}
+                storeCurrency={storeCurrency}
+                showBundleInfo={false}
+              />
+            ))}
+          {bundles.length > 0 && items.length > 0 && (
+            <div className="bg-slate-50/50">
+              <div className="px-6 py-3">
+                <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Bundles
+                </span>
+              </div>
+            </div>
+          )}
+          {bundles.length > 0 &&
+            bundles.map((bundle: any, index: number) => (
+              <div key={`bundle-${bundle.id}-${index}`} className="bg-slate-50/30">
+                <CartBundle bundle={bundle} storeCurrency={storeCurrency} />
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Cart;

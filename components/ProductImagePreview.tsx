@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { X, ZoomIn, Loader2 } from 'lucide-react';
+import { X, ZoomIn } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProductImagePreviewProps {
   itemName: string;
@@ -47,31 +47,11 @@ export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
     setPreviewAlt('');
   };
 
-  if (isLoading) {
-    return (
-      <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
-          <span className="text-xs text-gray-500">Loading image...</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Check if we have a valid image URL (more lenient than just hasImage)
+  // Check if we have a valid image URL – show image immediately when we have it (no loader)
   const hasValidImageUrl = imageUrl && imageUrl !== '/placeholder.svg' && imageUrl !== '';
-  
-  if (!hasValidImageUrl) {
-    return (
-      <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
-        <div className="text-center text-gray-500">
-          <div className="text-sm">No image available</div>
-        </div>
-      </div>
-    );
-  }
 
-  return (
+  if (hasValidImageUrl) {
+    return (
     <>
       <div className={`relative group ${className}`}>
         <div className="relative w-full h-full">
@@ -116,6 +96,21 @@ export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
         </div>
       )}
     </>
+  );
+  }
+
+  // Still loading and no URL yet – show skeleton, no spinner
+  if (isLoading) {
+    return <Skeleton className={className} />;
+  }
+
+  // No image available
+  return (
+    <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
+      <div className="text-center text-gray-500">
+        <div className="text-sm">No image available</div>
+      </div>
+    </div>
   );
 };
 

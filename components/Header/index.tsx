@@ -22,8 +22,6 @@ import { getCategories } from "@/hooks/getCategories";
 import { productService } from "@/lib/erpnext/services/productService";
 import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/imageUtils";
 import { formatPrice, getEffectivePrice } from "@/lib/currencyUtils";
-import { getErpnextImageUrl } from "@/lib/erpnextImageUtils";
-
 interface StoreData {
   store_name?: string;
   store_detail?: {
@@ -259,33 +257,18 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
       <header className="gradient-blue-grey border-b border-white/20 sticky top-0 z-50 shadow-sm">
         <div className="page-container">
           {/* Main Header Content */}
-          <div className="flex items-center justify-between py-4">
+          <div className="flex items-center justify-between gap-6 py-4">
             {/* Logo Section */}
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex-shrink-0 group">
-                <div className="flex items-center space-x-3">
-                  {companyLogo ? (
-                    <Image
-                      src={getErpnextImageUrl(companyLogo)}
-                      alt={`${storeName} Logo`}
-                      width={90}
-                      height={60}
-                      className="transition-transform duration-300 group-hover:scale-105 object-contain brightness-0 invert"
-                      unoptimized
-                    />
-                  ) : headerLogoId ? (
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_NHOST_STORAGE_URL}/files/${headerLogoId}`}
-                      alt="Header Logo"
-                      width={90}
-                      height={60}
-                      className="transition-transform duration-300 group-hover:scale-105 brightness-0 invert"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl bg-white/20">
-                      {storeName?.charAt(0) || "S"}
-                    </div>
-                  )}
+                <div className="flex items-center ">
+                  <Image
+                    src="/HORIZONTAL Logo CNC KRAL.png"
+                    alt={`${storeName} Logo`}
+                    width={90}
+                    height={60}
+                    className="transition-transform duration-300 group-hover:scale-105 object-contain brightness-0 invert"
+                  />
                 </div>
               </Link>
             </div>

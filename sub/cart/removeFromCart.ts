@@ -3,8 +3,8 @@
 
 export const RemoveFromCart = (productId: string) => {
     try {
-        // Get existing cart from localStorage
-        const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        // Get existing cart from sessionStorage
+        const existingCart = JSON.parse(sessionStorage.getItem("cart") || "[]");
         console.log("Removing product with ID:", productId);
         console.log("Current cart:", existingCart);
         
@@ -12,8 +12,8 @@ export const RemoveFromCart = (productId: string) => {
         const updatedCart = existingCart.filter((item: any) => item.id !== productId);
         console.log("Updated cart:", updatedCart);
         
-        // Save updated cart to localStorage
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        // Save updated cart to sessionStorage
+        sessionStorage.setItem("cart", JSON.stringify(updatedCart));
         
         // Dispatch custom event to notify components
         window.dispatchEvent(new CustomEvent("cartUpdated"));

@@ -18,7 +18,7 @@ const Cart = ({ storeCurrency }: CartProps) => {
   useEffect(() => {
     const syncCart = () => {
       try {
-        const cartDataString = localStorage.getItem('cart');
+        const cartDataString = sessionStorage.getItem('cart');
         const cartData = cartDataString ? JSON.parse(cartDataString) : [];
         setCart(Array.isArray(cartData) ? cartData : []);
       } catch {

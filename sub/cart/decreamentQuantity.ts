@@ -3,8 +3,8 @@
 
 export const DecreamentQuantity = (productId: string) => {
     try {
-        // Get existing cart from localStorage
-        const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        // Get existing cart from sessionStorage
+        const existingCart = JSON.parse(sessionStorage.getItem("cart") || "[]");
         console.log("Decrementing quantity for product ID:", productId);
         console.log("Current cart:", existingCart);
         
@@ -23,8 +23,8 @@ export const DecreamentQuantity = (productId: string) => {
                 console.log("Removed item from cart");
             }
             
-            // Save updated cart to localStorage
-            localStorage.setItem("cart", JSON.stringify(existingCart));
+            // Save updated cart to sessionStorage
+            sessionStorage.setItem("cart", JSON.stringify(existingCart));
             
             // Dispatch custom event to notify components
             window.dispatchEvent(new CustomEvent("cartUpdated"));

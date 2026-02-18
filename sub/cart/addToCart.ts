@@ -3,8 +3,8 @@
 
 export const AddToCart = (product: any, quantity: number = 1) => {
     try {
-        // Get existing cart from localStorage
-        const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        // Get existing cart from sessionStorage
+        const existingCart = JSON.parse(sessionStorage.getItem("cart") || "[]");
         
         // Create a unique identifier for cart items
         // For variations, use variationId + selectedAttributes to create unique key
@@ -50,8 +50,8 @@ export const AddToCart = (product: any, quantity: number = 1) => {
             existingCart.push(cartItem);
         }
         
-        // Save updated cart to localStorage
-        localStorage.setItem("cart", JSON.stringify(existingCart));
+        // Save updated cart to sessionStorage
+        sessionStorage.setItem("cart", JSON.stringify(existingCart));
         
         // Dispatch custom event to notify components
         window.dispatchEvent(new CustomEvent("cartUpdated"));

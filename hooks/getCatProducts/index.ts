@@ -1,23 +1,33 @@
 import { productService } from '@/lib/erpnext/services/productService';
 import { getAllCategories } from '@/hooks/getCategories';
 
+const normalizeSlug = (s: string) => decodeURIComponent(s || '').trim().toLowerCase();
+
 export const getCatProducts = async (storeId: string, catSlug: string) => {
     try {
-        // First, get all categories to find the one matching the slug
+        const slugNorm = normalizeSlug(catSlug);
+        if (!slugNorm) {
+            return { catName: '', catProducts: [], catSubCats: [], currentStock: [] };
+        }
+
+        // First, get all categories to find the one matching the slug (or id/name)
         const { categories } = await getAllCategories(storeId);
-        const matchingCategory = categories.find(
-            cat => cat.slug === catSlug || cat.slug === decodeURIComponent(catSlug)
+        const categoriesList = Array.isArray(categories) ? categories : [];
+        const matchingCategory = categoriesList.find(
+            cat => normalizeSlug(cat.slug) === slugNorm ||
+                   normalizeSlug(cat.id) === slugNorm ||
+                   (cat.name && cat.name.toLowerCase().trim() === slugNorm)
         );
-        
-        // Use the actual category name/id (not slug) to fetch products
-        // If no match found, try using the slug directly (in case it's already the category name)
+
+        // Use the actual ERPNext item group name (id) to fetch products
         const categoryName = matchingCategory ? matchingCategory.id : catSlug;
-        const categoryDisplayName = matchingCategory ? matchingCategory.name : catSlug;
+        const categoryDisplayName = matchingCategory ? matchingCategory.name : catSlug.replace(/-/g, ' ');
         
-        // Get products by category from ERPNext using the actual category name
-        const products = await productService.getProductsByCategory(categoryName);
-        const stockData = await productService.getStockBalance();
-        
+        // Get products by category from ERPNext using the actual item group name
+        const productsRaw = await productService.getProductsByCategory(categoryName);
+        const products = Array.isArray(productsRaw) ? productsRaw : [];
+        const stockData = (await productService.getStockBalance()) || [];
+
         // Transform ERPNext products to match expected format
         const catProducts = products.map((product, index) => ({
             id: product.name,
@@ -45,7 +55,7 @@ export const getCatProducts = async (storeId: string, catSlug: string) => {
         }));
 
         // Transform stock data
-        const currentStock = stockData.map(stock => ({
+        const currentStock = (Array.isArray(stockData) ? stockData : []).map(stock => ({
             sku: stock.item_code,
             available_quantity: stock.actual_qty,
             reserved_quantity: stock.reserved_qty,
@@ -57,8 +67,8 @@ export const getCatProducts = async (storeId: string, catSlug: string) => {
         }));
 
         // Get subcategories if they exist
-        const subCategories = matchingCategory 
-            ? categories.filter(cat => cat.parent_id === matchingCategory.id)
+        const subCategories = matchingCategory
+            ? categoriesList.filter(cat => cat.parent_id === matchingCategory.id)
             : [];
 
         return {
@@ -69,8 +79,9 @@ export const getCatProducts = async (storeId: string, catSlug: string) => {
         };
     } catch (error) {
         console.error('Error fetching category products from ERPNext:', error);
+        const fallbackName = (typeof catSlug === 'string' ? catSlug : '').replace(/-/g, ' ') || 'Category';
         return {
-            catName: catSlug,
+            catName: fallbackName,
             catProducts: [],
             catSubCats: [],
             currentStock: [],

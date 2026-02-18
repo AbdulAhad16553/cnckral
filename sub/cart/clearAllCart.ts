@@ -3,8 +3,8 @@
 
 export const clearAllCart = () => {
     try {
-        // Clear cart from localStorage
-        localStorage.setItem("cart", JSON.stringify([]));
+        // Clear cart from sessionStorage
+        sessionStorage.setItem("cart", JSON.stringify([]));
         
         // Dispatch custom event to notify components
         window.dispatchEvent(new CustomEvent("cartUpdated"));

@@ -44,7 +44,7 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
   useEffect(() => {
     const handleCartUpdate = () => {
       try {
-        const cartDataString = localStorage.getItem('cart');
+        const cartDataString = sessionStorage.getItem('cart');
         const cartData = cartDataString ? JSON.parse(cartDataString) : [];
         setCartItems(Array.isArray(cartData) ? cartData : []);
       } catch {
@@ -131,7 +131,7 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
           : 'Sales invoice created',
       });
 
-      localStorage.removeItem('cart');
+      sessionStorage.removeItem('cart');
       setCartItems([]);
       window.dispatchEvent(new CustomEvent('cartUpdated'));
       setDialogOpen(false);

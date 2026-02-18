@@ -67,7 +67,7 @@ export class StoreService {
           primary_color: '#3B82F6', // Default blue
           secondary_color: '#1F2937', // Default dark
           currency: company.default_currency || 'USD',
-          tagline: `Welcome to ${company.company_name || company.name}`,
+          tagline: `Welcome to ${company.company_name || 'CNC KRAL'}`,
           coming_soon: 0,
           payment_method_active: 1,
           email: company.email,
@@ -154,7 +154,7 @@ export class StoreService {
           currency: company.default_currency || 'USD',
           primary_color: '#3B82F6',
           secondary_color: '#1F2937',
-          tagline: `Welcome to ${company.company_name || 'Our Store'}`,
+            tagline: `Welcome to ${company.company_name || 'CNC KRAL'}`,
           coming_soon: false,
           payment_method_active: true
         };
@@ -164,7 +164,7 @@ export class StoreService {
         currency: 'USD',
         primary_color: '#3B82F6',
         secondary_color: '#1F2937',
-        tagline: 'Welcome to Our Store',
+        tagline: 'Welcome to CNC KRAL',
         coming_soon: false,
         payment_method_active: true
       };

@@ -33,9 +33,9 @@ const Categories = ({ categories, hideOnPage, subcat }: CategoriesProps) => {
         }}
       >
         {categories?.length > 0 ? (
-          categories.map((category: any, index: any) => (
+          categories.map((category: any) => (
             <motion.div
-              key={index}
+              key={category.id ?? category.slug ?? category.name ?? 'cat'}
               variants={{
                 hidden: { opacity: 0, y: 24 },
                 visible: {

@@ -4,18 +4,11 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
 const HERO_IMAGES = [
-  {
-    src: "https://images.unsplash.com/photo-1565680018434-b513d5e261bc?w=1200&h=500&fit=crop",
-    alt: "CNC machinery and precision tooling",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1200&h=500&fit=crop",
-    alt: "Industrial laser cutting equipment",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&h=500&fit=crop",
-    alt: "Precision manufacturing and CNC tools",
-  },
+  { src: "/coverr%20web.jpg.jpeg", alt: "TOOLS - Imported Cutting Tools" },
+  { src: "/coverr%20webb.jpg.jpeg", alt: "PRECISION - Advanced CNC & Laser Solutions" },
+  { src: "/web%201.jpg.jpeg", alt: "KRAL CNC machines and industrial showroom" },
+  { src: "/web%202.jpg.jpeg", alt: "KRAL CNC machine and control cabinet" },
+  { src: "/web%203.jpg.jpeg", alt: "POWER - Industrial Machines" },
 ];
 
 const INTERVAL_MS = 5000;

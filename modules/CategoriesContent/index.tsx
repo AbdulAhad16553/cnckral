@@ -40,10 +40,12 @@ const CategoriesContent = ({
     const [showFilters, setShowFilters] = useState(false);
     const userChangedPrice = useRef(false);
 
+    const safeCatProducts = Array.isArray(catProducts) ? catProducts : [];
+
     // Initialize price range from catProducts
     useEffect(() => {
-        if (catProducts && catProducts.length > 0 && !userChangedPrice.current) {
-            const prices = catProducts.flatMap((product: any) => {
+        if (safeCatProducts.length > 0 && !userChangedPrice.current) {
+            const prices = safeCatProducts.flatMap((product: any) => {
                 const prices: number[] = [];
                 // Get price from main product
                 if (product.sale_price) prices.push(product.sale_price);
@@ -61,7 +63,7 @@ const CategoriesContent = ({
             const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
             setPriceRange([0, maxPrice]);
         }
-    }, [catProducts]);
+    }, [safeCatProducts]);
 
     const handlePriceRangeChange = (newRange: [number, number]) => {
         userChangedPrice.current = true;
@@ -120,10 +122,10 @@ const CategoriesContent = ({
     };
 
     // Use catProducts directly (already fetched on server)
-    const filteredProducts = filterByPriceRange(catProducts || []);
+    const filteredProducts = filterByPriceRange(safeCatProducts);
     const sortedProducts = sortProducts(filteredProducts, sortBy);
     const hasProducts = sortedProducts.length > 0;
-    const hasSubCategories = catSubCats && catSubCats.length > 0;
+    const hasSubCategories = Array.isArray(catSubCats) && catSubCats.length > 0;
     const showPriceFilter = !hasSubCategories && hasProducts;
 
     // Batch image loading for CNC-style product grid
@@ -275,16 +277,16 @@ const CategoriesContent = ({
                             </div>
                             <h3 className="text-xl font-semibold text-slate-900 mb-2">No products found</h3>
                             <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                                {catProducts && catProducts.length > 0
+                                {safeCatProducts.length > 0
                                     ? "No products match your current filters. Try adjusting your price range."
                                     : "This category doesn't have any products yet. Check back later for new products."}
                             </p>
-                            {catProducts && catProducts.length > 0 && (
+                            {safeCatProducts.length > 0 && (
                                 <Button
                                     variant="outline"
                                     className="border-slate-300"
                                     onClick={() => {
-                                        const allPrices = catProducts.flatMap((product: any) => {
+                                        const allPrices = safeCatProducts.flatMap((product: any) => {
                                             const prs: number[] = [];
                                             if (product.sale_price) prs.push(product.sale_price);
                                             if (product.base_price) prs.push(product.base_price);

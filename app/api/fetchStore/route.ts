@@ -12,8 +12,8 @@ const getFallbackStorePayload = () => {
       stores: [
         {
           id: "default-store",
-          store_name: "Kral Laser",
-          company_id: "Kral Laser",
+          store_name: "Cnc Kral",
+          company_id: "Cnc Kral",
           store_detail: {
             currency: "PKR",
           },

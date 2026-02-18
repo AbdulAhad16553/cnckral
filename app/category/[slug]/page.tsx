@@ -4,11 +4,15 @@ import { getUrlWithScheme } from '@/lib/getUrlWithScheme';
 import { getCatProducts } from '@/hooks/getCatProducts';
 import CategoriesContent from '@/modules/CategoriesContent';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 type Params = Promise<{ slug: string }>;
 
 export default async function CategoryPage({ params }: { params: Params }) {
-    const { slug: categoryId } = await params;
+    const { slug: categorySlug } = await params;
+    if (!categorySlug?.trim()) {
+        notFound();
+    }
 
     const Headers = await headers();
     const host = Headers.get("host");
@@ -18,12 +22,17 @@ export default async function CategoryPage({ params }: { params: Params }) {
 
     const fullStoreUrl = getUrlWithScheme(host);
     const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
-    const data = await response.json();
-    const storeId = data?.store?.stores[0].id;
-    const companyId = data?.store?.stores[0].company_id;
-    const storeCurrency = data?.store?.stores[0].store_detail?.currency ? data?.store?.stores[0].store_detail?.currency : "Rs.";
+    const data = await response.json().catch(() => ({}));
+    const store = data?.store?.stores?.[0];
+    if (!store?.id) {
+        notFound();
+    }
 
-    const { catProducts, catName, catSubCats, currentStock } = await getCatProducts(storeId, categoryId);
+    const storeId = store.id;
+    const companyId = store.company_id ?? '';
+    const storeCurrency = store.store_detail?.currency ?? "Rs.";
+
+    const { catProducts, catName, catSubCats, currentStock } = await getCatProducts(storeId, categorySlug);
 
     return (
         <Layout>

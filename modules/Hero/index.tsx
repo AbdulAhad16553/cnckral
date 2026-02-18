@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, Wrench } from "lucide-react";
 import { HeroImageCarousel } from "@/components/HeroImageCarousel";
-import Image from "next/image";
+import { FeaturedProductImageCarousel } from "@/components/FeaturedProductImageCarousel";
 
 interface HeroProps {
   content: {
@@ -23,13 +23,16 @@ const Hero = async ({
   products,
   hideOnPage,
 }: HeroProps) => {
-  const storeName = storeData?.store_name || "Kral Laser";
+  const storeName =  "CNC KRAL";
 
   const featuredProduct = Array.isArray(products) && products.length > 0 ? products[0] : null;
-  const featuredImage =
-    featuredProduct?.product_images && featuredProduct.product_images.length > 0
-      ? featuredProduct.product_images[0].image_id
-      : null;
+  const productImages = (() => {
+    const imgs = featuredProduct?.product_images ?? [];
+    if (imgs.length === 0) return [];
+    const featured = imgs.find((img: any) => img?.position === "featured");
+    const rest = imgs.filter((img: any) => img?.position !== "featured");
+    return featured ? [featured, ...rest] : imgs;
+  })();
 
   const infoCards = [
     {
@@ -77,21 +80,13 @@ const Hero = async ({
               className="group"
             >
               <div className="relative flex items-center gap-6 sm:gap-8 px-5 sm:px-8 py-4 sm:py-5 rounded-full bg-white/90 shadow-xl border border-slate-200/70 backdrop-blur-md max-w-3xl">
-                {/* Elliptical image */}
-                <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-slate-100 border border-slate-200">
-                  {featuredImage ? (
-                    <Image
-                      src={featuredImage}
-                      alt={featuredProduct.name || "Featured product"}
-                      fill
-                      sizes="112px"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
-                      No image
-                    </div>
-                  )}
+                {/* Product images carousel */}
+                <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-slate-100 border border-slate-200 transition-transform duration-300 group-hover:scale-105">
+                  <FeaturedProductImageCarousel
+                    images={productImages}
+                    alt={featuredProduct.name || "Featured product"}
+                    className="w-full h-full"
+                  />
                 </div>
 
                 {/* Content */}

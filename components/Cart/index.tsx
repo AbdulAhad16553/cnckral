@@ -10,7 +10,7 @@ const Cart = () => {
 
   useEffect(() => {
     const updateCartCount = () => {
-      const stored = localStorage.getItem("cart");
+      const stored = sessionStorage.getItem("cart");
       const items = stored ? JSON.parse(stored) : [];
       setCartCount(items.length);
     };

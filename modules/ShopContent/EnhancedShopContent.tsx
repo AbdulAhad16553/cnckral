@@ -30,7 +30,12 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
   hideOnPage = false,
   mode = "all",
 }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const isMachineMode = mode === "machine";
+
+  // For machine page, default to list view (single column cards)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(
+    isMachineMode ? 'list' : 'grid'
+  );
   const [paginationMode, setPaginationMode] = useState<'pagination' | 'infinite' | 'load-more'>('pagination');
   const [pageSize, setPageSize] = useState(1000); // Load all products
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,20 +103,22 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Quick Category Dropdown */}
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-52">
-              <SelectValue placeholder="All categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Quick Category Dropdown (hidden on Machines page) */}
+          {!isMachineMode && (
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-52">
+                <SelectValue placeholder="All categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           {/* Search */}
           <div className="relative">
@@ -123,25 +130,27 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
             />
           </div>
 
-          {/* View Mode Toggle */}
-          <div className="flex items-center border rounded-lg">
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className="rounded-r-none"
-            >
-              <Grid3X3 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-              className="rounded-l-none"
-            >
-              <List className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* View Mode Toggle (hidden on Machines page; always list) */}
+          {!isMachineMode && (
+            <div className="flex items-center border rounded-lg">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="rounded-r-none"
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-l-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
           {/* Settings */}
           <Button
@@ -220,23 +229,25 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
                 </Select>
               </div>
 
-              {/* Category Filter */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Category</label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Category Filter (hidden on Machines page) */}
+              {!isMachineMode && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Category</label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             {/* Price Range */}
@@ -283,58 +294,60 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
       )}
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filters
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Categories */}
-              <div>
-                <h4 className="font-medium mb-2">Categories</h4>
-                <div className="space-y-2">
-                  <Button
-                    variant={selectedCategory === 'all' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setSelectedCategory('all')}
-                    className="w-full justify-start"
-                  >
-                    All Categories
-                  </Button>
-                  {(showAllCategories ? categories : categories.slice(0, 12)).map((category) => (
+      <div className={isMachineMode ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 lg:grid-cols-4 gap-6"}>
+        {/* Sidebar (hidden on Machines page) */}
+        {!isMachineMode && (
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Filters
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Categories */}
+                <div>
+                  <h4 className="font-medium mb-2">Categories</h4>
+                  <div className="space-y-2">
                     <Button
-                      key={category.id}
-                      variant={selectedCategory === category.id ? 'default' : 'ghost'}
+                      variant={selectedCategory === 'all' ? 'default' : 'ghost'}
                       size="sm"
-                      onClick={() => setSelectedCategory(category.id)}
+                      onClick={() => setSelectedCategory('all')}
                       className="w-full justify-start"
                     >
-                      {category.name}
+                      All Categories
                     </Button>
-                  ))}
+                    {(showAllCategories ? categories : categories.slice(0, 12)).map((category) => (
+                      <Button
+                        key={category.id}
+                        variant={selectedCategory === category.id ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setSelectedCategory(category.id)}
+                        className="w-full justify-start"
+                      >
+                        {category.name}
+                      </Button>
+                    ))}
+                  </div>
+                  {categories.length > 12 && (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="mt-2 px-0"
+                      onClick={() => setShowAllCategories((prev) => !prev)}
+                    >
+                      {showAllCategories ? "Show fewer categories" : `Show all categories (${categories.length})`}
+                    </Button>
+                  )}
                 </div>
-                {categories.length > 12 && (
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="mt-2 px-0"
-                    onClick={() => setShowAllCategories((prev) => !prev)}
-                  >
-                    {showAllCategories ? "Show fewer categories" : `Show all categories (${categories.length})`}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Products */}
-        <div className="lg:col-span-3">
+        <div className={isMachineMode ? "w-full" : "lg:col-span-3"}>
           <PaginatedProducts
             companyId={necessary.companyId}
             storeId={necessary.storeId}

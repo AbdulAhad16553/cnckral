@@ -315,6 +315,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
           const basePriceForDisplay = getBasePriceForDisplay(product);
           const priceRange = getPriceRange(product);
           const hasVariations = product.product_variations && product.product_variations.length > 0;
+          const isMachineQuoteLayout = quoteFilter === "machine";
           
           // Create unique key combining multiple identifiers
           const baseId = product.id || product.sku || product.name || `product-${index}`;
@@ -337,6 +338,193 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
           }
 
           if (viewMode === "list") {
+            // Dedicated, taller, image-on-top layout for machine quotation items
+            if (isMachineQuoteLayout) {
+              return (
+                <Card
+                  key={uniqueKey}
+                  className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200 rounded-xl"
+                >
+                  {/* Image at top with tall frame */}
+                  <div className="w-full bg-slate-50 border-b">
+                    <Link href={`/product/${encodeURIComponent(product.sku)}`}>
+                      <ProductImagePreview
+                        itemName={product.sku}
+                        productName={product.name}
+                        imageUrl={imageUrl}
+                        hasImage={productHasImage}
+                        isLoading={isImageLoading}
+                        width={960}
+                        height={540}
+                        className="w-full h-64 sm:h-80 object-cover"
+                        showPreview={true}
+                      />
+                    </Link>
+                  </div>
+
+                  {/* Professional quotation layout */}
+                  <div className="p-6 sm:p-7 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                    {/* Left: title, meta, description */}
+                    <div className="space-y-3 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <Link href={`/product/${encodeURIComponent(product.sku)}`}>
+                            <h3 className="font-semibold text-lg sm:text-xl text-slate-900 hover:text-primary transition-colors">
+                              {product.name}
+                            </h3>
+                          </Link>
+                          {product.sku && (
+                            <p className="text-xs text-slate-500 tracking-wide uppercase">
+                              Item code: <span className="font-medium">{product.sku}</span>
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge
+                            variant="outline"
+                            className="text-xs font-semibold bg-amber-50 text-amber-800 border-amber-300"
+                          >
+                            Quotation Item
+                          </Badge>
+                          {hasVariations && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs font-semibold bg-blue-50 text-blue-800 border-blue-300"
+                            >
+                              {product.product_variations.length} configurations
+                            </Badge>
+                          )}
+                          {isOutOfStock && !product.enable_quote_request && (
+                            <Badge variant="destructive" className="text-xs font-semibold">
+                              Out of Stock
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {product.short_description && (
+                        <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">
+                          {product.short_description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Right: price, stock, actions */}
+                    <div className="flex flex-col items-end gap-3 min-w-[220px]">
+                      <div className="text-right">
+                        {hasVariations ? (
+                          priceRange ? (
+                            <div className="flex flex-col items-end">
+                              <span className="text-xs uppercase tracking-wide text-slate-500">
+                                Price range
+                              </span>
+                              <span className="font-semibold text-lg text-primary">
+                                From{" "}
+                                {formatPrice(
+                                  priceRange.min,
+                                  product.currency || storeCurrency
+                                )}
+                              </span>
+                              {priceRange.min !== priceRange.max && (
+                                <span className="text-xs text-slate-500">
+                                  Up to{" "}
+                                  {formatPrice(
+                                    priceRange.max,
+                                    product.currency || storeCurrency
+                                  )}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-end">
+                              <span className="text-xs uppercase tracking-wide text-slate-500">
+                                Starting from
+                              </span>
+                              <span className="font-semibold text-lg text-primary">
+                                {formatPrice(
+                                  effectivePrice,
+                                  product.currency || storeCurrency
+                                )}
+                              </span>
+                            </div>
+                          )
+                        ) : (
+                          <div className="flex flex-col items-end">
+                            <span className="text-xs uppercase tracking-wide text-slate-500">
+                              Estimated price
+                            </span>
+                            <span className="font-semibold text-lg text-primary">
+                              {formatPrice(
+                                effectivePrice,
+                                product.currency || storeCurrency
+                              )}
+                            </span>
+                            {productHasDiscount && (
+                              <span className="text-xs text-slate-400 line-through">
+                                {formatPrice(
+                                  basePriceForDisplay,
+                                  product.currency || storeCurrency
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs text-slate-600">
+                        {productStock > 0 ? (
+                          <>
+                            <span className="inline-flex items-center gap-1">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                              <span className="font-medium text-emerald-700">
+                                {productStock} in stock
+                              </span>
+                            </span>
+                            {product.type === "variable" && (
+                              <span className="text-slate-500">
+                                ({product.product_variations?.length || 0} configurations)
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />
+                            <span className="font-medium text-amber-700">
+                              Built to order
+                            </span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            router.push(`/product/${encodeURIComponent(product.sku)}`)
+                          }
+                        >
+                          View details
+                        </Button>
+                        {(!isOutOfStock || product.enable_quote_request) && (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              router.push(`/product/${encodeURIComponent(product.sku)}`)
+                            }
+                          >
+                            <ShoppingCart className="h-4 w-4 mr-1" />
+                            Request quotation
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            }
+
+            // Default compact list layout for non-machine views
             return (
               <Card
                 key={uniqueKey}

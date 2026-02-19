@@ -16,6 +16,9 @@ interface ProductImagePreviewProps {
   height?: number;
   showPreview?: boolean;
   onClick?: () => void;
+  objectFit?: 'cover' | 'contain';
+  /** When true, image fills container (use with objectFit="contain" to fit inside a fixed frame) */
+  fill?: boolean;
 }
 
 export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
@@ -28,7 +31,9 @@ export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
   width = 400,
   height = 400,
   showPreview = true,
-  onClick
+  onClick,
+  objectFit = 'cover',
+  fill = false
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [previewAlt, setPreviewAlt] = useState<string>('');
@@ -58,9 +63,11 @@ export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
           <Image
             src={imageUrl}
             alt={productName}
-            width={width}
-            height={height}
-            className="object-cover cursor-pointer transition-transform group-hover:scale-105"
+            {...(fill
+              ? { fill: true, sizes: '100vw' }
+              : { width, height }
+            )}
+            className={`${objectFit === 'contain' ? 'object-contain' : 'object-cover'} cursor-pointer transition-transform group-hover:scale-105`}
             onClick={() => openImagePreview(imageUrl, productName)}
           />
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">

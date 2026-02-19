@@ -345,9 +345,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                   key={uniqueKey}
                   className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200 rounded-xl"
                 >
-                  {/* Image at top with tall frame */}
-                  <div className="w-full bg-slate-50 border-b">
-                    <Link href={`/product/${encodeURIComponent(product.sku)}`}>
+                  {/* Image at top with tall frame – fit inside card, no overflow */}
+                  <div className="w-full h-64 sm:h-80 bg-slate-50 border-b overflow-hidden flex items-center justify-center">
+                    <Link href={`/product/${encodeURIComponent(product.sku)}`} className="w-full h-full flex items-center justify-center">
                       <ProductImagePreview
                         itemName={product.sku}
                         productName={product.name}
@@ -356,7 +356,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                         isLoading={isImageLoading}
                         width={960}
                         height={540}
-                        className="w-full h-64 sm:h-80 object-cover"
+                        className="w-full h-full"
+                        objectFit="contain"
+                        fill
                         showPreview={true}
                       />
                     </Link>
@@ -493,29 +495,6 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                               Built to order
                             </span>
                           </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            router.push(`/product/${encodeURIComponent(product.sku)}`)
-                          }
-                        >
-                          View details
-                        </Button>
-                        {(!isOutOfStock || product.enable_quote_request) && (
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              router.push(`/product/${encodeURIComponent(product.sku)}`)
-                            }
-                          >
-                            <ShoppingCart className="h-4 w-4 mr-1" />
-                            Request quotation
-                          </Button>
                         )}
                       </div>
                     </div>

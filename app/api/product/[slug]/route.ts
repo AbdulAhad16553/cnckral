@@ -178,14 +178,22 @@ export async function GET(
     }
 
     // 5️⃣ Return Response
-    return NextResponse.json({
-      success: true,
-      product: {
-        ...product,
-        stock: stockInfo,
-        attachments
+    return NextResponse.json(
+      {
+        success: true,
+        product: {
+          ...product,
+          stock: stockInfo,
+          attachments,
+        },
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+          Pragma: "no-cache",
+        },
       }
-    });
+    );
 
   } catch (error) {
     console.error('Error fetching product:', error);

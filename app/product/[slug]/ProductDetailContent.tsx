@@ -22,6 +22,7 @@ import AttributeFilter from '@/common/AttributeFilter';
 import { AddToCart } from '@/sub/cart/addToCart';
 import { getErpnextImageUrl } from '@/lib/erpnextImageUtils';
 import ProductDescription from '@/components/ProductDescription';
+import MachineProductGallery from '@/components/MachineProductGallery';
 import QuotationDialog from '@/components/QuotationDialog';
 import { ProductSkeleton } from '@/components/ui/product-skeleton';
 
@@ -278,7 +279,10 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`/api/product/${slug}`);
+        const response = await fetch(`/api/product/${slug}`, {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" },
+        });
         const data = await response.json();
         
         if (!response.ok) {
@@ -379,9 +383,12 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        {/* Left: Gallery + Description */}
+        {/* Left: Gallery + Description (no top gallery for quote items – use MachineProductGallery) */}
         <div className="lg:col-span-7 space-y-8">
-          {/* Main Image */}
+          {/* Main Image – hidden for quotation items with attachments */}
+          {!(isCustomQuotationItem && product.attachments?.some((a) =>
+            /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
+          )) && (
           <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden border border-slate-200/80 shadow-sm relative group">
             {galleryImages.length > 0 && currentImage ? (
               <div className="relative w-full h-full">
@@ -412,9 +419,12 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
               </div>
             )}
           </div>
+          )}
 
-          {/* Thumbnails */}
-          {galleryImages.length > 1 && (
+          {/* Thumbnails – hidden for quotation items with attachments */}
+          {!(isCustomQuotationItem && product.attachments?.some((a) =>
+            /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
+          )) && galleryImages.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {galleryImages.map((image, index) => (
                 <button
@@ -445,9 +455,26 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
             </div>
           )}
 
-          {/* Description */}
-          <section className="pt-4 border-t border-slate-200">
-            <ProductDescription description={product.description} />
+          {/* Description / Machine alternating gallery (HSG-style for quotation items) */}
+          <section className={
+            isCustomQuotationItem && product.attachments?.some((a) =>
+              /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
+            ) ? "pt-0" : "pt-4 border-t border-slate-200"
+          }>
+            {isCustomQuotationItem && product.attachments?.some((a) =>
+              /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
+            ) ? (
+              <MachineProductGallery
+                product={{
+                  item_name: product.item_name,
+                  description: product.description,
+                  attachments: product.attachments,
+                }}
+                isMachine={true}
+              />
+            ) : (
+              <ProductDescription description={product.description} />
+            )}
           </section>
         </div>
 

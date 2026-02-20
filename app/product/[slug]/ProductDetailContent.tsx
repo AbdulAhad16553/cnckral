@@ -16,7 +16,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Package, DollarSign, Tag, Info, X, ZoomIn, ShoppingCart, Plus, Minus, ChevronLeft, ChevronRight, FileImage, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Package, DollarSign, Tag, Info, X, ZoomIn, ShoppingCart, Plus, Minus, ChevronLeft, ChevronRight, FileImage, CheckCircle, Quote } from 'lucide-react';
 import Image from 'next/image';
 import AttributeFilter from '@/common/AttributeFilter';
 import { AddToCart } from '@/sub/cart/addToCart';
@@ -94,8 +94,10 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   // Added to cart confirmation dialog
   const [showAddedToCartDialog, setShowAddedToCartDialog] = useState(false);
 
-  // Check if product is custom quotation item
-  const isCustomQuotationItem = product?.custom_quotation_item === 1;
+  // Check if product is custom quotation item (ERPNext may use custom_quotation_item or custom_custom_quotation_item)
+  const isCustomQuotationItem =
+    (product as any)?.custom_quotation_item === 1 ||
+    (product as any)?.custom_custom_quotation_item === 1;
 
   // Initialize gallery images from product data
   useEffect(() => {
@@ -366,7 +368,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   return (
     <div className="max-w-7xl mx-auto">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+      <nav className="mb-8 flex items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
         <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
         <Link href="/shop" className="hover:text-slate-900 transition-colors">Shop</Link>
@@ -382,13 +384,94 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
         <span className="text-slate-900 font-medium truncate" aria-current="page">{product.item_name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        {/* Left: Gallery + Description (no top gallery for quote items – use MachineProductGallery) */}
-        <div className="lg:col-span-7 space-y-8">
-          {/* Main Image – hidden for quotation items with attachments */}
-          {!(isCustomQuotationItem && product.attachments?.some((a) =>
-            /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
-          )) && (
+      {/* For quote items (machines): HSG-style = item name at top, then image preview */}
+      {isCustomQuotationItem && (
+        <div className="mb-6 space-y-4">
+          {/* 1. Item name at top */}
+          <div>
+            <span className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-semibold tracking-wider text-blue-700">
+              MACHINE DETAIL
+            </span>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
+              {product.item_name}
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              SKU: <span className="font-mono text-slate-600">{product.name}</span>
+            </p>
+          </div>
+
+          {/* 2. Top image preview – main product image + attachments (HSG hero style) */}
+          <div className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-md">
+            {galleryImages.length > 0 && currentImage ? (
+              <div className="relative aspect-[16/9] w-full sm:aspect-[2/1]">
+                <Image
+                  src={currentImage.url}
+                  alt={currentImage.alt}
+                  fill
+                  className="object-contain cursor-zoom-in transition-transform duration-300 hover:scale-[1.02]"
+                  onClick={() => openImagePreview(currentImageIndex)}
+                  sizes="(max-width: 1024px) 100vw, 1200px"
+                  priority
+                />
+                {galleryImages.length > 1 && (
+                  <div className="absolute top-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                    {currentImageIndex + 1} / {galleryImages.length}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex aspect-[16/9] items-center justify-center text-slate-400">
+                <Package className="h-16 w-16 opacity-50" />
+                <span className="ml-2 text-sm">No image available</span>
+              </div>
+            )}
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto border-t border-slate-200/80 bg-slate-50/80 p-2">
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                      currentImageIndex === idx
+                        ? "border-blue-600 ring-2 ring-blue-600/20"
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="56px" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 3. CTA buttons */}
+          <div className="flex flex-wrap gap-3">
+            <Button
+              size="lg"
+              className="bg-blue-600 px-8 font-semibold text-white shadow-md shadow-blue-600/25 hover:bg-blue-700"
+              onClick={() => {
+                if (isTemplate && !selectedVariation) {
+                  document.getElementById("quote-variations")?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  setShowQuotationDialog(true);
+                }
+              }}
+            >
+              Get a Quote
+            </Button>
+            <Button variant="outline" size="lg" className="rounded-lg border-slate-300 font-medium" asChild>
+              <Link href="/contact">Talk to Expert</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className={`grid grid-cols-1 gap-8 lg:gap-12 ${isCustomQuotationItem ? "lg:grid-cols-1" : "lg:grid-cols-12"}`}>
+        {/* Main content: full-width for quote items (HSG-style), otherwise 7-col */}
+        <div className={isCustomQuotationItem ? "w-full space-y-8" : "lg:col-span-7 space-y-8"}>
+          {/* Main Image – only for non-quotation items (machines use top preview above) */}
+          {!isCustomQuotationItem && (
           <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden border border-slate-200/80 shadow-sm relative group">
             {galleryImages.length > 0 && currentImage ? (
               <div className="relative w-full h-full">
@@ -421,10 +504,8 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           </div>
           )}
 
-          {/* Thumbnails – hidden for quotation items with attachments */}
-          {!(isCustomQuotationItem && product.attachments?.some((a) =>
-            /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
-          )) && galleryImages.length > 1 && (
+          {/* Thumbnails – hidden for quotation items */}
+          {!isCustomQuotationItem && galleryImages.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {galleryImages.map((image, index) => (
                 <button
@@ -455,30 +536,38 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
             </div>
           )}
 
-          {/* Description / Machine alternating gallery (HSG-style for quotation items) */}
-          <section className={
-            isCustomQuotationItem && product.attachments?.some((a) =>
-              /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
-            ) ? "pt-0" : "pt-4 border-t border-slate-200"
-          }>
-            {isCustomQuotationItem && product.attachments?.some((a) =>
-              /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(a.file_name || "")
-            ) ? (
-              <MachineProductGallery
-                product={{
-                  item_name: product.item_name,
-                  description: product.description,
-                  attachments: product.attachments,
-                }}
-                isMachine={true}
-              />
+          {/* Description / Machine gallery (HSG-style for all quotation items) */}
+          <section className={isCustomQuotationItem ? "pt-0" : "pt-4 border-t border-slate-200"}>
+            {isCustomQuotationItem ? (
+              <>
+                <MachineProductGallery
+                  product={{
+                    item_name: product.item_name,
+                    description: product.description,
+                    attachments: product.attachments,
+                  }}
+                  isMachine={true}
+                />
+                {/* Testimonial section for machine detail */}
+                <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+                  <Quote className="h-10 w-10 text-blue-600/30" aria-hidden />
+                  <blockquote className="mt-2 text-slate-700 text-base sm:text-lg leading-relaxed">
+                    &ldquo;We have been using their equipment for over three years. Outstanding reliability and excellent after-sales support. Highly recommend for industrial applications.&rdquo;
+                  </blockquote>
+                  <footer className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                    <span className="font-semibold text-slate-900">— Manufacturing Director</span>
+                    <span className="text-slate-500">Leading Industrial Solutions</span>
+                  </footer>
+                </div>
+              </>
             ) : (
               <ProductDescription description={product.description} />
             )}
           </section>
         </div>
 
-        {/* Right: Sticky product info & actions */}
+        {/* Right: Sticky product info & actions (hidden for quote items – use hero + variations below) */}
+        {!isCustomQuotationItem && (
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-24 space-y-6">
             {/* Badges */}
@@ -761,7 +850,45 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           </Card>
           </div>
         </div>
+        )}
       </div>
+
+      {/* For quote items: Variations section below (if template) */}
+      {isCustomQuotationItem && (
+        <div className="mt-6 space-y-4">
+          {isTemplate && product.variants && product.variants.length > 0 && (
+            <Card id="quote-variations" className="rounded-xl border-slate-200 p-5 scroll-mt-24">
+              <h3 className="mb-3 text-base font-semibold">Select Configuration</h3>
+              <AttributeFilter
+                templateItemName={product.name}
+                onAttributeChange={handleAttributeChange}
+                selectedAttributes={selectedAttributes}
+              />
+              {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
+                <div className="mt-4 space-y-3">
+                  {filteredVariations.map((variant) => {
+                    const isSelected = selectedVariation?.name === variant.name;
+                    return (
+                      <div
+                        key={variant.name}
+                        onClick={() => handleVariationClick(variant)}
+                        className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
+                          isSelected ? "border-blue-600 ring-2 ring-blue-600/20" : "border-slate-200 hover:border-slate-300"
+                        }`}
+                      >
+                        <span className="font-medium">{variant.item_name}</span>
+                        {variant.price != null && (
+                          <span className="text-slate-600">{variant.currency} {Number(variant.price).toLocaleString()}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Enhanced Image Preview Modal with Navigation */}
       {showImagePreview && galleryImages.length > 0 && (

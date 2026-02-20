@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { productService } from '@/lib/erpnext/services/productService';
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
-import { productCache } from '@/lib/cache';
+import { productCache, stockCache, priceCache } from '@/lib/cache';
 import { trackPaginationPerformance, trackPaginationCacheHit, trackPaginationCacheMiss } from '@/lib/paginationPerformance';
 import { getErpnextImageUrl } from '@/lib/erpnextImageUtils';
 
@@ -13,12 +13,13 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const mode = searchParams.get('mode') || 'all'; // machine | parts | all
+    const nocache = searchParams.get('nocache') === '1' || searchParams.get('bust') === '1';
     const offset = (page - 1) * limit;
 
     const quoteFilter = mode === 'machine' ? 1 : mode === 'parts' ? 0 : undefined;
     
     const cacheKey = `products-page-${page}-limit-${limit}-mode-${mode}`;
-    const cachedProducts = productCache.get(cacheKey);
+    const cachedProducts = nocache ? null : productCache.get(cacheKey);
     
     if (cachedProducts) {
       const loadTime = Date.now() - startTime;
@@ -45,37 +46,53 @@ export async function GET(request: NextRequest) {
     );
     const allItemCodes = [...new Set([...productCodes, ...variantCodes])];
 
-    // 1 API call for ALL prices (instead of N)
-    const { data: pricesData } = await erpnextClient.getItemPricesBatch(allItemCodes);
-    const priceMap = new Map<string, { price_list_rate: number; currency: string }>();
-    (pricesData || []).forEach((p: any) => {
-      const code = p.item_code ?? p.name;
-      if (code && !priceMap.has(code))
-        priceMap.set(code, { price_list_rate: p.price_list_rate ?? 0, currency: p.currency || 'PKR' });
+    // Fetch prices per item (batch "in" filter may not work in all ERPNext versions)
+    const pricePromises = allItemCodes.map(async (itemCode) => {
+      const cacheKey = `price-${itemCode}`;
+      const cached = priceCache.get(cacheKey);
+      if (cached) return { itemCode, price: cached };
+      try {
+        const { data: prices } = await erpnextClient.getList<any>(
+          "Item Price",
+          { item_code: itemCode },
+          ["price_list_rate", "currency"],
+          1
+        );
+        const priceData = prices && prices.length > 0
+          ? { price_list_rate: prices[0].price_list_rate || 0, currency: prices[0].currency || 'PKR' }
+          : { price_list_rate: 0, currency: 'PKR' };
+        priceCache.set(cacheKey, priceData, 15 * 60 * 1000);
+        return { itemCode, price: priceData };
+      } catch {
+        return { itemCode, price: { price_list_rate: 0, currency: 'PKR' } };
+      }
     });
 
-    let stockMap = new Map<string, { totalStock: number; bins: any[] } | null>();
-    if (allItemCodes.length > 0) {
+    // Fetch stock per item (reliable across ERPNext versions)
+    const stockPromises = allItemCodes.map(async (itemCode) => {
+      const ckey = `stock-${itemCode}`;
+      const cached = stockCache.get(ckey);
+      // Only use cache when we have a definite cached result (truthy = has stock data; we don't cache null to avoid ambiguity)
+      if (cached !== null && cached !== undefined) return { itemCode, stock: cached };
       try {
-        const { data: binsData } = await erpnextClient.getItemStockBatch(allItemCodes);
-        const binsByItem = new Map<string, any[]>();
-        (binsData || []).forEach((b: any) => {
-          const code = b.item_code ?? b.name;
-          if (code) {
-            if (!binsByItem.has(code)) binsByItem.set(code, []);
-            binsByItem.get(code)!.push(b);
-          }
-        });
-        allItemCodes.forEach(code => {
-          const bins = binsByItem.get(code);
-          stockMap.set(code, bins?.length
-            ? { totalStock: bins.reduce((t: number, x: any) => t + (x.actual_qty || 0), 0), bins }
-            : null);
-        });
+        const { data: stockData } = await erpnextClient.getItemStock(itemCode);
+        const stockInfo = stockData && stockData.length > 0
+          ? { totalStock: stockData.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0), bins: stockData }
+          : null;
+        stockCache.set(cacheKey, stockInfo, 2 * 60 * 1000);
+        return { itemCode, stock: stockInfo };
       } catch {
-        allItemCodes.forEach(code => stockMap.set(code, null));
+        return { itemCode, stock: null };
       }
-    }
+    });
+
+    const [priceResults, stockResults] = await Promise.all([
+      Promise.all(pricePromises),
+      Promise.all(stockPromises),
+    ]);
+
+    const priceMap = new Map(priceResults.map((r) => [r.itemCode, r.price]));
+    const stockMap = new Map(stockResults.map((r) => [r.itemCode, r.stock]));
 
     // Transform ERPNext products to match frontend interface
     const transformedProducts = products.map((product, index) => {
@@ -206,7 +223,9 @@ export async function GET(request: NextRequest) {
     productCache.set(cacheKey, cacheData, 30 * 60 * 1000); // 30 minutes
 
     const loadTime = Date.now() - startTime;
-    console.log(`✅ Products page ${page} loaded in ${loadTime}ms (${transformedProducts.length} items)`);
+    const withPrice = transformedProducts.filter((p) => (p.base_price || p.sale_price) > 0).length;
+    const withStock = transformedProducts.filter((p) => p.stock?.totalStock > 0 || (p.product_variations || []).some((v: any) => v.stock?.totalStock > 0)).length;
+    console.log(`✅ Products page ${page} loaded in ${loadTime}ms | ${transformedProducts.length} items | ${withPrice} with price | ${withStock} with stock`);
     
     // Track performance metrics
     trackPaginationPerformance(loadTime, false);

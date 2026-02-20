@@ -67,7 +67,7 @@ export const usePaginatedProducts = (
       setLoading(true);
       setError(null);
 
-      const cacheKey = `products-page-${page}-limit-${pageSize}-mode-${mode}`;
+      const cacheKey = `products-v2-page-${page}-limit-${pageSize}-mode-${mode}`;
       const cachedData = productsCache.get(cacheKey);
       if (cachedData) {
         console.log(`⚡ Serving products page ${page} from client cache`);
@@ -79,10 +79,9 @@ export const usePaginatedProducts = (
 
       console.log(`🔄 Loading products page ${page} from server...`);
       
-      // Only add cache-busting in development when explicitly refreshing
-      const cacheParam = process.env.NODE_ENV === 'development' && page === 1 ? `&t=${Date.now()}` : '';
       const modeParam = mode !== 'all' ? `&mode=${mode}` : '';
-      const response = await fetch(`/api/products?page=${page}&limit=${pageSize}${modeParam}${cacheParam}`);
+      const nocacheParam = process.env.NODE_ENV === 'development' ? '&nocache=1' : '';
+      const response = await fetch(`/api/products?page=${page}&limit=${pageSize}${modeParam}${nocacheParam}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -115,7 +114,7 @@ export const usePaginatedProducts = (
       setError(null);
 
       const nextPage = pagination.currentPage + 1;
-      const cacheKey = `products-page-${nextPage}-limit-${pageSize}-mode-${mode}`;
+      const cacheKey = `products-v2-page-${nextPage}-limit-${pageSize}-mode-${mode}`;
       
       // Check client-side cache first
       const cachedData = productsCache.get(cacheKey);
@@ -128,7 +127,8 @@ export const usePaginatedProducts = (
       }
 
       const modeParam = mode !== 'all' ? `&mode=${mode}` : '';
-      const response = await fetch(`/api/products?page=${nextPage}&limit=${pageSize}${modeParam}`);
+      const nocacheParam = process.env.NODE_ENV === 'development' ? '&nocache=1' : '';
+      const response = await fetch(`/api/products?page=${nextPage}&limit=${pageSize}${modeParam}${nocacheParam}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -162,9 +162,8 @@ export const usePaginatedProducts = (
   }, [pagination, loadPage]);
 
   const refresh = useCallback(async () => {
-    // Clear cache for current page
     if (pagination) {
-      const cacheKey = `products-page-${pagination.currentPage}-limit-${pageSize}`;
+      const cacheKey = `products-v2-page-${pagination.currentPage}-limit-${pageSize}-mode-${mode}`;
       productsCache.delete(cacheKey);
     }
     
@@ -173,7 +172,7 @@ export const usePaginatedProducts = (
     } else {
       await loadPage(initialPage);
     }
-  }, [pagination, loadPage, initialPage, pageSize]);
+  }, [pagination, loadPage, initialPage, pageSize, mode]);
 
   // Auto-load initial page
   useEffect(() => {

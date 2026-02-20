@@ -368,7 +368,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   return (
     <div className="max-w-7xl mx-auto">
       {/* Breadcrumb */}
-      <nav className="mb-8 flex items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
+      <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
         <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
         <Link href="/shop" className="hover:text-slate-900 transition-colors">Shop</Link>
@@ -386,59 +386,59 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
 
       {/* For quote items (machines): HSG-style = item name at top, then image preview */}
       {isCustomQuotationItem && (
-        <div className="mb-6 space-y-4">
+        <div className="mb-5 space-y-3">
           {/* 1. Item name at top */}
           <div>
-            <span className="inline-flex items-center rounded-full bg-blue-600/10 px-3 py-1 text-xs font-semibold tracking-wider text-blue-700">
-              MACHINE DETAIL
+            <span className="inline-flex items-center rounded bg-blue-600/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-700">
+              Machine Detail
             </span>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
+            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
               {product.item_name}
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500">
               SKU: <span className="font-mono text-slate-600">{product.name}</span>
             </p>
           </div>
 
-          {/* 2. Top image preview – main product image + attachments (HSG hero style) */}
-          <div className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-md">
+          {/* 2. Top image preview – compact hero (HSG-style) */}
+          <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm">
             {galleryImages.length > 0 && currentImage ? (
-              <div className="relative aspect-[16/9] w-full sm:aspect-[2/1]">
+              <div className="relative h-[200px] w-full sm:h-[240px]">
                 <Image
                   src={currentImage.url}
                   alt={currentImage.alt}
                   fill
-                  className="object-contain cursor-zoom-in transition-transform duration-300 hover:scale-[1.02]"
+                  className="object-contain cursor-zoom-in p-2 transition-transform hover:scale-[1.02]"
                   onClick={() => openImagePreview(currentImageIndex)}
-                  sizes="(max-width: 1024px) 100vw, 1200px"
+                  sizes="(max-width: 640px) 100vw, 800px"
                   priority
                 />
                 {galleryImages.length > 1 && (
-                  <div className="absolute top-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                  <div className="absolute right-2 top-2 rounded bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white">
                     {currentImageIndex + 1} / {galleryImages.length}
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex aspect-[16/9] items-center justify-center text-slate-400">
-                <Package className="h-16 w-16 opacity-50" />
-                <span className="ml-2 text-sm">No image available</span>
+              <div className="flex h-[160px] items-center justify-center text-slate-400">
+                <Package className="h-12 w-12 opacity-50" />
+                <span className="ml-2 text-sm">No image</span>
               </div>
             )}
             {galleryImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto border-t border-slate-200/80 bg-slate-50/80 p-2">
+              <div className="flex gap-1.5 border-t border-slate-200 bg-slate-50/90 p-1.5">
                 {galleryImages.map((img, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                    className={`relative h-10 w-10 shrink-0 overflow-hidden rounded border transition-all ${
                       currentImageIndex === idx
-                        ? "border-blue-600 ring-2 ring-blue-600/20"
+                        ? "border-blue-600 ring-1 ring-blue-600/30"
                         : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
-                    <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="56px" />
+                    <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="40px" />
                   </button>
                 ))}
               </div>
@@ -446,10 +446,10 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           </div>
 
           {/* 3. CTA buttons */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <Button
-              size="lg"
-              className="bg-blue-600 px-8 font-semibold text-white shadow-md shadow-blue-600/25 hover:bg-blue-700"
+              size="default"
+              className="bg-blue-600 px-6 font-semibold text-white hover:bg-blue-700"
               onClick={() => {
                 if (isTemplate && !selectedVariation) {
                   document.getElementById("quote-variations")?.scrollIntoView({ behavior: "smooth" });
@@ -460,16 +460,16 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
             >
               Get a Quote
             </Button>
-            <Button variant="outline" size="lg" className="rounded-lg border-slate-300 font-medium" asChild>
+            <Button variant="outline" size="default" className="rounded-md border-slate-300 font-medium" asChild>
               <Link href="/contact">Talk to Expert</Link>
             </Button>
           </div>
         </div>
       )}
 
-      <div className={`grid grid-cols-1 gap-8 lg:gap-12 ${isCustomQuotationItem ? "lg:grid-cols-1" : "lg:grid-cols-12"}`}>
+      <div className={`grid grid-cols-1 gap-6 lg:gap-10 ${isCustomQuotationItem ? "lg:grid-cols-1" : "lg:grid-cols-12"}`}>
         {/* Main content: full-width for quote items (HSG-style), otherwise 7-col */}
-        <div className={isCustomQuotationItem ? "w-full space-y-8" : "lg:col-span-7 space-y-8"}>
+        <div className={isCustomQuotationItem ? "w-full space-y-5" : "lg:col-span-7 space-y-8"}>
           {/* Main Image – only for non-quotation items (machines use top preview above) */}
           {!isCustomQuotationItem && (
           <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden border border-slate-200/80 shadow-sm relative group">
@@ -549,12 +549,12 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
                   isMachine={true}
                 />
                 {/* Testimonial section for machine detail */}
-                <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
-                  <Quote className="h-10 w-10 text-blue-600/30" aria-hidden />
-                  <blockquote className="mt-2 text-slate-700 text-base sm:text-lg leading-relaxed">
+                <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                  <Quote className="h-8 w-8 text-blue-600/25" aria-hidden />
+                  <blockquote className="mt-1.5 text-slate-700 text-sm sm:text-base leading-relaxed">
                     &ldquo;We have been using their equipment for over three years. Outstanding reliability and excellent after-sales support. Highly recommend for industrial applications.&rdquo;
                   </blockquote>
-                  <footer className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  <footer className="mt-3 flex flex-wrap items-center gap-x-3 text-xs sm:text-sm">
                     <span className="font-semibold text-slate-900">— Manufacturing Director</span>
                     <span className="text-slate-500">Leading Industrial Solutions</span>
                   </footer>
@@ -855,10 +855,10 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
 
       {/* For quote items: Variations section below (if template) */}
       {isCustomQuotationItem && (
-        <div className="mt-6 space-y-4">
+        <div className="mt-5 space-y-3">
           {isTemplate && product.variants && product.variants.length > 0 && (
-            <Card id="quote-variations" className="rounded-xl border-slate-200 p-5 scroll-mt-24">
-              <h3 className="mb-3 text-base font-semibold">Select Configuration</h3>
+            <Card id="quote-variations" className="rounded-lg border-slate-200 p-4 scroll-mt-24">
+              <h3 className="mb-3 text-sm font-semibold">Select Configuration</h3>
               <AttributeFilter
                 templateItemName={product.name}
                 onAttributeChange={handleAttributeChange}

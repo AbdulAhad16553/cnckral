@@ -64,10 +64,10 @@ export class StoreService {
           store_type: 'ecommerce',
           domain: domain,
           company_id: company.name,
-          primary_color: '#3B82F6', // Default blue
+          primary_color: '#FE0000', // Default red
           secondary_color: '#1F2937', // Default dark
           currency: company.default_currency || 'USD',
-          tagline: `Welcome to ${company.company_name || 'CNC KRAL'}`,
+          tagline: `Welcome to ${company.company_name || 'Krallaser'}`,
           coming_soon: 0,
           payment_method_active: 1,
           email: company.email,
@@ -152,9 +152,9 @@ export class StoreService {
         const company = companyList[0];
         return {
           currency: company.default_currency || 'USD',
-          primary_color: '#3B82F6',
+          primary_color: '#FE0000',
           secondary_color: '#1F2937',
-            tagline: `Welcome to ${company.company_name || 'CNC KRAL'}`,
+            tagline: `Welcome to ${company.company_name || 'Krallaser'}`,
           coming_soon: false,
           payment_method_active: true
         };
@@ -162,9 +162,9 @@ export class StoreService {
 
       return {
         currency: 'USD',
-        primary_color: '#3B82F6',
+        primary_color: '#FE0000',
         secondary_color: '#1F2937',
-        tagline: 'Welcome to CNC KRAL',
+        tagline: 'Welcome to Krallaser',
         coming_soon: false,
         payment_method_active: true
       };

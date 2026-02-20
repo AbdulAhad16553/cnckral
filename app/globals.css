@@ -126,7 +126,7 @@ body {
   }
 
   .price-range-display {
-    @apply bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200;
+    @apply bg-gradient-to-r from-red-50 to-red-100 border border-red-200;
   }
 
   .breadcrumb-link {
@@ -176,23 +176,27 @@ body {
     overflow: hidden;
   }
 
-  /* Gradient utilities */
+  /* Gradient utilities - Red theme */
   .gradient-blue {
-    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
+    background: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
+  }
+
+  .gradient-red {
+    background: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
   }
 
   .gradient-grey {
-    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+    background: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
   }
 
-  /* Blue + Grey combined - for footer & top bar */
+  /* Red gradient for header & footer */
   .gradient-blue-grey {
-    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 35%, #717B85 65%, #363E47 100%);
+    background: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
   }
 
   /* Enhanced Footer Styles */
   .footer-gradient {
-    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 35%, #717B85 65%, #363E47 100%);
+    background: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
   }
 
   .footer-card {

@@ -13,7 +13,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "CNC Kral",
+  title: "Krallaser",
   description: "Tools, Machinery, and Equipment for the Metalworking Industry",
   icons: {
     icon: "/cnc_kral.png",
@@ -31,7 +31,7 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
-          <title>{"CNC Kral"}</title>
+          <title>{"Krallaser"}</title>
           <meta
             name="description"
             content={
@@ -52,11 +52,11 @@ export default async function RootLayout({
           <style>
             {`
               :root {
-                --primary-color: #0368E5;
-                --primary-gradient: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
-                --grey-gradient: linear-gradient(135deg, #717B85 0%, #363E47 100%);
-                --secondary-color: #363E47;
-                --primary-hover: #0256c7;
+                --primary-color: #FE0000;
+                --primary-gradient: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
+                --grey-gradient: linear-gradient(135deg, #FE0000 0%, #830d0f 100%);
+                --secondary-color: #830d0f;
+                --primary-hover: #c90000;
               }
             `}
           </style>
@@ -74,7 +74,7 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
-          <title>CNC Kral</title>
+          <title>Krallaser</title>
           <meta name="description" content="Tools, Machinery, and Equipment for the Metalworking Industry" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/cnc_kral.png" type="image/png" />

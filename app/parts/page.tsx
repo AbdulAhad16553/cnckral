@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Parts & Accessories | CNC Kral",
+  title: "Parts & Accessories | Krallaser",
   description: "Browse all spare parts and accessories for your machines.",
 };
 

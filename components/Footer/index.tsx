@@ -150,7 +150,7 @@ const Footer = async ({ storeData }: FooterProps) => {
               <div className="mb-8">
                 <div className="mb-6">
                   <Image
-                    src="/HORIZONTAL Logo CNC KRAL.png"
+                    src="/HORIZONTAL Logo Krallaser.png"
                     alt={`${storeName || "Store"} Logo`}
                     width={160}
                     height={50}

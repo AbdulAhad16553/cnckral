@@ -58,13 +58,13 @@ export function ResourceLinks() {
                 <item.icon className="w-5 h-5 text-slate-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-900 group-hover:text-[#21B9FF] transition-colors">
+                <h3 className="font-semibold text-slate-900 group-hover:text-[#FE0000] transition-colors">
                   {item.title}
                 </h3>
                 <p className="text-sm text-slate-500">{item.description}</p>
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#21B9FF] group-hover:translate-x-0.5 transition-all" />
+            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#FE0000] group-hover:translate-x-0.5 transition-all" />
           </Link>
         </motion.div>
       ))}

@@ -23,7 +23,7 @@ const Hero = async ({
   products,
   hideOnPage,
 }: HeroProps) => {
-  const storeName =  "CNC KRAL";
+  const storeName =  "Krallaser";
 
   const featuredProduct = Array.isArray(products) && products.length > 0 ? products[0] : null;
   const productImages = (() => {
@@ -92,7 +92,7 @@ const Hero = async ({
 
                 {/* Content */}
                 <div className="flex-1 text-left">
-                  <p className="text-xs font-semibold tracking-wide uppercase text-[#21B9FF] mb-1">
+                  <p className="text-xs font-semibold tracking-wide uppercase text-[#FE0000] mb-1">
                     Featured Product
                   </p>
                   <h2 className="text-lg sm:text-xl font-semibold text-slate-900 line-clamp-1">
@@ -110,7 +110,7 @@ const Hero = async ({
                   <span className="text-[11px] font-medium text-slate-500 mb-1">
                     Explore details
                   </span>
-                  <div className="inline-flex items-center gap-1 text-sm font-semibold text-[#21B9FF] group-hover:text-[#1593cc] transition-colors">
+                  <div className="inline-flex items-center gap-1 text-sm font-semibold text-[#FE0000] group-hover:text-[#830d0f] transition-colors">
                     View Product
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -133,13 +133,13 @@ const Hero = async ({
                   <Wrench className="w-6 h-6 text-slate-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 group-hover:text-[#21B9FF] transition-colors">
+                  <h3 className="font-semibold text-slate-900 group-hover:text-[#FE0000] transition-colors">
                     {card.title}
                   </h3>
                   <p className="text-sm text-slate-500">{card.description}</p>
                 </div>
               </div>
-              <span className="text-slate-400 group-hover:text-[#21B9FF] transition-colors">
+              <span className="text-slate-400 group-hover:text-[#FE0000] transition-colors">
                 <ArrowRight className="w-5 h-5" />
               </span>
             </Link>

@@ -32,7 +32,7 @@ const RelatedProducts = ({
   storeData,
 }: RelatedProductsProps) => {
   // Get dynamic colors from store data
-  const primaryColor = storeData?.store_detail?.primary_color || "#3B82F6";
+  const primaryColor = storeData?.store_detail?.primary_color || "#FE0000";
 
   // Filter out current product and limit to 4 related products
   const relatedProducts = products

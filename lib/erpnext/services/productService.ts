@@ -65,6 +65,7 @@ export class ProductService {
     item_code?: string;
     item_group?: string;
     disabled?: 0 | 1;
+    custom_quotation_item?: 0 | 1; // 1 = machines only, 0 = parts only
   }, limit?: number, offset?: number): Promise<ERPNextProduct[]> {
     try {
       const cacheKey = 'erpnext-detailed-products';
@@ -108,6 +109,12 @@ export class ProductService {
         filteredItems = filteredItems.filter(item => {
           if (filters.disabled !== undefined && item.disabled !== filters.disabled) {
             return false;
+          }
+          if (filters.custom_quotation_item !== undefined) {
+            const q = item.custom_quotation_item ?? item.custom_custom_quotation_item ?? 0;
+            const isMachine = q === 1 || q === "1" || q === true || q === "Yes";
+            if (filters.custom_quotation_item === 1 && !isMachine) return false;
+            if (filters.custom_quotation_item === 0 && isMachine) return false;
           }
           if (filters.item_group && item.item_group !== filters.item_group) {
             return false;

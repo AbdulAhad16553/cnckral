@@ -65,11 +65,12 @@ interface Product {
 
 interface ProductDetailContentProps {
   slug: string;
+  initialProduct?: Product | null;
 }
 
-export default function ProductDetailContent({ slug }: ProductDetailContentProps) {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function ProductDetailContent({ slug, initialProduct }: ProductDetailContentProps) {
+  const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
+  const [loading, setLoading] = useState(!initialProduct);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -285,21 +286,17 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   }, [showAddedToCartDialog]);
 
   useEffect(() => {
+    if (initialProduct) return; // Server already provided data
     const fetchProduct = async () => {
       try {
         setLoading(true);
         setError(null);
-        
         const response = await fetch(`/api/product/${slug}`, {
           cache: "no-store",
           headers: { "Cache-Control": "no-cache" },
         });
         const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch product');
-        }
-        
+        if (!response.ok) throw new Error(data.error || 'Failed to fetch product');
         setProduct(data.product);
       } catch (err) {
         console.error('Error fetching product:', err);
@@ -308,9 +305,8 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
         setLoading(false);
       }
     };
-
     fetchProduct();
-  }, [slug]);
+  }, [slug, initialProduct]);
 
   const isTemplate = product?.variants && product?.variants.length > 0;
   const isSimpleProductInStock = product && !isTemplate && product.stock && product.stock.totalStock > 0;

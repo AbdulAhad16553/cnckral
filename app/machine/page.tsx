@@ -22,16 +22,16 @@ export default async function MachinePage() {
 
   const fullStoreUrl = getUrlWithScheme(host);
 
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { cache: "no-store" });
-  const data = await response.json();
+  const [storeRes, categoriesRes] = await Promise.all([
+    fetch(`${fullStoreUrl}/api/fetchStore`, { cache: "no-store" }),
+    getAllCategories("default-store"),
+  ]);
+  const data = await storeRes.json();
 
-  const storeId = data?.store?.stores[0].id;
-  const companyId = data?.store?.stores[0].company_id;
-  const storeCurrency = data?.store?.stores[0].store_detail?.currency
-    ? data?.store?.stores[0].store_detail?.currency
-    : "Rs.";
-
-  const { categories } = await getAllCategories(storeId);
+  const storeId = data?.store?.stores[0].id ?? "default-store";
+  const companyId = data?.store?.stores[0].company_id ?? "Krallaser";
+  const storeCurrency = data?.store?.stores[0].store_detail?.currency ?? "Rs.";
+  const { categories } = categoriesRes;
 
   return (
     <Layout>

@@ -263,7 +263,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
               <Link href="/" className="flex-shrink-0 group">
                 <div className="flex items-center ">
                   <Image
-                    src="/HORIZONTAL Logo Krallaser.png"
+                    src="/krallogo.svg"
                     alt={`${storeName} Logo`}
                     width={90}
                     height={60}

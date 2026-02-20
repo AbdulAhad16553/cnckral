@@ -65,17 +65,20 @@ class ERPNextClient {
   }
 
   // ========================================
-  // 🔹 Generic: Get List
+  // 🔹 Generic: Get List (filters can be Record or array e.g. [["field","in",[...]]])
   // ========================================
   async getList<T>(
     doctype: string,
-    filters?: Record<string, any>,
+    filters?: Record<string, any> | any[],
     fields?: string[],
     limit = 100,
     offset = 0
   ): Promise<ERPNextResponse<T[]>> {
     const params = new URLSearchParams();
-    if (filters && Object.keys(filters).length > 0)
+    const hasFilters = Array.isArray(filters)
+      ? filters.length > 0
+      : filters && Object.keys(filters).length > 0;
+    if (hasFilters)
       params.append("filters", JSON.stringify(filters));
     if (fields && fields.length > 0)
       params.append("fields", JSON.stringify(fields));
@@ -331,6 +334,26 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
       100
     );
   }
+
+  /** Batch fetch stock for multiple items in ONE call */
+  async getItemStockBatch(itemCodes: string[]): Promise<ERPNextResponse<any[]>> {
+    if (!itemCodes.length) return { data: [] };
+    return this.getList("Bin", 
+      [["item_code", "in", itemCodes]] as any,
+      ["item_code", "warehouse", "actual_qty", "reserved_qty", "projected_qty"],
+      5000
+    );
+  }
+
+  /** Batch fetch Item Prices in ONE call */
+  async getItemPricesBatch(itemCodes: string[]): Promise<ERPNextResponse<any[]>> {
+    if (!itemCodes.length) return { data: [] };
+    return this.getList("Item Price",
+      [["item_code", "in", itemCodes]] as any,
+      ["item_code", "price_list_rate", "currency"],
+      2000
+    );
+  }
   async getItemAttachments(itemCode: string): Promise<ERPNextResponse<any[]>> {
     try {
       const params = new URLSearchParams();
@@ -358,20 +381,17 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
       const { data: item } = await this.getDoc<any>("Item", itemCode);
       if (!item) return { data: null, message: "Item not found" };
 
-      // Fetch Item Group details
-      const { data: group } = await this.getList<any>(
-        "Item Group",
-        { name: item.item_group },
-        ["name", "item_group_name", "image"],
-        1
-      );
-
-      const groupInfo = group && group.length > 0 ? group[0] : null;
+      // Fetch Item Group + main price in parallel (no need to wait for variants)
+      const [groupRes, mainPriceRes] = await Promise.all([
+        this.getList<any>("Item Group", { name: item.item_group }, ["name", "item_group_name", "image"], 1),
+        this.getList<any>("Item Price", { item_code: item.name }, ["price_list_rate", "currency"], 1),
+      ]);
+      const groupInfo = groupRes.data?.[0] ?? null;
+      const mainPrice = mainPriceRes.data?.[0];
 
       let variants = [];
       if (item.has_variants) {
         // Fetch all variants - ERPNext returns each attribute as a separate row
-        // So we need a higher limit to ensure we get all variants with all their attributes
         const { data: variantList } = await this.getList<any>(
           "Item",
           { variant_of: item.name },
@@ -383,24 +403,32 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
             "attributes.attribute_value",
             "description",
             "stock_uom",
+            "standard_rate", // use as fallback if no Item Price
           ],
-          1000 // Increased limit to ensure all variants are fetched
+          1000
         );
 
-        // Group variants by name since ERPNext returns each attribute as separate entry
+        const uniqueVariantNames = [...new Set((variantList || []).map((v: any) => v.name))];
+        // Batch fetch ALL variant prices in ONE call (fixes N+1)
+        let priceMap: Record<string, { price: number | null; currency: string | null }> = {};
+        if (uniqueVariantNames.length > 0) {
+          const { data: prices } = await this.getList<any>(
+            "Item Price",
+            [["item_code", "in", uniqueVariantNames]] as any,
+            ["item_code", "price_list_rate", "currency"],
+            1000
+          );
+          (prices || []).forEach((p: any) => {
+            if (!priceMap[p.item_code] || !priceMap[p.item_code].price)
+              priceMap[p.item_code] = { price: p.price_list_rate ?? null, currency: p.currency ?? null };
+          });
+        }
+
         const variantMap = new Map();
-        
         for (const variant of variantList || []) {
           const variantName = variant.name;
-          
           if (!variantMap.has(variantName)) {
-            const { data: price } = await this.getList<any>(
-              "Item Price",
-              { item_code: variantName },
-              ["price_list_rate", "currency"],
-              1
-            );
-            
+            const pr = priceMap[variantName];
             variantMap.set(variantName, {
               name: variantName,
               item_name: variant.item_name,
@@ -408,40 +436,30 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
               description: variant.description,
               stock_uom: variant.stock_uom,
               attributes: [],
-              price: price && price.length > 0 ? price[0].price_list_rate : null,
-              currency: price && price.length > 0 ? price[0].currency : null,
+              price: pr?.price ?? variant.standard_rate ?? null,
+              currency: pr?.currency ?? "PKR",
             });
           }
-          
-          // Add attribute to the variant
-          if (variant.attribute && variant.attribute_value) {
-            variantMap.get(variantName).attributes.push({
-              attribute: variant.attribute,
-              attribute_value: variant.attribute_value
-            });
+          if (variant.attributes) {
+            const attrs = Array.isArray(variant.attributes) ? variant.attributes : [variant.attributes];
+            for (const a of attrs) {
+              if (a?.attribute && a?.attribute_value)
+                variantMap.get(variantName).attributes.push({ attribute: a.attribute, attribute_value: a.attribute_value });
+            }
+          } else if (variant.attribute && variant.attribute_value) {
+            variantMap.get(variantName).attributes.push({ attribute: variant.attribute, attribute_value: variant.attribute_value });
           }
         }
-        
         variants = Array.from(variantMap.values());
       }
-
-      // Fetch main item price
-      const { data: price } = await this.getList<any>(
-        "Item Price",
-        { item_code: item.name },
-        ["price_list_rate", "currency"],
-        1
-      );
 
       return {
         data: {
           ...item,
           item_group_name: groupInfo?.item_group_name,
           item_group_image: groupInfo?.image,
-          price:
-            price && price.length > 0 ? price[0].price_list_rate : null,
-          currency:
-            price && price.length > 0 ? price[0].currency : null,
+          price: mainPrice?.price_list_rate ?? item.standard_rate ?? null,
+          currency: mainPrice?.currency ?? "PKR",
           variants,
         },
       };

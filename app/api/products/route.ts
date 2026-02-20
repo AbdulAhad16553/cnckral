@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { productService } from '@/lib/erpnext/services/productService';
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
-import { productCache, stockCache, priceCache } from '@/lib/cache';
+import { productCache } from '@/lib/cache';
 import { trackPaginationPerformance, trackPaginationCacheHit, trackPaginationCacheMiss } from '@/lib/paginationPerformance';
+import { getErpnextImageUrl } from '@/lib/erpnextImageUtils';
 
 export async function GET(request: NextRequest) {
   try {
     const startTime = Date.now();
     const { searchParams } = new URL(request.url);
     
-    // Get pagination parameters
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
+    const mode = searchParams.get('mode') || 'all'; // machine | parts | all
     const offset = (page - 1) * limit;
+
+    const quoteFilter = mode === 'machine' ? 1 : mode === 'parts' ? 0 : undefined;
     
-    // Create cache key with pagination
-    const cacheKey = `products-page-${page}-limit-${limit}`;
+    const cacheKey = `products-page-${page}-limit-${limit}-mode-${mode}`;
     const cachedProducts = productCache.get(cacheKey);
     
     if (cachedProducts) {
-      console.log(`⚡ Serving products page ${page} from cache`);
       const loadTime = Date.now() - startTime;
       trackPaginationPerformance(loadTime, true);
       trackPaginationCacheHit();
-      
       return NextResponse.json({ 
         products: cachedProducts.products,
         pagination: cachedProducts.pagination,
@@ -32,76 +32,44 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`🔄 Fetching products page ${page} (${limit} items) from ERPNext...`);
+    const filters: { disabled: 0 | 1; custom_quotation_item?: 0 | 1 } = { disabled: 0 };
+    if (quoteFilter !== undefined) filters.custom_quotation_item = quoteFilter as 0 | 1;
     
-    // Fetch products from ERPNext with pagination
-    const products = await productService.getProducts({ disabled: 0 }, limit, offset);
+    const products = await productService.getProducts(filters, limit, offset);
     
-    // Batch fetch all prices and stock data to avoid N+1 queries
     const productCodes = products.map(p => p.name);
     const variantCodes = products.flatMap(p => 
       p.has_variants && (p as any).variants 
         ? (p as any).variants.map((v: any) => v.name)
         : []
     );
-    const allItemCodes = [...productCodes, ...variantCodes];
+    const allItemCodes = [...new Set([...productCodes, ...variantCodes])];
 
-    // Batch fetch prices
-    const pricePromises = allItemCodes.map(async (itemCode) => {
-      const cacheKey = `price-${itemCode}`;
-      const cached = priceCache.get(cacheKey);
-      if (cached) return { itemCode, price: cached };
-      
-      try {
-        const { data: prices } = await erpnextClient.getList<any>(
-          "Item Price",
-          { item_code: itemCode },
-          ["price_list_rate", "currency"],
-          1
-        );
-        
-        const priceData = prices && prices.length > 0 
-          ? { price_list_rate: prices[0].price_list_rate || 0, currency: prices[0].currency || 'PKR' }
-          : { price_list_rate: 0, currency: 'PKR' };
-          
-        priceCache.set(cacheKey, priceData, 15 * 60 * 1000); // 15 minutes
-        return { itemCode, price: priceData };
-      } catch (error) {
-        return { itemCode, price: { price_list_rate: 0, currency: 'PKR' } };
-      }
+    const isMachineMode = mode === 'machine';
+    
+    // 1 API call for ALL prices (instead of N)
+    const { data: pricesData } = await erpnextClient.getItemPricesBatch(allItemCodes);
+    const priceMap = new Map<string, { price_list_rate: number; currency: string }>();
+    (pricesData || []).forEach((p: any) => {
+      if (!priceMap.has(p.item_code))
+        priceMap.set(p.item_code, { price_list_rate: p.price_list_rate ?? 0, currency: p.currency || 'PKR' });
     });
 
-    // Batch fetch stock data
-    const stockPromises = allItemCodes.map(async (itemCode) => {
-      const cacheKey = `stock-${itemCode}`;
-      const cached = stockCache.get(cacheKey);
-      if (cached) return { itemCode, stock: cached };
-      
-      try {
-        const { data: stockData } = await erpnextClient.getItemStock(itemCode);
-        const stockInfo = stockData && stockData.length > 0 
-          ? {
-              totalStock: stockData.reduce((total: number, bin: any) => total + (bin.actual_qty || 0), 0),
-              bins: stockData
-            }
-          : null;
-          
-        stockCache.set(cacheKey, stockInfo, 2 * 60 * 1000); // 2 minutes
-        return { itemCode, stock: stockInfo };
-      } catch (error) {
-        return { itemCode, stock: null };
-      }
-    });
-
-    // Execute all batch operations in parallel
-    const [priceResults, stockResults] = await Promise.all([
-      Promise.all(pricePromises),
-      Promise.all(stockPromises)
-    ]);
-
-    // Create lookup maps for O(1) access
-    const priceMap = new Map(priceResults.map(r => [r.itemCode, r.price]));
-    const stockMap = new Map(stockResults.map(r => [r.itemCode, r.stock]));
+    let stockMap = new Map<string, { totalStock: number; bins: any[] } | null>();
+    if (!isMachineMode && allItemCodes.length > 0) {
+      const { data: binsData } = await erpnextClient.getItemStockBatch(allItemCodes);
+      const binsByItem = new Map<string, any[]>();
+      (binsData || []).forEach((b: any) => {
+        if (!binsByItem.has(b.item_code)) binsByItem.set(b.item_code, []);
+        binsByItem.get(b.item_code)!.push(b);
+      });
+      allItemCodes.forEach(code => {
+        const bins = binsByItem.get(code);
+        stockMap.set(code, bins?.length 
+          ? { totalStock: bins.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0), bins }
+          : null);
+      });
+    }
 
     // Transform ERPNext products to match frontend interface
     const transformedProducts = products.map((product, index) => {
@@ -176,6 +144,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      const imagePath = product.website_image || product.image;
       return {
         id: product.name,
         name: product.item_name,
@@ -189,34 +158,27 @@ export async function GET(request: NextRequest) {
         sale_price: displayPrice,
         sku: product.item_code || product.name || `item-${index}`,
         slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
-        // expose both the raw ERP flag and a normalized boolean
         custom_quotation_item: rawEnableQuote,
         enable_quote_request: enableQuoteRequest,
-        product_images: (product.website_image || product.image) ? [{
+        product_images: imagePath ? [{
           id: `img-${index}`,
-          image_id: product.website_image || product.image,
+          image_id: imagePath,
           position: 1
         }] : [],
+        image_url: imagePath ? getErpnextImageUrl(imagePath) : undefined,
         product_variations: variations,
         stock: stockInfo,
-        // Add price range for variable products
         ...(priceRange && { price_range: priceRange })
       };
     });
 
-    // Get total count for pagination (cached separately for better performance)
-    const totalCountCacheKey = 'products-total-count';
+    const totalCountCacheKey = `products-total-count-${mode}`;
     let totalProducts = productCache.get(totalCountCacheKey);
-    
     if (!totalProducts) {
-      console.log('🔄 Fetching total product count...');
-      totalProducts = await productService.getProducts({ disabled: 0 }, 1000);
-      // Cache total count for 30 minutes
+      const allFiltered = await productService.getProducts(filters, 5000, 0);
+      totalProducts = allFiltered;
       productCache.set(totalCountCacheKey, totalProducts, 30 * 60 * 1000);
-    } else {
-      console.log('⚡ Using cached total count');
     }
-    
     const totalPages = Math.ceil(totalProducts.length / limit);
     
     // Create pagination info

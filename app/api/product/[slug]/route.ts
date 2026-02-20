@@ -102,79 +102,49 @@ export async function GET(
 
     const itemCode = decodeURIComponent(slug);
 
-    // 1️⃣ Fetch Product Details
-    const response = await erpnextClient.getFullProductDetails(itemCode);
+    // 1️⃣ Fetch Product Details + Attachments in parallel
+    const [response, attachRes] = await Promise.all([
+      erpnextClient.getFullProductDetails(itemCode),
+      erpnextClient.getItemAttachments(itemCode).catch(() => ({ data: [] })),
+    ]);
 
     if (!response.data) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
     const product = response.data;
-
-    // 2️⃣ Fetch Attachments
-    let attachments: any[] = [];
-    try {
-      const attachRes = await erpnextClient.getItemAttachments(itemCode);
-      attachments = attachRes?.data ?? [];
-    } catch (err) {
-      console.log("No attachments found for item:", itemCode);
-    }
-
-    // Add attachments to product object
+    const attachments = attachRes?.data ?? [];
     product.attachments = attachments;
 
-    // 3️⃣ Get stock for main item
+    // 2️⃣ Skip stock for machines (custom quotation items) - major speedup
+    const isMachine = product.custom_quotation_item === 1 || product.custom_custom_quotation_item === 1;
     let stockInfo = null;
 
-    try {
-      const { data: stockData } = await erpnextClient.getItemStock(itemCode);
-
-      if (stockData && stockData.length > 0) {
-        const totalStock = stockData.reduce(
-          (total: number, bin: any) => total + (bin.actual_qty || 0),
-          0
-        );
-
-        stockInfo = {
-          totalStock,
-          bins: stockData
-        };
-      }
-    } catch (error) {
-      console.log(`No stock found for ${itemCode}`);
-    }
-
-    // 4️⃣ Get stock for variants
-    if (product.variants && product.variants.length > 0) {
-      const variantsWithStock = await Promise.all(
-        product.variants.map(async (variant: any) => {
-          let variantStockInfo = null;
-          try {
-            const { data: variantStockData } = await erpnextClient.getItemStock(variant.name);
-
-            if (variantStockData && variantStockData.length > 0) {
-              const totalVariantStock = variantStockData.reduce(
-                (total: number, bin: any) => total + (bin.actual_qty || 0),
-                0
-              );
-
-              variantStockInfo = {
-                totalStock: totalVariantStock,
-                bins: variantStockData
-              };
-            }
-          } catch (error) {
-            console.log(`No stock found for variant ${variant.name}`);
-          }
-
-          return {
-            ...variant,
-            stock: variantStockInfo
+    if (!isMachine) {
+      try {
+        const { data: stockData } = await erpnextClient.getItemStock(itemCode);
+        if (stockData && stockData.length > 0) {
+          stockInfo = {
+            totalStock: stockData.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0),
+            bins: stockData
           };
-        })
-      );
+        }
+      } catch {
+        /* no stock */
+      }
 
-      product.variants = variantsWithStock;
+      if (product.variants && product.variants.length > 0) {
+        const stockPromises = product.variants.map(async (variant: any) => {
+          try {
+            const { data: d } = await erpnextClient.getItemStock(variant.name);
+            const total = d?.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0) ?? 0;
+            return { ...variant, stock: d?.length ? { totalStock: total, bins: d } : null };
+          } catch {
+            return { ...variant, stock: null };
+          }
+        });
+        product.variants = await Promise.all(stockPromises);
+      }
     }
 
     // 5️⃣ Return Response

@@ -60,10 +60,10 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     optimizationTime: 0
   });
 
-  // Load all products at once - no pagination
   const paginatedProducts = usePaginatedProducts({
-    pageSize, // Respect provided page size
-    autoLoad: true
+    pageSize,
+    autoLoad: true,
+    mode: quoteFilter
   });
 
   const {
@@ -161,19 +161,15 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     return products.map(product => product.sku).filter(Boolean);
   }, [products]);
 
-  // Batch load images for all items with loader
+  const needsBatchImages = products.some((p: any) => !p.image_url);
   const {
     isLoading: isImageLoading,
-    isError: imageError,
     getImageUrl,
     hasImage,
-    isImageLoaded,
-    progress: imageLoadingProgress,
-    isComplete: isImageLoadingComplete,
     summary: imageLoadingSummary
   } = useBatchItemImages({
     itemNames,
-    enabled: products.length > 0
+    enabled: products.length > 0 && needsBatchImages
   });
 
   // Update performance metrics for batch image loading
@@ -304,9 +300,8 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
             (image: any) => image.position === "featured"
           );
           
-          // Get image URL from batch loading
-          const imageUrl = getImageUrl(product.sku);
-          const productHasImage = hasImage(product.sku);
+          const imageUrl = product.image_url || (needsBatchImages ? getImageUrl(product.sku) : '/placeholder.svg');
+          const productHasImage = !!product.image_url || (needsBatchImages && hasImage(product.sku));
 
           const productStock = calculateProductStock(product);
           const isOutOfStock = product.type === "variable" ? false : productStock <= 0;
@@ -353,7 +348,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                         productName={product.name}
                         imageUrl={imageUrl}
                         hasImage={productHasImage}
-                        isLoading={isImageLoading}
+                        isLoading={needsBatchImages ? isImageLoading : false}
                         width={960}
                         height={540}
                         className="w-full h-full"
@@ -517,7 +512,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       productName={product.name}
                       imageUrl={imageUrl}
                       hasImage={productHasImage}
-                      isLoading={isImageLoading}
+                      isLoading={needsBatchImages ? isImageLoading : false}
                       width={128}
                       height={128}
                       className="w-full h-full"
@@ -691,7 +686,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       productName={product.name}
                       imageUrl={imageUrl}
                       hasImage={productHasImage}
-                      isLoading={isImageLoading}
+                      isLoading={needsBatchImages ? isImageLoading : false}
                       width={400}
                       height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

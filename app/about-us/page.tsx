@@ -1,12 +1,17 @@
-import Content from "@/common/Content";
+import type { Metadata } from "next";
 import Hero from "@/modules/Hero";
 import Layout from "@/components/Layout";
-import { getStorePage } from "@/hooks/getStorePage";
+import AboutUsContent from "@/components/AboutUsContent";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import { headers } from "next/headers";
-import React from "react";
 import { getAllCategories } from "@/hooks/getCategories";
 import { getProducts } from "@/hooks/getProducts";
+
+export const metadata: Metadata = {
+  title: "About Kral Laser | Industrial Fiber Laser Cutting Machines",
+  description:
+    "Kral Laser provides advanced fiber laser cutting, marking, and industrial machinery in Pakistan. Based in Lahore. High-precision machines for 24/7 metal fabrication.",
+};
 
 export default async function AboutUsPage() {
   const Headers = await headers();
@@ -20,9 +25,7 @@ export default async function AboutUsPage() {
   const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
   const data = await response.json();
   const storeId = data?.store?.stores[0].id;
-  
-  // Fetch all required data
-  const { page } = await getStorePage(storeId, "about-us");
+
   const { categories } = await getAllCategories(storeId);
   const { products } = await getProducts(storeId);
 
@@ -32,15 +35,15 @@ export default async function AboutUsPage() {
         <Hero
           hideOnPage={true}
           content={{
-            title: page?.title,
-            heroImage: undefined
+            title: "About Us",
+            heroImage: undefined,
           }}
           storeData={data?.store?.stores[0]}
           categories={categories}
           products={products}
         />
-        <Content content={page?.content || ''} />
+        <AboutUsContent />
       </div>
     </Layout>
   );
-};
+}

@@ -45,30 +45,36 @@ export async function GET(request: NextRequest) {
     );
     const allItemCodes = [...new Set([...productCodes, ...variantCodes])];
 
-    const isMachineMode = mode === 'machine';
-    
     // 1 API call for ALL prices (instead of N)
     const { data: pricesData } = await erpnextClient.getItemPricesBatch(allItemCodes);
     const priceMap = new Map<string, { price_list_rate: number; currency: string }>();
     (pricesData || []).forEach((p: any) => {
-      if (!priceMap.has(p.item_code))
-        priceMap.set(p.item_code, { price_list_rate: p.price_list_rate ?? 0, currency: p.currency || 'PKR' });
+      const code = p.item_code ?? p.name;
+      if (code && !priceMap.has(code))
+        priceMap.set(code, { price_list_rate: p.price_list_rate ?? 0, currency: p.currency || 'PKR' });
     });
 
     let stockMap = new Map<string, { totalStock: number; bins: any[] } | null>();
-    if (!isMachineMode && allItemCodes.length > 0) {
-      const { data: binsData } = await erpnextClient.getItemStockBatch(allItemCodes);
-      const binsByItem = new Map<string, any[]>();
-      (binsData || []).forEach((b: any) => {
-        if (!binsByItem.has(b.item_code)) binsByItem.set(b.item_code, []);
-        binsByItem.get(b.item_code)!.push(b);
-      });
-      allItemCodes.forEach(code => {
-        const bins = binsByItem.get(code);
-        stockMap.set(code, bins?.length 
-          ? { totalStock: bins.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0), bins }
-          : null);
-      });
+    if (allItemCodes.length > 0) {
+      try {
+        const { data: binsData } = await erpnextClient.getItemStockBatch(allItemCodes);
+        const binsByItem = new Map<string, any[]>();
+        (binsData || []).forEach((b: any) => {
+          const code = b.item_code ?? b.name;
+          if (code) {
+            if (!binsByItem.has(code)) binsByItem.set(code, []);
+            binsByItem.get(code)!.push(b);
+          }
+        });
+        allItemCodes.forEach(code => {
+          const bins = binsByItem.get(code);
+          stockMap.set(code, bins?.length
+            ? { totalStock: bins.reduce((t: number, x: any) => t + (x.actual_qty || 0), 0), bins }
+            : null);
+        });
+      } catch {
+        allItemCodes.forEach(code => stockMap.set(code, null));
+      }
     }
 
     // Transform ERPNext products to match frontend interface

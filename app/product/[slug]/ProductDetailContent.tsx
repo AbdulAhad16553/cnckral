@@ -16,11 +16,12 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Package, DollarSign, Tag, Info, X, ZoomIn, ShoppingCart, Plus, Minus, ChevronLeft, ChevronRight, FileImage, CheckCircle, Quote } from 'lucide-react';
+import { ArrowLeft, Package, DollarSign, Tag, Info, X, ZoomIn, ShoppingCart, Plus, Minus, ChevronLeft, ChevronRight, FileImage, CheckCircle, Quote, MessageCircle, Mail, Phone } from 'lucide-react';
 import Image from 'next/image';
 import AttributeFilter from '@/common/AttributeFilter';
 import { AddToCart } from '@/sub/cart/addToCart';
 import { getErpnextImageUrl } from '@/lib/erpnextImageUtils';
+import { motion } from "motion/react";
 import ProductDescription from '@/components/ProductDescription';
 import MachineProductGallery from '@/components/MachineProductGallery';
 import QuotationDialog from '@/components/QuotationDialog';
@@ -93,6 +94,14 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   const [showQuotationDialog, setShowQuotationDialog] = useState(false);
   // Added to cart confirmation dialog
   const [showAddedToCartDialog, setShowAddedToCartDialog] = useState(false);
+  // Phone number dialog (machine page)
+  const [showPhoneDialog, setShowPhoneDialog] = useState(false);
+
+  const MACHINE_CONTACT = {
+    email: "krallaser@gmail.com",
+    phone: "+923103339404",
+    whatsapp: "https://wa.me/923103339404",
+  };
 
   // Check if product is custom quotation item (ERPNext may use custom_quotation_item or custom_custom_quotation_item)
   const isCustomQuotationItem =
@@ -366,7 +375,67 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
   const currentImage = galleryImages[currentImageIndex];
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className={isCustomQuotationItem ? "min-h-screen bg-gradient-to-br from-sky-50 via-slate-100 to-sky-100/80" : ""}>
+      {/* Machine page: floating left sidebar (HSG-style) */}
+      {isCustomQuotationItem && (
+        <div className="fixed left-0 top-1/2 z-40 -translate-y-1/2 flex flex-col gap-1 border-r border-slate-200/80 bg-white/90 shadow-lg py-2">
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("quote-variations");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+              else setShowQuotationDialog(true);
+            }}
+            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            title="Inquiry"
+          >
+            <FileImage className="h-5 w-5 text-slate-600" />
+            <span className="text-[10px] font-medium text-slate-600">Inquiry</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("quote-variations");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+              else setShowQuotationDialog(true);
+            }}
+            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            title="Variations"
+          >
+            <Tag className="h-5 w-5 text-slate-600" />
+            <span className="text-[10px] font-medium text-slate-600">Variations</span>
+          </button>
+          <a
+            href={MACHINE_CONTACT.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            title="WhatsApp"
+          >
+            <MessageCircle className="h-5 w-5 text-green-600" />
+            <span className="text-[10px] font-medium text-slate-600">WhatsApp</span>
+          </a>
+          <a
+            href={`mailto:${MACHINE_CONTACT.email}`}
+            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            title="Email"
+          >
+            <Mail className="h-5 w-5 text-slate-600" />
+            <span className="text-[10px] font-medium text-slate-600">Email</span>
+          </a>
+          <button
+            type="button"
+            onClick={() => setShowPhoneDialog(true)}
+            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            title="Phone"
+          >
+            <Phone className="h-5 w-5 text-slate-600" />
+            <span className="text-[10px] font-medium text-slate-600">Tel</span>
+          </button>
+        </div>
+      )}
+
+    <div className={`max-w-7xl mx-auto ${isCustomQuotationItem ? "pl-12 sm:pl-14" : ""}`}>
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
@@ -400,70 +469,32 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
             </p>
           </div>
 
-          {/* 2. Top image preview – compact hero (HSG-style) */}
-          <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 shadow-sm">
-            {galleryImages.length > 0 && currentImage ? (
-              <div className="relative h-[200px] w-full sm:h-[240px]">
+          {/* 2. Top image – single image, full width, come-in animation */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden"
+          >
+            {galleryImages.length > 0 ? (
+              <div className="relative aspect-[21/9] w-full min-h-[180px] bg-slate-100">
                 <Image
-                  src={currentImage.url}
-                  alt={currentImage.alt}
+                  src={galleryImages[0].url}
+                  alt={galleryImages[0].alt}
                   fill
-                  className="object-contain cursor-zoom-in p-2 transition-transform hover:scale-[1.02]"
-                  onClick={() => openImagePreview(currentImageIndex)}
-                  sizes="(max-width: 640px) 100vw, 800px"
+                  className="object-cover cursor-zoom-in transition-transform hover:scale-[1.02]"
+                  onClick={() => openImagePreview(0)}
+                  sizes="100vw"
                   priority
                 />
-                {galleryImages.length > 1 && (
-                  <div className="absolute right-2 top-2 rounded bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white">
-                    {currentImageIndex + 1} / {galleryImages.length}
-                  </div>
-                )}
               </div>
             ) : (
-              <div className="flex h-[160px] items-center justify-center text-slate-400">
+              <div className="flex aspect-[21/9] min-h-[180px] w-full items-center justify-center bg-slate-100 text-slate-400">
                 <Package className="h-12 w-12 opacity-50" />
                 <span className="ml-2 text-sm">No image</span>
               </div>
             )}
-            {galleryImages.length > 1 && (
-              <div className="flex gap-1.5 border-t border-slate-200 bg-slate-50/90 p-1.5">
-                {galleryImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setCurrentImageIndex(idx)}
-                    className={`relative h-10 w-10 shrink-0 overflow-hidden rounded border transition-all ${
-                      currentImageIndex === idx
-                        ? "border-blue-600 ring-1 ring-blue-600/30"
-                        : "border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="40px" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 3. CTA buttons */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              size="default"
-              className="bg-blue-600 px-6 font-semibold text-white hover:bg-blue-700"
-              onClick={() => {
-                if (isTemplate && !selectedVariation) {
-                  document.getElementById("quote-variations")?.scrollIntoView({ behavior: "smooth" });
-                } else {
-                  setShowQuotationDialog(true);
-                }
-              }}
-            >
-              Get a Quote
-            </Button>
-            <Button variant="outline" size="default" className="rounded-md border-slate-300 font-medium" asChild>
-              <Link href="/contact">Talk to Expert</Link>
-            </Button>
-          </div>
+          </motion.div>
         </div>
       )}
 
@@ -890,6 +921,26 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
         </div>
       )}
 
+      {/* Phone number dialog (machine page) */}
+      <Dialog open={showPhoneDialog} onOpenChange={setShowPhoneDialog}>
+        <DialogContent className="sm:max-w-sm rounded-xl">
+          <DialogHeader>
+            <DialogTitle>Contact Number</DialogTitle>
+            <DialogDescription>Call us for inquiries about this product.</DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-3 py-4">
+            <Phone className="h-8 w-8 text-slate-600" />
+            <a href={`tel:${MACHINE_CONTACT.phone}`} className="text-xl font-semibold text-slate-900 hover:text-blue-600">
+              {MACHINE_CONTACT.phone}
+            </a>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPhoneDialog(false)}>Close</Button>
+            <Button asChild><a href={`tel:${MACHINE_CONTACT.phone}`}>Call Now</a></Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Enhanced Image Preview Modal with Navigation */}
       {showImagePreview && galleryImages.length > 0 && (
         <div 
@@ -1024,6 +1075,7 @@ export default function ProductDetailContent({ slug }: ProductDetailContentProps
           selectedVariation={selectedVariation}
         />
       )}
+    </div>
     </div>
   );
 }

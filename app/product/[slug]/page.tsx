@@ -12,8 +12,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
   return (
-    <main className="min-h-screen bg-slate-50/80">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <main className="min-h-screen bg-neutral-50">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <Suspense fallback={<ProductSkeleton />}>
           <ProductDetailContentWithData slug={slug} />
         </Suspense>

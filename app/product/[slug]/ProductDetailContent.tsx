@@ -338,15 +338,15 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
   if (error) {
     return (
-      <div className="max-w-6xl mx-auto text-center py-12">
-        <div className="text-red-600 mb-4">
-          <Package className="h-16 w-16 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+      <div className="mx-auto max-w-xl text-center py-24 px-4">
+        <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 mb-6">
+          <Package className="h-10 w-10 text-neutral-500" />
         </div>
-        <Button onClick={() => router.back()} variant="outline">
+        <h2 className="text-2xl font-bold text-neutral-900 mb-2">Product not found</h2>
+        <p className="text-neutral-600 mb-8">{error}</p>
+        <Button onClick={() => router.back()} variant="outline" className="rounded-xl">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Go Back
+          Go back
         </Button>
       </div>
     );
@@ -354,15 +354,15 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
   if (!product) {
     return (
-      <div className="max-w-6xl mx-auto text-center py-12">
-        <div className="text-gray-600 mb-4">
-          <Package className="h-16 w-16 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-          <p className="text-gray-600 mb-6">The requested product could not be found.</p>
+      <div className="mx-auto max-w-xl text-center py-24 px-4">
+        <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 mb-6">
+          <Package className="h-10 w-10 text-neutral-500" />
         </div>
-        <Button onClick={() => router.back()} variant="outline">
+        <h2 className="text-2xl font-bold text-neutral-900 mb-2">Product not found</h2>
+        <p className="text-neutral-600 mb-8">The requested product could not be found.</p>
+        <Button onClick={() => router.back()} variant="outline" className="rounded-xl">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Go Back
+          Go back
         </Button>
       </div>
     );
@@ -371,10 +371,10 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
   const currentImage = galleryImages[currentImageIndex];
 
   return (
-    <div className={isCustomQuotationItem ? "min-h-screen bg-gradient-to-br from-sky-50 via-slate-100 to-sky-100/80" : ""}>
-      {/* Machine page: floating left sidebar (HSG-style) */}
+    <div className={isCustomQuotationItem ? "min-h-screen bg-gradient-to-b from-neutral-50 to-slate-100/50" : ""}>
+      {/* Floating quick actions sidebar (machines) */}
       {isCustomQuotationItem && (
-        <div className="fixed left-0 top-1/2 z-40 -translate-y-1/2 flex flex-col gap-1 border-r border-slate-200/80 bg-white/90 shadow-lg py-2">
+        <div className="fixed left-0 top-1/2 z-40 -translate-y-1/2 flex flex-col gap-0.5 rounded-r-2xl border border-l-0 border-neutral-200/80 bg-white/95 backdrop-blur-sm shadow-xl py-3">
           <button
             type="button"
             onClick={() => {
@@ -382,11 +382,11 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
               if (el) el.scrollIntoView({ behavior: "smooth" });
               else setShowQuotationDialog(true);
             }}
-            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            className="flex flex-col items-center gap-1 px-4 py-2.5 hover:bg-neutral-50 transition-colors rounded-r-lg"
             title="Inquiry"
           >
-            <FileImage className="h-5 w-5 text-slate-600" />
-            <span className="text-[10px] font-medium text-slate-600">Inquiry</span>
+            <FileImage className="h-5 w-5 text-neutral-600" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">Inquiry</span>
           </button>
           <button
             type="button"
@@ -395,99 +395,110 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
               if (el) el.scrollIntoView({ behavior: "smooth" });
               else setShowQuotationDialog(true);
             }}
-            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            className="flex flex-col items-center gap-1 px-4 py-2.5 hover:bg-neutral-50 transition-colors rounded-r-lg"
             title="Variations"
           >
-            <Tag className="h-5 w-5 text-slate-600" />
-            <span className="text-[10px] font-medium text-slate-600">Variations</span>
+            <Tag className="h-5 w-5 text-neutral-600" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">Variations</span>
           </button>
           <a
             href={MACHINE_CONTACT.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            className="flex flex-col items-center gap-1 px-4 py-2.5 hover:bg-neutral-50 transition-colors rounded-r-lg"
             title="WhatsApp"
           >
-            <MessageCircle className="h-5 w-5 text-green-600" />
-            <span className="text-[10px] font-medium text-slate-600">WhatsApp</span>
+            <MessageCircle className="h-5 w-5 text-emerald-600" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">WhatsApp</span>
           </a>
           <a
             href={`mailto:${MACHINE_CONTACT.email}`}
-            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            className="flex flex-col items-center gap-1 px-4 py-2.5 hover:bg-neutral-50 transition-colors rounded-r-lg"
             title="Email"
           >
-            <Mail className="h-5 w-5 text-slate-600" />
-            <span className="text-[10px] font-medium text-slate-600">Email</span>
+            <Mail className="h-5 w-5 text-neutral-600" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">Email</span>
           </a>
           <button
             type="button"
             onClick={() => setShowPhoneDialog(true)}
-            className="flex flex-col items-center gap-1 px-3 py-2 hover:bg-sky-50 transition-colors"
+            className="flex flex-col items-center gap-1 px-4 py-2.5 hover:bg-neutral-50 transition-colors rounded-r-lg"
             title="Phone"
           >
-            <Phone className="h-5 w-5 text-slate-600" />
-            <span className="text-[10px] font-medium text-slate-600">Tel</span>
+            <Phone className="h-5 w-5 text-neutral-600" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">Call</span>
           </button>
         </div>
       )}
 
-    <div className={`max-w-7xl mx-auto ${isCustomQuotationItem ? "pl-12 sm:pl-14" : ""}`}>
-      {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
-        <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
-        <Link href="/shop" className="hover:text-slate-900 transition-colors">Shop</Link>
-        <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
+    <div className={`mx-auto max-w-7xl ${isCustomQuotationItem ? "pl-14 sm:pl-16" : ""}`}>
+      {/* Breadcrumb - minimal international style */}
+      <nav className="mb-8 flex items-center gap-1.5 text-sm text-neutral-500" aria-label="Breadcrumb">
+        <Link href="/" className="hover:text-neutral-900 transition-colors">Home</Link>
+        <ChevronRight className="h-4 w-4 text-neutral-300 shrink-0" />
+        <Link href="/shop" className="hover:text-neutral-900 transition-colors">Shop</Link>
         {product.item_group && (
           <>
-            <Link href={`/shop?group=${encodeURIComponent(product.item_group)}`} className="hover:text-slate-900 transition-colors truncate max-w-[120px] sm:max-w-none">
+            <ChevronRight className="h-4 w-4 text-neutral-300 shrink-0" />
+            <Link href={`/shop?group=${encodeURIComponent(product.item_group)}`} className="hover:text-neutral-900 transition-colors truncate max-w-[140px] sm:max-w-none">
               {product.item_group}
             </Link>
-            <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
           </>
         )}
-        <span className="text-slate-900 font-medium truncate" aria-current="page">{product.item_name}</span>
+        <ChevronRight className="h-4 w-4 text-neutral-300 shrink-0" />
+        <span className="text-neutral-900 font-medium truncate max-w-[200px] sm:max-w-md" aria-current="page">{product.item_name}</span>
       </nav>
 
-      {/* For quote items (machines): HSG-style = item name at top, then image preview */}
+      {/* Machine hero: product name + hero image */}
       {isCustomQuotationItem && (
-        <div className="mb-5 space-y-3">
-          {/* 1. Item name at top */}
-          <div>
-            <span className="inline-flex items-center rounded bg-blue-600/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-700">
-              Machine Detail
+        <div className="mb-10 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
+            <span className="inline-flex items-center rounded-full bg-neutral-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white">
+              Industrial Equipment
             </span>
-            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
+            <h1 className="mt-4 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl md:text-4xl lg:text-[2.5rem] leading-tight">
               {product.item_name}
             </h1>
-            <p className="mt-0.5 text-xs text-slate-500">
-              SKU: <span className="font-mono text-slate-600">{product.name}</span>
+            <p className="mt-2 text-sm text-neutral-500 font-mono">
+              Ref: {product.name}
             </p>
-          </div>
+          </motion.div>
 
-          {/* 2. Top image – single image, full width, come-in animation */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden"
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="relative w-full overflow-hidden rounded-2xl bg-neutral-100 shadow-xl ring-1 ring-neutral-200/50"
           >
             {galleryImages.length > 0 ? (
-              <div className="relative aspect-[21/9] w-full min-h-[180px] bg-slate-100">
+              <div className="relative aspect-[21/9] w-full min-h-[200px] sm:min-h-[240px] bg-neutral-100">
                 <Image
                   src={galleryImages[0].url}
                   alt={galleryImages[0].alt}
                   fill
-                  className="object-cover cursor-zoom-in transition-transform hover:scale-[1.02]"
+                  className="object-cover cursor-zoom-in transition-transform duration-500 hover:scale-[1.02]"
                   onClick={() => openImagePreview(0)}
                   sizes="100vw"
                   priority
                 />
+                {galleryImages.length > 1 && (
+                  <button
+                    onClick={() => openImagePreview(0)}
+                    className="absolute bottom-4 right-4 rounded-full bg-white/90 backdrop-blur-sm px-4 py-2 text-sm font-medium text-neutral-800 shadow-lg hover:bg-white transition-colors flex items-center gap-2"
+                  >
+                    <ZoomIn className="h-4 w-4" />
+                    View gallery ({galleryImages.length})
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="flex aspect-[21/9] min-h-[180px] w-full items-center justify-center bg-slate-100 text-slate-400">
-                <Package className="h-12 w-12 opacity-50" />
-                <span className="ml-2 text-sm">No image</span>
+              <div className="flex aspect-[21/9] min-h-[200px] w-full items-center justify-center bg-neutral-100 text-neutral-400">
+                <Package className="h-16 w-16 opacity-40" />
+                <span className="ml-3 text-sm font-medium">No image available</span>
               </div>
             )}
           </motion.div>
@@ -497,9 +508,9 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
       <div className={`grid grid-cols-1 gap-6 lg:gap-10 ${isCustomQuotationItem ? "lg:grid-cols-1" : "lg:grid-cols-12"}`}>
         {/* Main content: full-width for quote items (HSG-style), otherwise 7-col */}
         <div className={isCustomQuotationItem ? "w-full space-y-5" : "lg:col-span-7 space-y-8"}>
-          {/* Main Image – only for non-quotation items (machines use top preview above) */}
+          {/* Main Image – only for non-quotation items */}
           {!isCustomQuotationItem && (
-          <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden border border-slate-200/80 shadow-sm relative group">
+          <div className="aspect-square bg-neutral-100 rounded-2xl overflow-hidden ring-1 ring-neutral-200/60 shadow-lg relative group">
             {galleryImages.length > 0 && currentImage ? (
               <div className="relative w-full h-full">
                 <Image
@@ -517,7 +528,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                   </span>
                 </div>
                 {galleryImages.length > 1 && (
-                  <div className="absolute top-3 right-3 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur-sm">
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-neutral-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg">
                     {currentImageIndex + 1} / {galleryImages.length}
                   </div>
                 )}
@@ -533,15 +544,15 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
           {/* Thumbnails – hidden for quotation items */}
           {!isCustomQuotationItem && galleryImages.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-thin">
               {galleryImages.map((image, index) => (
                 <button
                   key={index}
                   type="button"
-                  className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 ${
+                  className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden ring-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 ${
                     currentImageIndex === index
-                      ? 'border-[var(--primary-color)] ring-2 ring-[var(--primary-color)]/20 shadow-md'
-                      : 'border-slate-200 hover:border-slate-300'
+                      ? 'ring-neutral-900 shadow-lg scale-[1.02]'
+                      : 'ring-transparent hover:ring-neutral-300'
                   }`}
                   onClick={() => setCurrentImageIndex(index)}
                   aria-label={`View image ${index + 1}`}
@@ -575,15 +586,15 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                   }}
                   isMachine={true}
                 />
-                {/* Testimonial section for machine detail */}
-                <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
-                  <Quote className="h-8 w-8 text-blue-600/25" aria-hidden />
-                  <blockquote className="mt-1.5 text-slate-700 text-sm sm:text-base leading-relaxed">
+                {/* Trust indicator for machine detail */}
+                <div className="mt-8 rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-sm">
+                  <Quote className="h-10 w-10 text-neutral-300" aria-hidden />
+                  <blockquote className="mt-3 text-neutral-700 text-base leading-relaxed">
                     &ldquo;We have been using their equipment for over three years. Outstanding reliability and excellent after-sales support. Highly recommend for industrial applications.&rdquo;
                   </blockquote>
-                  <footer className="mt-3 flex flex-wrap items-center gap-x-3 text-xs sm:text-sm">
-                    <span className="font-semibold text-slate-900">— Manufacturing Director</span>
-                    <span className="text-slate-500">Leading Industrial Solutions</span>
+                  <footer className="mt-4 flex flex-wrap items-center gap-x-3 text-sm">
+                    <span className="font-semibold text-neutral-900">— Manufacturing Director</span>
+                    <span className="text-neutral-500">Leading Industrial Solutions</span>
                   </footer>
                 </div>
               </>
@@ -600,47 +611,47 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
             {/* Badges */}
             <div className="flex flex-wrap items-center gap-2">
               {isTemplate && (
-                <Badge variant="outline" className="text-xs font-medium border-slate-300 text-slate-700">
-                  <Tag className="h-3 w-3 mr-1" />
-                  Template Product
+                <Badge variant="outline" className="text-xs font-semibold border-neutral-300 text-neutral-700 rounded-full px-3">
+                  <Tag className="h-3 w-3 mr-1.5" />
+                  Configurable
                 </Badge>
               )}
               {isCustomQuotationItem && (
-                <Badge className="bg-blue-600/10 text-blue-700 border-blue-200 text-xs font-medium">
-                  <Info className="h-3 w-3 mr-1" />
+                <Badge className="bg-neutral-900 text-white text-xs font-semibold rounded-full px-3 border-0">
+                  <Info className="h-3 w-3 mr-1.5" />
                   Request Quote
                 </Badge>
               )}
               {!isTemplate && !isCustomQuotationItem && product.stock && product.stock.totalStock > 0 && (
-                <Badge className="bg-emerald-600/10 text-emerald-700 border-emerald-200 text-xs font-medium">
-                  In Stock: {product.stock.totalStock} {product.stock_uom}
+                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-semibold rounded-full px-3">
+                  In Stock · {product.stock.totalStock} {product.stock_uom}
                 </Badge>
               )}
               {!isTemplate && !isCustomQuotationItem && product.stock && product.stock.totalStock === 0 && (
-                <Badge variant="outline" className="text-red-600 border-red-200 bg-red-50 text-xs font-medium">
+                <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50 text-xs font-semibold rounded-full px-3">
                   Out of Stock
                 </Badge>
               )}
             </div>
 
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight mb-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight leading-tight mb-2">
                 {product.item_name}
               </h1>
-              <p className="text-slate-500 text-sm font-mono">SKU: {product.name}</p>
+              <p className="text-neutral-500 text-sm font-mono tracking-wide">Ref: {product.name}</p>
             </div>
 
             {/* Price */}
-            {product.price != null && (
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900">
+            {product.price != null && product.price > 0 && (
+              <div className="flex flex-wrap items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
                   {product.currency} {Number(product.price).toLocaleString()}
                 </span>
-                <span className="text-slate-500 text-sm">per {product.stock_uom}</span>
+                <span className="text-neutral-500 text-sm">/ {product.stock_uom}</span>
               </div>
             )}
 
-            <Separator className="bg-slate-200" />
+            <Separator className="bg-neutral-200" />
 
           {/* Simple Product Add to Cart Section */}
           {!isTemplate && isSimpleProductInStock && !isCustomQuotationItem && (
@@ -695,8 +706,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
               {/* Price List for Filtered Variations */}
               {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-                    <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">
+                    <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-5">
+                    <h3 className="text-sm font-semibold text-neutral-700 uppercase tracking-wider mb-4">
                       {isCustomQuotationItem ? 'Configurations' : 'Available options'} ({filteredVariations.length})
                     </h3>
                     <div className="space-y-2">
@@ -709,9 +720,9 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                             key={variant.name}
                             className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                               isSelectable
-                                ? 'bg-white hover:shadow-sm cursor-pointer hover:border-slate-300'
-                                : 'bg-slate-100/80 opacity-70 cursor-not-allowed'
-                            } ${isSelected ? 'border-[var(--primary-color)] ring-1 ring-[var(--primary-color)]/20 shadow-sm' : 'border-slate-200'}`}
+                                ? 'bg-white hover:shadow-sm cursor-pointer hover:border-neutral-300'
+                                : 'bg-neutral-100/80 opacity-70 cursor-not-allowed'
+                            } ${isSelected ? 'border-neutral-900 ring-1 ring-neutral-900/10 shadow-sm' : 'border-neutral-200'}`}
                             onClick={() => isSelectable && handleVariationClick(variant)}
                           >
                             <div className="flex-1 flex items-center space-x-3">
@@ -757,7 +768,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                                   {variant.currency} {Number(variant.price).toLocaleString()}
                                 </span>
                                 {isCustomQuotationItem ? (
-                                  <Badge className="text-xs bg-blue-600/10 text-blue-700 border-blue-200">Quote</Badge>
+                                  <Badge className="text-xs bg-neutral-100 text-neutral-700 border-neutral-200 rounded-full">Quote</Badge>
                                 ) : variantInStock ? (
                                   <Badge className="text-xs bg-emerald-600/10 text-emerald-700 border-emerald-200">{(variant as any).stock.totalStock} in stock</Badge>
                                 ) : (
@@ -806,9 +817,9 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                   )}
                 </div>
               ) : (
-                <div className="text-center py-6 rounded-xl border border-dashed border-slate-200 bg-slate-50/50">
-                  <Package className="h-10 w-10 mx-auto text-slate-400 mb-3" />
-                  <p className="text-sm font-medium text-slate-700">Select options above to see {isCustomQuotationItem ? 'configurations' : 'prices'}.</p>
+                <div className="text-center py-8 rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/80">
+                  <Package className="h-10 w-10 mx-auto text-neutral-400 mb-3" />
+                  <p className="text-sm font-medium text-neutral-600">Select options above to see {isCustomQuotationItem ? 'configurations' : 'prices'}.</p>
                 </div>
               )}
             </div>
@@ -819,57 +830,58 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
             {(isCustomQuotationItem || (!isTemplate && product.stock && product.stock.totalStock === 0)) && (
               <Button
                 size="lg"
-                className="w-full bg-[var(--primary-color)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-lg"
+                className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-semibold rounded-xl h-12"
                 onClick={() => setShowQuotationDialog(true)}
                 disabled={isTemplate && isCustomQuotationItem && !selectedVariation}
               >
+                <Quote className="mr-2 h-4 w-4" />
                 Request Quote
               </Button>
             )}
             {!isTemplate && isSimpleProductInStock && !isCustomQuotationItem && (
-              <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg" onClick={handleSimpleProductAddToCart}>
+              <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl h-12" onClick={handleSimpleProductAddToCart}>
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 Add to Cart
               </Button>
             )}
-            <Button variant="outline" size="lg" className="w-full rounded-lg border-slate-300" asChild>
+            <Button variant="outline" size="lg" className="w-full rounded-xl border-neutral-300 h-12 font-medium" asChild>
               <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>
 
-          {/* Specifications table */}
-          <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold text-slate-900">Specifications</CardTitle>
+          {/* Specifications */}
+          <Card className="rounded-2xl border-neutral-200/80 shadow-sm overflow-hidden">
+            <CardHeader className="pb-3 border-b border-neutral-100">
+              <CardTitle className="text-base font-semibold text-neutral-900">Specifications</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <dl className="divide-y divide-slate-100 text-sm">
-                <div className="flex justify-between gap-4 px-6 py-3">
-                  <dt className="text-slate-500">Item code</dt>
-                  <dd className="font-mono font-medium text-slate-900 text-right">{product.name}</dd>
+              <dl className="divide-y divide-neutral-100 text-sm">
+                <div className="flex justify-between gap-4 px-6 py-4">
+                  <dt className="text-neutral-500 font-medium">Item code</dt>
+                  <dd className="font-mono font-semibold text-neutral-900 text-right">{product.name}</dd>
                 </div>
-                <div className="flex justify-between gap-4 px-6 py-3">
-                  <dt className="text-slate-500">Category</dt>
-                  <dd className="font-medium text-slate-900 text-right">{product.item_group}</dd>
+                <div className="flex justify-between gap-4 px-6 py-4">
+                  <dt className="text-neutral-500 font-medium">Category</dt>
+                  <dd className="font-medium text-neutral-900 text-right">{product.item_group}</dd>
                 </div>
                 {!isTemplate && product.stock && !isCustomQuotationItem && (
-                  <div className="flex justify-between gap-4 px-6 py-3">
-                    <dt className="text-slate-500">Availability</dt>
-                    <dd className={`font-medium text-right ${product.stock.totalStock > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                  <div className="flex justify-between gap-4 px-6 py-4">
+                    <dt className="text-neutral-500 font-medium">Availability</dt>
+                    <dd className={`font-medium text-right ${product.stock.totalStock > 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
                       {product.stock.totalStock} {product.stock_uom}
                     </dd>
                   </div>
                 )}
                 {isTemplate && (
-                  <div className="flex justify-between gap-4 px-6 py-3">
-                    <dt className="text-slate-500">Variations</dt>
-                    <dd className="font-medium text-slate-900 text-right">{product.variants?.length ?? 0} options</dd>
+                  <div className="flex justify-between gap-4 px-6 py-4">
+                    <dt className="text-neutral-500 font-medium">Variations</dt>
+                    <dd className="font-medium text-neutral-900 text-right">{product.variants?.length ?? 0} options</dd>
                   </div>
                 )}
                 {isCustomQuotationItem && (
-                  <div className="flex justify-between gap-4 px-6 py-3">
-                    <dt className="text-slate-500">Type</dt>
-                    <dd className="font-medium text-blue-600 text-right">Custom quotation</dd>
+                  <div className="flex justify-between gap-4 px-6 py-4">
+                    <dt className="text-neutral-500 font-medium">Type</dt>
+                    <dd className="font-medium text-neutral-900 text-right">Custom quotation</dd>
                   </div>
                 )}
               </dl>
@@ -884,8 +896,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
       {isCustomQuotationItem && (
         <div className="mt-5 space-y-3">
           {isTemplate && product.variants && product.variants.length > 0 && (
-            <Card id="quote-variations" className="rounded-lg border-slate-200 p-4 scroll-mt-24">
-              <h3 className="mb-3 text-sm font-semibold">Select Configuration</h3>
+            <Card id="quote-variations" className="rounded-2xl border-neutral-200/80 shadow-sm p-6 scroll-mt-24">
+              <h3 className="mb-4 text-base font-semibold text-neutral-900">Select Configuration</h3>
               <AttributeFilter
                 templateItemName={product.name}
                 onAttributeChange={handleAttributeChange}
@@ -899,8 +911,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                       <div
                         key={variant.name}
                         onClick={() => handleVariationClick(variant)}
-                        className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
-                          isSelected ? "border-blue-600 ring-2 ring-blue-600/20" : "border-slate-200 hover:border-slate-300"
+                        className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${
+                          isSelected ? "border-neutral-900 ring-2 ring-neutral-900/10 bg-neutral-50" : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/50"
                         }`}
                       >
                         <span className="font-medium">{variant.item_name}</span>
@@ -917,145 +929,112 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
         </div>
       )}
 
-      {/* Phone number dialog (machine page) */}
+      {/* Phone dialog */}
       <Dialog open={showPhoneDialog} onOpenChange={setShowPhoneDialog}>
-        <DialogContent className="sm:max-w-sm rounded-xl">
+        <DialogContent className="sm:max-w-md rounded-2xl border-neutral-200 shadow-xl">
           <DialogHeader>
-            <DialogTitle>Contact Number</DialogTitle>
-            <DialogDescription>Call us for inquiries about this product.</DialogDescription>
+            <DialogTitle className="text-lg font-semibold">Contact us</DialogTitle>
+            <DialogDescription>Call for inquiries about this product.</DialogDescription>
           </DialogHeader>
-          <div className="flex items-center gap-3 py-4">
-            <Phone className="h-8 w-8 text-slate-600" />
-            <a href={`tel:${MACHINE_CONTACT.phone}`} className="text-xl font-semibold text-slate-900 hover:text-blue-600">
+          <div className="flex items-center gap-4 py-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
+              <Phone className="h-6 w-6 text-neutral-700" />
+            </div>
+            <a href={`tel:${MACHINE_CONTACT.phone}`} className="text-xl font-semibold text-neutral-900 hover:text-neutral-600 transition-colors">
               {MACHINE_CONTACT.phone}
             </a>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPhoneDialog(false)}>Close</Button>
-            <Button asChild><a href={`tel:${MACHINE_CONTACT.phone}`}>Call Now</a></Button>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowPhoneDialog(false)} className="rounded-xl">Close</Button>
+            <Button asChild className="rounded-xl bg-neutral-900 hover:bg-neutral-800">
+              <a href={`tel:${MACHINE_CONTACT.phone}`}>Call now</a>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Enhanced Image Preview Modal with Navigation */}
+      {/* Image lightbox */}
       {showImagePreview && galleryImages.length > 0 && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={closeImagePreview}
         >
-          <div className="relative max-w-6xl max-h-[90vh] w-full h-full flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4 px-4">
-              <div className="text-white">
-                <h3 className="font-semibold">{galleryImages[currentImageIndex].alt}</h3>
-                <p className="text-sm text-gray-300">
-                  Image {currentImageIndex + 1} of {galleryImages.length}
-                </p>
-              </div>
+          <div className="relative max-w-6xl w-full h-full flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-4 px-2">
+              <p className="text-neutral-400 text-sm font-medium">
+                {currentImageIndex + 1} of {galleryImages.length}
+              </p>
               <button
                 onClick={closeImagePreview}
-                className="bg-black/50 text-white rounded-full p-2 hover:bg-black/75 transition-all z-20"
+                className="rounded-full p-2.5 text-white hover:bg-white/10 transition-colors"
+                aria-label="Close"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
-            
-            {/* Main Image Container */}
-            <div className="relative flex-1 flex items-center justify-center overflow-hidden">
-              {/* Previous Button */}
+            <div className="relative flex-1 flex items-center justify-center min-h-0">
               {galleryImages.length > 1 && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prevImage();
-                  }}
-                  className="absolute left-4 z-10 bg-black/50 text-white rounded-full p-3 hover:bg-black/75 transition-all"
+                  onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                  className="absolute left-2 sm:left-4 z-10 rounded-full p-3 bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  aria-label="Previous"
                 >
                   <ChevronLeft className="h-6 w-6" />
                 </button>
               )}
-              
-              {/* Image */}
-              <div className="relative w-full h-full flex items-center justify-center">
-                <Image
-                  src={galleryImages[currentImageIndex].url}
-                  alt={galleryImages[currentImageIndex].alt}
-                  width={800}
-                  height={600}
-                  className="max-w-full max-h-full object-contain"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-              
-              {/* Next Button */}
+              <Image
+                src={galleryImages[currentImageIndex].url}
+                alt={galleryImages[currentImageIndex].alt}
+                width={1200}
+                height={800}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg"
+              />
               {galleryImages.length > 1 && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nextImage();
-                  }}
-                  className="absolute right-4 z-10 bg-black/50 text-white rounded-full p-3 hover:bg-black/75 transition-all"
+                  onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                  className="absolute right-2 sm:right-4 z-10 rounded-full p-3 bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  aria-label="Next"
                 >
                   <ChevronRight className="h-6 w-6" />
                 </button>
               )}
             </div>
-            
-            {/* Thumbnails Strip */}
             {galleryImages.length > 1 && (
-              <div className="mt-4 px-4">
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {galleryImages.map((image, index) => (
-                    <div
-                      key={index}
-                      className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden cursor-pointer border-2 ${
-                        currentImageIndex === index 
-                          ? 'border-blue-500 ring-2 ring-blue-300' 
-                          : 'border-transparent hover:border-white'
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentImageIndex(index);
-                      }}
-                    >
-                      <Image
-                        src={image.url}
-                        alt={`Thumbnail ${index + 1}`}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
+              <div className="flex gap-2 overflow-x-auto py-4 justify-center">
+                {galleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }}
+                    className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden ring-2 transition-all ${
+                      currentImageIndex === i ? 'ring-white' : 'ring-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <Image src={img.url} alt="" width={56} height={56} className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
             )}
-            
-            {/* Keyboard navigation info */}
-            <div className="text-center text-gray-400 text-xs mt-2">
-              Use ← → arrow keys or click on thumbnails to navigate
-            </div>
           </div>
         </div>
       )}
       
-      {/* Added to cart confirmation dialog */}
+      {/* Added to cart confirmation */}
       <Dialog open={showAddedToCartDialog} onOpenChange={setShowAddedToCartDialog}>
-        <DialogContent className="sm:max-w-md rounded-xl border-slate-200 shadow-xl">
-          <DialogHeader className="text-center sm:text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 mb-4">
-              <CheckCircle className="h-8 w-8 text-emerald-600" />
+        <DialogContent className="sm:max-w-md rounded-2xl border-neutral-200 shadow-xl">
+          <DialogHeader className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 mb-4">
+              <CheckCircle className="h-9 w-9 text-emerald-600" />
             </div>
-            <DialogTitle className="text-xl font-semibold text-slate-900 text-center">Added to cart</DialogTitle>
-            <DialogDescription className="text-slate-600 text-center">
-              The item has been added to your cart. You can continue shopping or view your cart.
+            <DialogTitle className="text-xl font-semibold text-neutral-900">Added to cart</DialogTitle>
+            <DialogDescription className="text-neutral-600">
+              The item has been added to your cart. Continue shopping or proceed to checkout.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-center mt-4">
-            <Button variant="outline" className="rounded-lg" onClick={() => setShowAddedToCartDialog(false)}>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-center mt-6">
+            <Button variant="outline" className="rounded-xl" onClick={() => setShowAddedToCartDialog(false)}>
               Continue shopping
             </Button>
-            <Button className="rounded-lg bg-emerald-600 hover:bg-emerald-700" asChild>
+            <Button className="rounded-xl bg-neutral-900 hover:bg-neutral-800 h-11" asChild>
               <Link href="/cart">View cart</Link>
             </Button>
           </DialogFooter>

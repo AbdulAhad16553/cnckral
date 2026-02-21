@@ -92,7 +92,7 @@ const Hero = async ({
 
                 {/* Content */}
                 <div className="flex-1 text-left">
-                  <p className="text-xs font-semibold tracking-wide uppercase text-[#FE0000] mb-1">
+                  <p className="text-xs font-semibold tracking-wide uppercase text-[var(--primary-color)] mb-1">
                     Featured Product
                   </p>
                   <h2 className="text-lg sm:text-xl font-semibold text-slate-900 line-clamp-1">
@@ -110,7 +110,7 @@ const Hero = async ({
                   <span className="text-[11px] font-medium text-slate-500 mb-1">
                     Explore details
                   </span>
-                  <div className="inline-flex items-center gap-1 text-sm font-semibold text-[#FE0000] group-hover:text-[#830d0f] transition-colors">
+                  <div className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary-color)] group-hover:text-[var(--secondary-color)] transition-colors">
                     View Product
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -133,13 +133,13 @@ const Hero = async ({
                   <Wrench className="w-6 h-6 text-slate-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 group-hover:text-[#FE0000] transition-colors">
+                  <h3 className="font-semibold text-slate-900 group-hover:text-[var(--primary-color)] transition-colors">
                     {card.title}
                   </h3>
                   <p className="text-sm text-slate-500">{card.description}</p>
                 </div>
               </div>
-              <span className="text-slate-400 group-hover:text-[#FE0000] transition-colors">
+              <span className="text-slate-400 group-hover:text-[var(--primary-color)] transition-colors">
                 <ArrowRight className="w-5 h-5" />
               </span>
             </Link>

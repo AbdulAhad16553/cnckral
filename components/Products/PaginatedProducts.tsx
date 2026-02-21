@@ -20,6 +20,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
 import ProductSkeleton from "@/common/Skeletons/Products";
+import MachinePageSkeleton from "@/common/Skeletons/MachinePage";
+import PartsPageSkeleton from "@/common/Skeletons/PartsPage";
 
 interface PaginatedProductsProps {
   companyId: string;
@@ -230,7 +232,13 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
   if (loading && products.length === 0) {
     return (
       <div className={className}>
-        <ProductSkeleton />
+        {quoteFilter === "machine" ? (
+          <MachinePageSkeleton />
+        ) : quoteFilter === "parts" ? (
+          <PartsPageSkeleton />
+        ) : (
+          <ProductSkeleton />
+        )}
       </div>
     );
   }

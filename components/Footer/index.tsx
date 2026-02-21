@@ -61,7 +61,7 @@ const Footer = async ({ storeData }: FooterProps) => {
   const storeName = storeData?.store_name
   const storeId = storeData?.id
   const tagline = storeData?.store_detail?.tagline
-  const primaryColor = storeData?.store_detail?.primary_color || "#dc2626"
+  const primaryColor = storeData?.store_detail?.primary_color || "#E60001"
   const secondaryColor = storeData?.store_detail?.secondary_color || "#1f2937"
   const currency = storeData?.store_detail?.currency || "$"
 
@@ -141,7 +141,7 @@ const Footer = async ({ storeData }: FooterProps) => {
   ]
 
   return (
-    <footer className="gradient-blue-grey text-slate-800">
+    <footer className="gradient-blue-grey text-white">
       <div className="page-container py-16">
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
@@ -154,15 +154,15 @@ const Footer = async ({ storeData }: FooterProps) => {
                     alt={`${storeName || "Store"} Logo`}
                     width={160}
                     height={50}
-                    className="max-h-12 object-contain brightness-0 invert opacity-90"
+                    className="max-h-12 object-contain"
                   />
                 </div>
-                <p className="text-slate-800 text-sm leading-relaxed mb-6 max-w-sm">
+                <p className="text-white/90 text-sm leading-relaxed mb-6 max-w-sm">
                   {description}
                 </p>
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   {trustFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2 text-slate-800">
+                    <div key={index} className="flex items-center gap-2 text-white/90">
                       <feature.icon size={16} className={feature.color} />
                       <span className="text-sm">{feature.text}</span>
                     </div>
@@ -170,7 +170,7 @@ const Footer = async ({ storeData }: FooterProps) => {
                 </div>
                 {socialLinks && socialLinks.length > 0 && (
                   <div className="flex items-center gap-3">
-                    <span className="text-slate-800 text-sm">Follow us</span>
+                    <span className="text-white/90 text-sm">Follow us</span>
                     <div className="flex gap-2">
                       {socialLinks.map((socialLink: any) => {
                         const platformKey = socialLink.platform_name.toLowerCase();
@@ -180,7 +180,7 @@ const Footer = async ({ storeData }: FooterProps) => {
                             href={socialLink.social_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-9 h-9 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center justify-center text-slate-700 hover:text-slate-900 transition-colors"
+                            className="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white hover:text-white transition-colors"
                             aria-label={socialLink.platform_name}
                           >
                             {socialIcons[platformKey] || <span className="text-xs">{socialLink.platform_name}</span>}
@@ -194,62 +194,62 @@ const Footer = async ({ storeData }: FooterProps) => {
             </div>
 
             <div className="lg:col-span-2">
-              <h3 className="text-slate-900 font-semibold text-sm uppercase tracking-wider mb-4">Company</h3>
+              <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Company</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/about-us" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">
+                  <Link href="/about-us" className="text-white/90 hover:text-white transition-colors text-sm">
                     About us
                   </Link>
                 </li>
                 <li>
-                  <Link href="/machine" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Machines</Link>
+                  <Link href="/machine" className="text-white/90 hover:text-white transition-colors text-sm">Machines</Link>
                 </li>
                 <li>
-                  <Link href="/parts" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Parts & Accessories</Link>
+                  <Link href="/parts" className="text-white/90 hover:text-white transition-colors text-sm">Parts & Accessories</Link>
                 </li>
                 <li>
-                  <Link href="/category" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Categories</Link>
+                  <Link href="/category" className="text-white/90 hover:text-white transition-colors text-sm">Categories</Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Contact</Link>
+                  <Link href="/contact" className="text-white/90 hover:text-white transition-colors text-sm">Contact</Link>
                 </li>
               </ul>
             </div>
 
             <div className="lg:col-span-2">
-              <h3 className="text-slate-900 font-semibold text-sm uppercase tracking-wider mb-4">Legal</h3>
+              <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Legal</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/privacy-policy" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Privacy Policy</Link>
+                  <Link href="/privacy-policy" className="text-white/90 hover:text-white transition-colors text-sm">Privacy Policy</Link>
                 </li>
                 <li>
-                  <Link href="/terms-conditions" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Terms & Conditions</Link>
+                  <Link href="/terms-conditions" className="text-white/90 hover:text-white transition-colors text-sm">Terms & Conditions</Link>
                 </li>
                 <li>
-                  <Link href="/shipping-policy" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Shipping</Link>
+                  <Link href="/shipping-policy" className="text-white/90 hover:text-white transition-colors text-sm">Shipping</Link>
                 </li>
                 <li>
-                  <Link href="/return-policy" className="text-slate-800 hover:text-slate-900 transition-colors text-sm">Returns</Link>
+                  <Link href="/return-policy" className="text-white/90 hover:text-white transition-colors text-sm">Returns</Link>
                 </li>
               </ul>
             </div>
 
             <div className="lg:col-span-4">
-              <h3 className="text-slate-900 font-semibold text-sm uppercase tracking-wider mb-4">Contact</h3>
+              <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Contact</h3>
               
               <div className="space-y-4">
                 {companyContactDetails.email && (
-                  <a href={`mailto:${companyContactDetails.email}`} className="block text-slate-800 hover:text-slate-900 transition-colors text-sm">
+                  <a href={`mailto:${companyContactDetails.email}`} className="block text-white/90 hover:text-white transition-colors text-sm">
                     {companyContactDetails.email}
                   </a>
                 )}
                 {companyContactDetails.phone && (
-                  <a href={`tel:${companyContactDetails.phone}`} className="block text-slate-800 hover:text-slate-900 transition-colors text-sm">
+                  <a href={`tel:${companyContactDetails.phone}`} className="block text-white/90 hover:text-white transition-colors text-sm">
                     {companyContactDetails.phone}
                   </a>
                 )}
                 {companyContactDetails.address && (
-                  <p className="text-slate-800 text-sm leading-relaxed max-w-xs">
+                  <p className="text-white/90 text-sm leading-relaxed max-w-xs">
                     {companyContactDetails.address}
                   </p>
                 )}
@@ -257,9 +257,9 @@ const Footer = async ({ storeData }: FooterProps) => {
 
               <div className="mt-6 grid grid-cols-2 gap-3">
                 {companyStats.map((stat, index) => (
-                  <div key={index} className="text-center p-3 bg-slate-200/80 rounded-lg">
-                    <div className="text-slate-900 font-semibold">{stat.number}</div>
-                    <div className="text-slate-800 text-xs">{stat.label}</div>
+                  <div key={index} className="text-center p-3 bg-white/15 rounded-lg">
+                    <div className="text-white font-semibold">{stat.number}</div>
+                    <div className="text-white/90 text-xs">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -268,7 +268,7 @@ const Footer = async ({ storeData }: FooterProps) => {
 
           <div className="border-t border-slate-300 pt-10 mt-10">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center justify-center gap-6 text-slate-800">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-white/90">
                 <span className="flex items-center gap-2">
                   <Shield className="h-4 w-4" /> Secure
                 </span>
@@ -279,9 +279,9 @@ const Footer = async ({ storeData }: FooterProps) => {
                   <CheckCircle className="h-4 w-4" /> Trusted
                 </span>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-slate-800">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-white/90">
                 <span>&copy; {new Date().getFullYear()} {storeName}</span>
-                <Link href="https://www.items.pk" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">
+                <Link href="https://www.items.pk" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                   Powered by items.pk
                 </Link>
               </div>

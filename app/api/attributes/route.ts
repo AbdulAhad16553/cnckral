@@ -24,8 +24,11 @@ export async function GET(request: NextRequest) {
     let hasMore = true;
 
     while (hasMore) {
+      // URL-encode filters to handle special characters in template names (e.g. "Sheet & Tube")
+      const filters = JSON.stringify([["variant_of", "=", templateItemName]]);
+      const fields = JSON.stringify(["name", "item_name", "attributes.attribute", "attributes.attribute_value"]);
       const variantsResponse = await fetch(
-        `${ERP_BASE_URL}/Item?filters=[["variant_of","=","${templateItemName}"]]&fields=["name","item_name","attributes.attribute","attributes.attribute_value"]&limit_start=${start}&limit_page_length=${pageLength}`,
+        `${ERP_BASE_URL}/Item?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}&limit_start=${start}&limit_page_length=${pageLength}`,
         {
           headers: {
             Authorization: `token ${API_KEY}:${API_SECRET}`,

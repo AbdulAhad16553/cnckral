@@ -64,7 +64,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const tagline = storeData?.store_detail?.tagline;
   const headerLogoId = storeData?.store_detail?.header_logo_id;
   const companyLogo = storeData?.company_logo;
-  const primaryColor = storeData?.store_detail?.primary_color || "#FE0000";
+  const primaryColor = storeData?.store_detail?.primary_color || "#E60001";
   const storeId = storeData?.id;
   const companyId = storeData?.company_id;
   const storeCurrency = storeData?.store_detail?.currency || "Rs.";
@@ -267,7 +267,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                     alt={`${storeName} Logo`}
                     width={90}
                     height={60}
-                    className="transition-transform duration-300 group-hover:scale-105 object-contain brightness-0 invert"
+                    className="transition-transform duration-300 group-hover:scale-105 object-contain"
                   />
                 </div>
               </Link>

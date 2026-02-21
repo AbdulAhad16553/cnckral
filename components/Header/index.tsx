@@ -38,7 +38,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
 
   const categoryMenuRef = useRef<HTMLDivElement>(null);
-  const categoryButtonRef = useRef<HTMLButtonElement>(null);
+  const categoryButtonRef = useRef<HTMLAnchorElement>(null);
   const categoryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Extract store data
@@ -158,9 +158,9 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
               </Link>
               {/* Mobile: wishlist, cart, account - shown on small screens */}
               <div className="flex sm:hidden items-center space-x-2">
-                <Link href="/wishlist" className="p-2 text-white/90 hover:text-white transition-colors">
+               
                   <Heart className="w-5 h-5" />
-                </Link>
+               
                 <Cart />
                 {storeId && companyId && (
                   <Account storeId={storeId} companyId={companyId} />
@@ -177,15 +177,16 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 Home
               </Link>
               <div className="relative group flex-shrink-0">
-                <button
+                <Link
                   ref={categoryButtonRef}
+                  href="/category"
                   className="flex items-center space-x-1 text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base py-1.5"
                   onMouseEnter={handleCategoryMouseEnter}
                   onMouseLeave={handleCategoryMouseLeave}
                 >
                   <span>Categories</span>
                   <ChevronDown className="w-4 h-4" />
-                </button>
+                </Link>
                 {isCategoryMenuOpen && (
                   <div
                     ref={categoryMenuRef}

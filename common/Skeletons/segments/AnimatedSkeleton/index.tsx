@@ -1,13 +1,17 @@
 import React from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 interface AnimatedSkeletonProps {
     className?: string
+    style?: React.CSSProperties
 }
 
-const AnimatedSkeleton = ({ className = '' }: AnimatedSkeletonProps) => {
+const AnimatedSkeleton = ({ className = '', style }: AnimatedSkeletonProps) => {
     return (
-        <Skeleton className={className} />
+        <div
+            className={cn("rounded-md skeleton-shimmer", className)}
+            style={style}
+        />
     )
 }
 

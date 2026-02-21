@@ -13,7 +13,12 @@ const normalizePhoneNumber = (phone: string): string => {
     return phone // optional: handle any fallback case
 }
 
-const Layout = async ({ children }: { children: React.ReactNode }) => {
+interface LayoutProps {
+  children: React.ReactNode
+  showFooter?: boolean
+}
+
+const Layout = async ({ children, showFooter = true }: LayoutProps) => {
 
     const Headers = await headers()
     const host = Headers.get("host");
@@ -71,9 +76,11 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
                 storeData={storeDataWithLogo}
             />
             <main className='min-h-screen'>{children}</main>
-            <Footer
-                storeData={storeDataWithLogo}
-            />
+            {showFooter && (
+                <Footer
+                    storeData={storeDataWithLogo}
+                />
+            )}
             <Toaster />
             {whatsappLink && (
                 <a

@@ -382,4 +382,36 @@ body {
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+
+  /* Skeleton shimmer animation */
+  @keyframes skeleton-shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgb(226 232 240) 0%,
+      rgb(203 213 225) 20%,
+      rgb(226 232 240) 40%,
+      rgb(226 232 240) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+
+  .dark .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgb(51 65 85) 0%,
+      rgb(71 85 105) 20%,
+      rgb(51 65 85) 40%,
+      rgb(51 65 85) 100%
+    );
+  }
 }

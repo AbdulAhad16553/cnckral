@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { productService } from "@/lib/erpnext/services/productService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,26 +19,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch relevant product catalog for accurate answers about parts/machines
-    let productContext = "";
-    try {
-      productContext = await productService.getProductsForChatContext(message, 25);
-    } catch (e) {
-      console.warn("Chat: Could not load product context", e);
-    }
-
-    const systemInstruction = productContext
-      ? `You are a helpful assistant for CNC KRAL, a company selling tools, machinery, and equipment for the metalworking industry.
-
-Use ONLY the product catalog below to answer questions about specific parts or machines. Base your answers on the descriptions and details provided. If asked about something not in the catalog, say you don't have that specific information and suggest contacting the company.
-
-PRODUCT CATALOG:
-${productContext}
-
-When answering: Be accurate and concise. Reference item names and codes when relevant. For pricing or stock, suggest visiting the product page or contacting sales.`
-      : "You are a helpful assistant for CNC KRAL, tools and machinery for metalworking. Answer questions about products and services. For specific product details, suggest visiting the website or contacting the company.";
-
     const genAI = new GoogleGenerativeAI(apiKey);
+    // Try models in order: 2.5-flash-lite (budget) -> 1.5-flash-8b -> gemini-pro
     const modelsToTry = ["gemini-2.5-flash-lite", "gemini-1.5-flash-8b", "gemini-pro"];
     let lastError: Error | null = null;
 
@@ -53,8 +34,8 @@ When answering: Be accurate and concise. Reference item names and codes when rel
 
         const chat = model.startChat({
           history: [
-            { role: "user", parts: [{ text: systemInstruction }] },
-            { role: "model", parts: [{ text: "I have the product catalog. Ask me about any part or machine." }] },
+            { role: "user", parts: [{ text: "You are a helpful assistant for CNC KRAL, tools and machinery for metalworking." }] },
+            { role: "model", parts: [{ text: "I'll help with questions about CNC KRAL's products and services." }] },
             ...formattedHistory,
           ],
         });

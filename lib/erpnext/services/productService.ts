@@ -18,6 +18,8 @@ export interface ERPNextProduct {
   is_purchase_item: 0 | 1;
   is_stock_item: 0 | 1;
   custom_is_website_item?: 0 | 1;
+  custom_quotation_item?: 0 | 1;
+  custom_custom_quotation_item?: 0 | 1;
   country_of_origin?: string;
   weight_per_unit?: number;
   shelf_life_in_days?: number;
@@ -274,7 +276,7 @@ export class ProductService {
 
       return toInclude
         .map((p) => {
-          const isMachine = p.custom_quotation_item === 1 || (p as any).custom_custom_quotation_item === 1;
+          const isMachine = p.custom_quotation_item === 1 || p.custom_custom_quotation_item === 1;
           const type = isMachine ? "Machine" : "Part";
           const desc = stripHtml(p.description || "").slice(0, 600);
           return `[${type}] ${p.item_name || p.name} (Item: ${p.item_code || p.name}, Category: ${p.item_group || "N/A"})${desc ? `\nDescription: ${desc}` : ""}`;

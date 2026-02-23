@@ -154,7 +154,7 @@ const Footer = async ({ storeData }: FooterProps) => {
                     alt={`${storeName || "Store"} Logo`}
                     width={160}
                     height={50}
-                    className="max-h-12 object-contain"
+                    className="max-h-12 object-contain brightness-0 invert"
                   />
                 </div>
                 <p className="text-white/90 text-sm leading-relaxed mb-6 max-w-sm">

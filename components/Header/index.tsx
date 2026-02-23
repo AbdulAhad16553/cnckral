@@ -120,8 +120,8 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
 
   return (
     <>
-      {/* Top Bar - matches Learn More / Contact Us button gradient */}
-      <div className="gradient-blue-grey-combined text-slate-300 py-2 text-sm hidden md:block border-b border-white/20">
+      {/* Top Bar - grey background, white text */}
+      <div className="bg-gray-600 text-white py-2 text-sm hidden md:block">
         <div className="page-container flex items-center justify-between">
           <div className="flex items-center gap-6">
             <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-2">
@@ -134,7 +134,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
             </a>
           </div>
           <div className="flex items-center gap-6">
-            <span className="text-slate-400">Free shipping on orders over Rs. 10,000</span>
+            <span>Free shipping on orders over Rs. 10,000</span>
             <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
           </div>
         </div>
@@ -160,7 +160,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                     alt={`${storeName || "Store"} Logo`}
                     width={160}
                     height={50}
-                    className="max-h-12 object-contain"
+                    className="max-h-12 object-contain brightness-0 invert"
                   />
               </Link>
               {/* Mobile: wishlist, cart, account - shown on small screens */}

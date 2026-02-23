@@ -127,7 +127,7 @@ body {
   }
 
   .price-range-display {
-    background: linear-gradient(to right, rgba(113, 123, 133, 0.08), rgba(54, 62, 71, 0.12));
+    background: linear-gradient(to right, rgba(3, 104, 229, 0.08), rgba(54, 62, 71, 0.12));
     @apply border;
     border-color: rgba(54, 62, 71, 0.3);
   }
@@ -179,33 +179,30 @@ body {
     overflow: hidden;
   }
 
-  /* Blue gradient - Primary accents */
+  /* Brand palette: #0368E5 (blue) + #363E47 (grey) only */
   .gradient-blue {
-    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
+    background: linear-gradient(135deg, #0368E5 0%, #363E47 100%);
   }
 
   .gradient-red {
-    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
+    background: linear-gradient(135deg, #0368E5 0%, #363E47 100%);
   }
 
-  /* Grey gradient - Secondary/neutral elements */
   .gradient-grey {
-    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+    background: linear-gradient(135deg, #0368E5 0%, #363E47 100%);
   }
 
-  /* Grey gradient for header & footer */
   .gradient-blue-grey {
-    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+    background: linear-gradient(135deg, #0368E5 0%, #363E47 100%);
   }
 
-  /* Combined blue-to-grey gradient - brand accent sections */
   .gradient-blue-grey-combined {
-    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 35%, #363E47 100%);
+    background: linear-gradient(135deg, #0368E5 0%, #363E47 100%);
   }
 
-  /* Light sections with combined brand tint */
+  /* Light sections with brand tint */
   .bg-brand-tint {
-    background: linear-gradient(to bottom, rgba(33, 185, 255, 0.04) 0%, rgba(54, 62, 71, 0.06) 100%);
+    background: linear-gradient(to bottom, rgba(3, 104, 229, 0.04) 0%, rgba(54, 62, 71, 0.06) 100%);
   }
 
   /* Card border with brand colors */
@@ -214,12 +211,11 @@ body {
   }
 
   .border-brand-grey {
-    border-color: rgba(113, 123, 133, 0.3);
+    border-color: rgba(54, 62, 71, 0.3);
   }
 
-  /* Enhanced Footer Styles */
   .footer-gradient {
-    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+    background: linear-gradient(135deg, #0368E5 0%, #363E47 100%);
   }
 
   .footer-card {

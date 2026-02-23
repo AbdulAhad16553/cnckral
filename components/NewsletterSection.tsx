@@ -21,7 +21,7 @@ export function NewsletterSection() {
 
   return (
     <motion.section
-      className="gradient-grey text-white rounded-2xl p-8 md:p-12 text-center"
+      className="gradient-blue-grey text-white rounded-2xl p-8 md:p-12 text-center shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

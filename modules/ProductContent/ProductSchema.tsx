@@ -24,11 +24,11 @@ const ProductSchema = ({ product, storeCurrency, storeData }: ProductSchemaProps
     sku: product.sku,
     brand: {
       "@type": "Brand",
-      name: storeData?.store_name || "Kral Laser"
+      name: storeData?.store_name || "CNC KRAL"
     },
     manufacturer: {
       "@type": "Organization",
-      name: storeData?.store_name || "Kral Laser"
+      name: storeData?.store_name || "CNC KRAL"
     },
     image: featuredImage ? [
       `${process.env.NEXT_PUBLIC_NHOST_STORAGE_URL}/files/${featuredImage.image_id}`
@@ -40,7 +40,7 @@ const ProductSchema = ({ product, storeCurrency, storeData }: ProductSchemaProps
       availability: "https://schema.org/InStock",
       seller: {
         "@type": "Organization",
-        name: storeData?.store_name || "Kral Laser"
+        name: storeData?.store_name || "CNC KRAL"
       },
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     },

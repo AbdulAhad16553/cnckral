@@ -51,10 +51,10 @@ export function ResourceLinks() {
         >
           <Link
             href={item.href}
-            className="group flex items-center justify-between p-5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all duration-200"
+            className="group flex items-center justify-between p-5 rounded-xl border border-slate-200 bg-white hover:border-[var(--primary-color)]/30 hover:shadow-md hover:shadow-[var(--primary-color)]/5 transition-all duration-200"
           >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-[var(--secondary-color)]/10 flex items-center justify-center group-hover:bg-[var(--primary-color)]/10 transition-colors">
                 <item.icon className="w-5 h-5 text-slate-600" />
               </div>
               <div>

@@ -135,7 +135,7 @@ const CategoriesContent = ({
             {hasSubCategories ? "— Sub-categories" : `— ${sortedProducts.length} product${sortedProducts.length !== 1 ? "s" : ""}`}
           </span>
         </h1>
-        <div className="h-px bg-gradient-to-r from-slate-200 to-transparent mt-4 max-w-2xl" />
+        <div className="h-px bg-gradient-to-r from-[var(--secondary-color)]/30 via-[var(--primary-color)]/20 to-transparent mt-4 max-w-2xl" />
       </motion.div>
 
       {/* Intro */}

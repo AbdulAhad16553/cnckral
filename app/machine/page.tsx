@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Machines | Krallaser",
+  title: "Machines | CNC KRAL",
   description: "Browse all machines that can be requested as a quote.",
 };
 
@@ -29,7 +29,7 @@ export default async function MachinePage() {
   const data = await storeRes.json();
 
   const storeId = data?.store?.stores[0].id ?? "default-store";
-  const companyId = data?.store?.stores[0].company_id ?? "Krallaser";
+  const companyId = data?.store?.stores[0].company_id ?? "CNC KRAL";
   const storeCurrency = data?.store?.stores[0].store_detail?.currency ?? "Rs.";
   const { categories } = categoriesRes;
 

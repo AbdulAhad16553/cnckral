@@ -17,7 +17,8 @@ body {
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
+    /* Brand: blue (#0368E5) from header/footer */
+    --primary: 213 96% 46%;
     --primary-foreground: 0 0% 98%;
     --secondary: 220 14% 96%;
     --secondary-foreground: 222 47% 11%;
@@ -29,7 +30,7 @@ body {
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 222 47% 11%;
+    --ring: 213 96% 46%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -195,6 +196,25 @@ body {
   /* Grey gradient for header & footer */
   .gradient-blue-grey {
     background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+  }
+
+  /* Combined blue-to-grey gradient - brand accent sections */
+  .gradient-blue-grey-combined {
+    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 35%, #363E47 100%);
+  }
+
+  /* Light sections with combined brand tint */
+  .bg-brand-tint {
+    background: linear-gradient(to bottom, rgba(33, 185, 255, 0.04) 0%, rgba(54, 62, 71, 0.06) 100%);
+  }
+
+  /* Card border with brand colors */
+  .border-brand {
+    border-color: rgba(3, 104, 229, 0.2);
+  }
+
+  .border-brand-grey {
+    border-color: rgba(113, 123, 133, 0.3);
   }
 
   /* Enhanced Footer Styles */

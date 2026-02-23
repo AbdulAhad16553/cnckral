@@ -151,9 +151,9 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 <Image
                   src="/HORIZONTAL Logo CNC KRAL.png"
                   alt={`${storeName} Logo`}
-                  width={90}
-                  height={60}
-                  className="h-10 w-auto sm:h-12 object-contain transition-transform duration-300 group-hover:scale-105"
+                  width={70}
+                  height={46}
+                  className="h-8 w-auto sm:h-9 object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               </Link>
               {/* Mobile: wishlist, cart, account - shown on small screens */}

@@ -83,7 +83,7 @@ const Footer = async ({ storeData }: FooterProps) => {
     const API_SECRET = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET
 
     if (ERP_BASE_URL && API_KEY && API_SECRET) {
-      const companyName = "Kral Laser"
+      const companyName = "CNC KRAL"
       const encodedName = encodeURIComponent(companyName)
       const response = await axios.get(
         `${ERP_BASE_URL}/Company/${encodedName}?fields=["email","phone_no"]`,

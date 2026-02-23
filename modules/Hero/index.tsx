@@ -23,7 +23,7 @@ const Hero = async ({
   products,
   hideOnPage,
 }: HeroProps) => {
-  const storeName =  "Krallaser";
+  const storeName =  "CNC KRAL";
 
   const featuredProduct = Array.isArray(products) && products.length > 0 ? products[0] : null;
   const productImages = (() => {
@@ -48,7 +48,7 @@ const Hero = async ({
   ];
 
   return (
-    <section className="relative w-full bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+    <section className="relative w-full bg-gradient-to-b from-slate-50 via-white to-slate-50/80 overflow-hidden">
       <div className="page-container py-16 lg:py-24">
         {/* Auto-moving hero image carousel */}
         <div className="mb-12 max-w-5xl mx-auto">
@@ -63,7 +63,7 @@ const Hero = async ({
             <Link href="/machine">
               <Button
                 size="lg"
-                className="group px-8 py-6 text-base font-semibold text-white gradient-blue hover:opacity-95 transition-opacity"
+                className="group px-8 py-6 text-base font-semibold text-white gradient-blue-grey-combined hover:opacity-95 transition-opacity shadow-lg shadow-[#0368E5]/20"
               >
                 Learn More
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-0.5 transition-transform" />
@@ -79,7 +79,7 @@ const Hero = async ({
               href={`/product/${encodeURIComponent(featuredProduct.sku || featuredProduct.slug || featuredProduct.id)}`}
               className="group"
             >
-              <div className="relative flex items-center gap-6 sm:gap-8 px-5 sm:px-8 py-4 sm:py-5 rounded-full bg-white/90 shadow-xl border border-slate-200/70 backdrop-blur-md max-w-3xl">
+              <div className="relative flex items-center gap-6 sm:gap-8 px-5 sm:px-8 py-4 sm:py-5 rounded-full bg-white/95 shadow-xl border border-[var(--primary-color)]/10 backdrop-blur-md max-w-3xl group-hover:border-[var(--secondary-color)]/20 transition-colors">
                 {/* Product images carousel */}
                 <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-slate-100 border border-slate-200 transition-transform duration-300 group-hover:scale-105">
                   <FeaturedProductImageCarousel
@@ -126,7 +126,7 @@ const Hero = async ({
             <Link
               key={i}
               href={card.href}
-              className="group flex items-center justify-between p-6 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all duration-200"
+              className="group flex items-center justify-between p-6 rounded-xl border border-slate-200 bg-white hover:border-[var(--primary-color)]/30 hover:shadow-md hover:shadow-[var(--primary-color)]/5 transition-all duration-200"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">

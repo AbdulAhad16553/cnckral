@@ -220,7 +220,7 @@ export default async function Home() {
         <Hero
           content={{
             title: "Laser Technology That Defines Excellence",
-            content: "At Kral Laser, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
+            content: "At CNC KRAL, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
             heroImage: undefined,
           }}
           storeData={data?.store?.stores[0]}
@@ -231,7 +231,7 @@ export default async function Home() {
       </HeroAnimationWrapper>
 
       {/* Category strip - CNC Tooling Shop style */}
-      <div className="bg-white page-container py-12 lg:py-14">
+      <div className="bg-white page-container py-12 lg:py-14 border-b border-[var(--secondary-color)]/10">
         <AnimatedSection delay={0.05}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Shop by Category</h2>
@@ -241,7 +241,7 @@ export default async function Home() {
       </div>
 
       {/* Need help + Resource links */}
-      <div className="bg-slate-50/50 page-container py-12 lg:py-14">
+      <div className="bg-brand-tint page-container py-12 lg:py-14">
         <AnimatedSection delay={0.08}>
           <NeedHelpSection />
         </AnimatedSection>
@@ -254,7 +254,7 @@ export default async function Home() {
       </div>
 
       {/* Featured Products */}
-      <div className="bg-white page-container py-12 lg:py-14">
+      <div className="bg-white page-container py-12 lg:py-14 border-b border-[var(--secondary-color)]/10">
         <AnimatedSection delay={0.12}>
           <HomeProducts
             companyId={companyId}

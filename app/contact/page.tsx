@@ -181,7 +181,7 @@ const ContactPage = async () => {
 
                     <Button
                       type="submit"
-                      className="w-full sm:w-auto px-8 py-6 text-base font-medium"
+                      className="w-full sm:w-auto px-8 py-6 text-base font-medium text-white hover:opacity-95 transition-opacity"
                       style={{ backgroundColor: "var(--primary-color)" }}
                     >
                       <Send className="w-4 h-4 mr-2" />

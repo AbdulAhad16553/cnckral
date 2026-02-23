@@ -13,7 +13,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Krallaser",
+  title: "CNC KRAL",
   description: "Tools, Machinery, and Equipment for the Metalworking Industry",
   icons: {
     icon: "/cnc_kral.png",
@@ -31,7 +31,7 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
-          <title>{"Krallaser"}</title>
+          <title>{"CNC KRAL"}</title>
           <meta
             name="description"
             content={
@@ -74,7 +74,7 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
-          <title>Krallaser</title>
+          <title>CNC KRAL</title>
           <meta name="description" content="Tools, Machinery, and Equipment for the Metalworking Industry" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/cnc_kral.png" type="image/png" />

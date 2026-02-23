@@ -8,9 +8,9 @@ import { getAllCategories } from "@/hooks/getCategories";
 import { getProducts } from "@/hooks/getProducts";
 
 export const metadata: Metadata = {
-  title: "About Kral Laser | Industrial Fiber Laser Cutting Machines",
+  title: "About CNC KRAL | CNC Machinery & Precision Tooling Distributor",
   description:
-    "Kral Laser provides advanced fiber laser cutting, marking, and industrial machinery in Pakistan. Based in Lahore. High-precision machines for 24/7 metal fabrication.",
+    "CNC KRAL is a prominent industrial machinery and hardware distributor in Lahore, Pakistan, specializing in CNC solutions, wood routers, laser cutters, plasma cutters, and precision cutting tools.",
 };
 
 export default async function AboutUsPage() {
@@ -31,7 +31,7 @@ export default async function AboutUsPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 bg-brand-tint/30 min-h-screen">
         <Hero
           hideOnPage={true}
           content={{

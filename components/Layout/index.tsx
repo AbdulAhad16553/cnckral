@@ -35,7 +35,7 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
     // Fetch company logo from ERPNext API
     let companyLogo = null;
     try {
-        const companyId = data?.store?.stores?.[0]?.company_id || "Kral Laser";
+        const companyId = data?.store?.stores?.[0]?.company_id || "CNC KRAL";
         const erpDomain = process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN;
         const apiKey = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY;
         const apiSecret = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET;

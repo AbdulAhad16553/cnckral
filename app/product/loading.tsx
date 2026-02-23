@@ -1,9 +1,12 @@
-import { CncBitLoader } from "@/components/CncBitLoader";
+import { ProductSkeleton } from "@/components/ui/product-skeleton";
+import Layout from "@/components/Layout";
 
 export default function ProductLoading() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <CncBitLoader />
-    </div>
+    <Layout>
+      <div className="min-h-screen bg-neutral-50">
+        <ProductSkeleton />
+      </div>
+    </Layout>
   );
 }

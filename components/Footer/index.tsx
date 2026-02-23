@@ -281,8 +281,8 @@ const Footer = async ({ storeData }: FooterProps) => {
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-white/90">
                 <span>&copy; {new Date().getFullYear()} {storeName}</span>
-                <Link href="https://www.items.pk" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  Powered by items.pk
+                <Link href="https://github.com/AbdulAhad16553" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  Powered by Abdul Ahad
                 </Link>
               </div>
             </div>

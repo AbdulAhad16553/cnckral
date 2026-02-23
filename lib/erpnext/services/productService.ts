@@ -237,6 +237,54 @@ export class ProductService {
       throw error;
     }
   }
+
+  /**
+   * Get product catalog context for AI chat. Returns products matching keywords in item_name or description.
+   * Used to give the AI accurate product info when answering questions about parts/machines.
+   */
+  async getProductsForChatContext(userMessage: string, maxProducts = 25): Promise<string> {
+    try {
+      const products = await this.getProducts({ disabled: 0 }, 500, 0);
+      if (!products || products.length === 0) return "";
+
+      const keywords = userMessage
+        .toLowerCase()
+        .replace(/[^\w\s]/g, " ")
+        .split(/\s+/)
+        .filter((w) => w.length >= 2 && !/^(what|how|which|the|a|an|is|are|do|does|can|have|has|about|for|with|your|this|that|you)$/.test(w));
+
+      const stripHtml = (html: string | undefined): string => {
+        if (!html || typeof html !== "string") return "";
+        return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      };
+
+      let matched = products;
+      if (keywords.length > 0) {
+        matched = products.filter((p) => {
+          const name = (p.item_name || "").toLowerCase();
+          const desc = stripHtml(p.description || "").toLowerCase();
+          const code = (p.item_code || p.name || "").toLowerCase();
+          const group = (p.item_group || "").toLowerCase();
+          const text = `${name} ${desc} ${code} ${group}`;
+          return keywords.some((k) => text.includes(k));
+        });
+      }
+
+      const toInclude = matched.length > 0 ? matched.slice(0, maxProducts) : products.slice(0, Math.min(15, products.length));
+
+      return toInclude
+        .map((p) => {
+          const isMachine = p.custom_quotation_item === 1 || (p as any).custom_custom_quotation_item === 1;
+          const type = isMachine ? "Machine" : "Part";
+          const desc = stripHtml(p.description || "").slice(0, 600);
+          return `[${type}] ${p.item_name || p.name} (Item: ${p.item_code || p.name}, Category: ${p.item_group || "N/A"})${desc ? `\nDescription: ${desc}` : ""}`;
+        })
+        .join("\n\n");
+    } catch (error) {
+      console.error("Error building chat product context:", error);
+      return "";
+    }
+  }
 }
 
 // Export singleton instance

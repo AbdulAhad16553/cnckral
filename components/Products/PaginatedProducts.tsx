@@ -9,6 +9,7 @@ import { ProgressiveImage } from "@/components/ui/progressive-image";
 import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import { useBatchItemImages } from "@/hooks/useBatchItemImages";
 import ProductImagePreview from "@/components/ProductImagePreview";
+import MachineCardDescription from "@/components/MachineCardDescription";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import {
   formatPrice,
@@ -408,9 +409,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       </div>
 
                       {product.short_description && (
-                        <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">
-                          {product.short_description}
-                        </p>
+                        <MachineCardDescription html={product.short_description} />
                       )}
                     </div>
 

@@ -61,8 +61,8 @@ const Footer = async ({ storeData }: FooterProps) => {
   const storeName = storeData?.store_name
   const storeId = storeData?.id
   const tagline = storeData?.store_detail?.tagline
-  const primaryColor = storeData?.store_detail?.primary_color || "#E60001"
-  const secondaryColor = storeData?.store_detail?.secondary_color || "#1f2937"
+  const primaryColor = storeData?.store_detail?.primary_color || "#0368E5"
+  const secondaryColor = storeData?.store_detail?.secondary_color || "#363E47"
   const currency = storeData?.store_detail?.currency || "$"
 
   const { page } = await getStorePage(storeId, "about-us")
@@ -150,7 +150,7 @@ const Footer = async ({ storeData }: FooterProps) => {
               <div className="mb-8">
                 <div className="mb-6">
                   <Image
-                    src="/krallogo.svg"
+                    src="/HORIZONTAL Logo CNC KRAL.png"
                     alt={`${storeName || "Store"} Logo`}
                     width={160}
                     height={50}

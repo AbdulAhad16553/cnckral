@@ -52,11 +52,11 @@ export default async function RootLayout({
           <style>
             {`
               :root {
-                --primary-color: #E60001;
-                --primary-gradient: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
-                --grey-gradient: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
-                --secondary-color: #B00405;
-                --primary-hover: #B00405;
+                --primary-color: #0368E5;
+                --primary-gradient: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
+                --grey-gradient: linear-gradient(135deg, #717B85 0%, #363E47 100%);
+                --secondary-color: #363E47;
+                --primary-hover: #21B9FF;
               }
             `}
           </style>

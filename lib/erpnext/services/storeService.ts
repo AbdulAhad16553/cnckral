@@ -64,8 +64,8 @@ export class StoreService {
           store_type: 'ecommerce',
           domain: domain,
           company_id: company.name,
-          primary_color: '#E60001', // Deep Red/Crimson
-          secondary_color: '#B00405', // Default dark
+          primary_color: '#0368E5', // Blue gradient - darker blue
+          secondary_color: '#363E47', // Grey gradient - darker grey
           currency: company.default_currency || 'USD',
           tagline: `Welcome to ${company.company_name || 'Krallaser'}`,
           coming_soon: 0,
@@ -152,8 +152,8 @@ export class StoreService {
         const company = companyList[0];
         return {
           currency: company.default_currency || 'USD',
-          primary_color: '#E60001',
-          secondary_color: '#B00405',
+          primary_color: '#0368E5',
+          secondary_color: '#363E47',
             tagline: `Welcome to ${company.company_name || 'Krallaser'}`,
           coming_soon: false,
           payment_method_active: true
@@ -162,8 +162,8 @@ export class StoreService {
 
       return {
         currency: 'USD',
-        primary_color: '#E60001',
-        secondary_color: '#B00405',
+        primary_color: '#0368E5',
+        secondary_color: '#363E47',
         tagline: 'Welcome to Krallaser',
         coming_soon: false,
         payment_method_active: true

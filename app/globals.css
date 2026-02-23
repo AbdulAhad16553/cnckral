@@ -126,9 +126,9 @@ body {
   }
 
   .price-range-display {
-    background: linear-gradient(to right, rgba(230, 0, 1, 0.08), rgba(176, 4, 5, 0.12));
+    background: linear-gradient(to right, rgba(113, 123, 133, 0.08), rgba(54, 62, 71, 0.12));
     @apply border;
-    border-color: rgba(176, 4, 5, 0.3);
+    border-color: rgba(54, 62, 71, 0.3);
   }
 
   .breadcrumb-link {
@@ -178,27 +178,28 @@ body {
     overflow: hidden;
   }
 
-  /* Gradient utilities - Jet Black to Deep Red/Crimson */
+  /* Blue gradient - Primary accents */
   .gradient-blue {
-    background: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
+    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
   }
 
   .gradient-red {
-    background: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
+    background: linear-gradient(135deg, #21B9FF 0%, #0368E5 100%);
   }
 
+  /* Grey gradient - Secondary/neutral elements */
   .gradient-grey {
-    background: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
+    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
   }
 
-  /* Jet Black to Crimson gradient for header & footer */
+  /* Grey gradient for header & footer */
   .gradient-blue-grey {
-    background: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
+    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
   }
 
   /* Enhanced Footer Styles */
   .footer-gradient {
-    background: linear-gradient(135deg, #000000 0%, #B00405 50%, #E60001 100%);
+    background: linear-gradient(135deg, #717B85 0%, #363E47 100%);
   }
 
   .footer-card {

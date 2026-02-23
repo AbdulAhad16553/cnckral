@@ -46,7 +46,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const tagline = storeData?.store_detail?.tagline;
   const headerLogoId = storeData?.store_detail?.header_logo_id;
   const companyLogo = storeData?.company_logo;
-  const primaryColor = storeData?.store_detail?.primary_color || "#E60001";
+  const primaryColor = storeData?.store_detail?.primary_color || "#0368E5";
   const storeId = storeData?.id;
   const companyId = storeData?.company_id;
   const storeCurrency = storeData?.store_detail?.currency || "Rs.";
@@ -149,7 +149,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
             <div className="flex items-center justify-between">
               <Link href="/" className="flex-shrink-0 group">
                 <Image
-                  src="/krallogo.svg"
+                  src="/HORIZONTAL Logo CNC KRAL.png"
                   alt={`${storeName} Logo`}
                   width={90}
                   height={60}

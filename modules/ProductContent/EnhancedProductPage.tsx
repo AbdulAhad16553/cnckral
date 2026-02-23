@@ -118,8 +118,8 @@ const EnhancedProductPage = ({
     productContent?.currency || necessary?.storeCurrency || "Rs.";
 
   // Dynamic store colors from CSS variables
-  const primaryColor = storeData?.store_detail?.primary_color || "#E60001";
-  const secondaryColor = storeData?.store_detail?.secondary_color || "#1F2937";
+  const primaryColor = storeData?.store_detail?.primary_color || "#0368E5";
+  const secondaryColor = storeData?.store_detail?.secondary_color || "#363E47";
 
   // Mock data for enhanced features (you can replace with real data later)
   const mockReviews = {

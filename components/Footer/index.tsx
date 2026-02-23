@@ -141,7 +141,7 @@ const Footer = async ({ storeData }: FooterProps) => {
   ]
 
   return (
-    <footer className="gradient-blue-grey text-white">
+    <footer className="gradient-blue-grey-combined text-white">
       <div className="page-container py-16">
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">

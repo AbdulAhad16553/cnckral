@@ -120,8 +120,8 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
 
   return (
     <>
-      {/* Top Bar - International style */}
-      <div className="gradient-blue-grey text-slate-300 py-2 text-sm hidden md:block border-b border-white/20">
+      {/* Top Bar - matches Learn More / Contact Us button gradient */}
+      <div className="gradient-blue-grey-combined text-slate-300 py-2 text-sm hidden md:block border-b border-white/20">
         <div className="page-container flex items-center justify-between">
           <div className="flex items-center gap-6">
             <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-2">
@@ -140,21 +140,28 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
         </div>
       </div>
 
-      {/* Main Header */}
-      <header className="gradient-blue-grey border-b border-white/20 sticky top-0 z-50 shadow-sm">
+      {/* Main Header - matches Learn More / Contact Us button gradient */}
+      <header className="gradient-blue-grey-combined border-b border-white/20 sticky top-0 z-50 shadow-sm">
         <div className="page-container">
           {/* Main Header Content */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 py-3 sm:py-4">
             {/* Logo + Mobile Actions */}
             <div className="flex items-center justify-between">
               <Link href="/" className="flex-shrink-0 group">
-                <Image
+                {/* <Image
                   src="/HORIZONTAL Logo CNC KRAL.png"
                   alt={`${storeName} Logo`}
-                  width={70}
+                  width={60}
                   height={46}
                   className="h-8 w-auto sm:h-9 object-contain transition-transform duration-300 group-hover:scale-105"
-                />
+                /> */}
+                <Image
+                    src="/HORIZONTAL Logo CNC KRAL.png"
+                    alt={`${storeName || "Store"} Logo`}
+                    width={160}
+                    height={50}
+                    className="max-h-12 object-contain"
+                  />
               </Link>
               {/* Mobile: wishlist, cart, account - shown on small screens */}
               <div className="flex sm:hidden items-center space-x-2">
@@ -185,7 +192,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                   onMouseLeave={handleCategoryMouseLeave}
                 >
                   <span>Categories</span>
-                  <ChevronDown className="w-4 h-4" />
+    
                 </Link>
                 {isCategoryMenuOpen && (
                   <div

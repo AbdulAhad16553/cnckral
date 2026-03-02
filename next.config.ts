@@ -21,8 +21,9 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Image optimization
+  // Image configuration (unoptimized for Vercel free plan)
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

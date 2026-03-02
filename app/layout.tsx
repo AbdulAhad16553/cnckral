@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import CacheInitializer from "@/components/CacheInitializer";
-import ChatBox from "@/components/ChatBox";
+// import ChatBox from "@/components/ChatBox";
 
 // Plus Jakarta Sans - professional, clean, excellent readability
 const plusJakarta = Plus_Jakarta_Sans({
@@ -65,7 +65,7 @@ export default async function RootLayout({
         <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
           {children}
-          <ChatBox />
+          {/* <ChatBox /> */}
         </body>
       </html>
     );
@@ -92,7 +92,7 @@ export default async function RootLayout({
         <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
           {children}
-          <ChatBox />
+          {/* <ChatBox /> */}
         </body>
       </html>
     );

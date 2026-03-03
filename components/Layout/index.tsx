@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { getUrlWithScheme } from '@/lib/getUrlWithScheme'
 import Image from 'next/image'
 import { Toaster } from 'sonner'
-import HeaderWrapper from './HeaderWrapper'
+import Header from '../Header'
 
 const normalizePhoneNumber = (phone: string): string => {
     phone = phone.trim()
@@ -72,9 +72,7 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
 
     return (
         <>
-            <HeaderWrapper
-                storeData={storeDataWithLogo}
-            />
+            <Header storeData={storeDataWithLogo} />
             <main className='min-h-screen'>{children}</main>
             {showFooter && (
                 <Footer

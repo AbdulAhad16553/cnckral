@@ -74,10 +74,10 @@ const ContactPage = async () => {
                     <div>
                       <h3 className="font-semibold text-slate-900">Phone</h3>
                       <a
-                        href={`tel:${contact?.phone || "+923103339404"}`}
+                        href={`tel:${contact?.phone || "0322 4414443"}`}
                         className="text-slate-600 hover:text-slate-900 transition-colors mt-1 block"
                       >
-                        {contact?.phone || "+92 310 3339404"}
+                        {contact?.phone || "0322 4414443"}
                       </a>
                     </div>
                   </div>

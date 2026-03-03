@@ -51,7 +51,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   const companyId = storeData?.company_id;
   const storeCurrency = storeData?.store_detail?.currency || "Rs.";
   // Contact fallbacks
-  const topBarPhone = "+923103339404";
+  const topBarPhone = "0322 4414443";
   const topBarEmail = "cnckral@gmail.com";
 
   const fetchCategories = useCallback(async () => {

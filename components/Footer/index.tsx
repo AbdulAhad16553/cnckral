@@ -96,7 +96,7 @@ const Footer = async ({ storeData }: FooterProps) => {
       if (response.status === 200 && response.data?.data) {
         companyContactDetails = {
           email: response.data.data.email || companyContactDetails.email || "cnckral@gmail.com",
-          phone: response.data.data.phone_no || companyContactDetails.phone || "+923103339404",
+          phone: response.data.data.phone_no || companyContactDetails.phone || "0322 4414443",
           address: "76 C Gulshan e Rehman Sultan Ahmad Road ichra, Lahore, Pakistan",
         }
       }
@@ -105,7 +105,7 @@ const Footer = async ({ storeData }: FooterProps) => {
     // Use fallback values; do not throw so layout still renders
     companyContactDetails = {
       email: companyContactDetails.email || "cnckral@gmail.com",
-      phone: companyContactDetails.phone || "+923103339404",
+      phone: companyContactDetails.phone || "0322 4414443",
       address: "76 C Gulshan e Rehman Sultan Ahmad Road ichra, Lahore, Pakistan",
     }
   }

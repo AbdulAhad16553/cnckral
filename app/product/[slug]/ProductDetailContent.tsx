@@ -100,8 +100,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
   const MACHINE_CONTACT = {
     email: "krallaser@gmail.com",
-    phone: "+923103339404",
-    whatsapp: "https://wa.me/923103339404",
+    phone: "0322 4414443",
+    whatsapp: "https://wa.me/923224414443",
   };
 
   // Check if product is custom quotation item (ERPNext may use custom_quotation_item or custom_custom_quotation_item)

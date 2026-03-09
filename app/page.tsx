@@ -6,6 +6,7 @@ import { CategoryStrip } from "@/components/CategoryStrip";
 import { NeedHelpSection } from "@/components/NeedHelpSection";
 import { ResourceLinks } from "@/components/ResourceLinks";
 import { NewsletterSection } from "@/components/NewsletterSection";
+import AEOFAQSection from "@/components/AEOFAQSection";
 import { headers } from "next/headers";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import Layout from "@/components/Layout";
@@ -26,12 +27,11 @@ export async function generateMetadata() {
   const { page } = await getStorePage(data?.store?.stores[0].id, "home");
 
   return {
-    title: page?.meta_title || "Items.pk",
-    description: page?.meta_description || "Manage your online store, inventory, and sales all in one place",
-    generator: data?.store?.stores?.[0]?.store_name,
-    applicationName: data?.store?.stores?.[0]?.store_name,
-    keywords: "",
-    // metadataBase: ,
+    title: page?.meta_title || "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan",
+    description: page?.meta_description || "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore.",
+    generator: data?.store?.stores?.[0]?.store_name || "CNC KRAL",
+    applicationName: data?.store?.stores?.[0]?.store_name || "CNC KRAL",
+    keywords: "best CNC supplier Pakistan, best CNC machine Pakistan, best CNC router Pakistan, CNC bits, marble tools",
   };
 }
 
@@ -265,6 +265,9 @@ export default async function Home() {
           />
         </AnimatedSection>
       </div>
+
+      {/* AEO FAQ - Answer Engine Optimization for AI/LLM visibility */}
+      <AEOFAQSection />
 
       {/* Newsletter */}
       <div className="page-container py-12 lg:py-14">

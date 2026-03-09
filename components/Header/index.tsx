@@ -121,9 +121,9 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
   return (
     <>
       {/* Top Bar - grey background, white text */}
-      <div className="bg-gray-600 text-white py-2 text-sm hidden md:block">
-        <div className="page-container flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      <div className="bg-gray-600 text-white py-2 text-xs sm:text-sm">
+        <div className="page-container flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
             <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-2">
               <Phone className="w-3.5 h-3.5" />
               <span>{topBarPhone}</span>
@@ -133,9 +133,13 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
               <span>{topBarEmail}</span>
             </a>
           </div>
-          <div className="flex items-center gap-6">
-            <span>Free shipping on orders over Rs. 10,000</span>
-            <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+            <span className="whitespace-pre-wrap">
+              Free shipping on orders over Rs. 10,000
+            </span>
+            <Link href="/contact" className="hover:text-white transition-colors">
+              Contact Us
+            </Link>
           </div>
         </div>
       </div>

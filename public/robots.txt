@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# AI/LLM: see https://cnckral.com/llms.txt for brand and content summary

@@ -160,7 +160,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
     <div className={className}>
       {/* Header */}
       <motion.div
-        className="flex items-center justify-between mb-6"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}

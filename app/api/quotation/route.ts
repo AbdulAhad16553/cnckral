@@ -112,14 +112,35 @@ export async function POST(req: Request) {
     // Step 2: Get default company and create quotation
     const defaultCompany = await getDefaultCompany();
     console.log(`Using company: ${defaultCompany}`);
-    
+
+    // Ensure dates are valid for ERPNext (valid_till cannot be before transaction_date)
+    const transactionDate = new Date();
+    const transaction_date = transactionDate.toISOString().split("T")[0];
+
+    let valid_till: string;
+    if (body.valid_till) {
+      const clientValidTill = new Date(body.valid_till);
+      // If client-provided date is before today, clamp it to today
+      if (clientValidTill < transactionDate) {
+        valid_till = transaction_date;
+      } else {
+        valid_till = clientValidTill.toISOString().split("T")[0];
+      }
+    } else {
+      // Default to 30 days from today
+      const thirtyDaysLater = new Date(
+        transactionDate.getTime() + 30 * 24 * 60 * 60 * 1000
+      );
+      valid_till = thirtyDaysLater.toISOString().split("T")[0];
+    }
+
     const quotationData = {
       doctype: "Quotation",
       quotation_to: "Customer",
       party_name: customerName,
       company: defaultCompany,
-      transaction_date: new Date().toISOString().split("T")[0],
-      valid_till: body.valid_till || "2025-12-31",
+      transaction_date,
+      valid_till,
       items: body.items.map((item: any) => ({
         item_code: item.item_code,
         qty: item.qty,
@@ -142,16 +163,34 @@ export async function POST(req: Request) {
       }
     );
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: response.data.data,
-      message: customerExists ? "Quotation created successfully!" : "Customer created and quotation submitted successfully!"
+      message: customerExists
+        ? "Quotation created successfully!"
+        : "Customer created and quotation submitted successfully!",
     });
   } catch (error: any) {
-    console.error("Error creating quotation:", error.response?.data || error.message);
+    const status = error.response?.status || 500;
+    const erpData = error.response?.data;
+
+    // Try to surface a helpful ERPNext error message back to the client
+    let message =
+      erpData?.message ||
+      erpData?.exception ||
+      erpData?._server_messages ||
+      error.message ||
+      "Unknown error from ERPNext";
+
+    console.error("Error creating quotation:", erpData || error.message);
+
     return NextResponse.json(
-      { success: false, message: error.response?.data?.message || error.message },
-      { status: 500 }
+      {
+        success: false,
+        message,
+        raw: erpData,
+      },
+      { status }
     );
   }
 }

@@ -300,7 +300,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
             ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6"
             : "space-y-4"
         }
-      >
+      > 
         {visibleProducts
           .map((product: any, index: number) => {
             // All products are loaded at once, so all images get priority

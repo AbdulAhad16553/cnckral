@@ -101,12 +101,12 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{headingTitle}</h1>
           <p className="text-slate-600 mt-1">{headingSubtitle}</p>
         </div>
-        
-        <div className="flex items-center gap-4">
+
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 md:gap-4 w-full md:w-auto justify-start md:justify-end">
           {/* Quick Category Dropdown (hidden on Machines page) */}
           {!isMachineMode && (
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-52">
+              <SelectTrigger className="w-full sm:w-52">
                 <SelectValue placeholder="All categories" />
               </SelectTrigger>
               <SelectContent>
@@ -121,23 +121,23 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
           )}
 
           {/* Search */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Input
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-64"
+              className="w-full sm:w-64"
             />
           </div>
 
           {/* View Mode Toggle (hidden on Machines page; always list) */}
           {!isMachineMode && (
-            <div className="flex items-center border rounded-lg">
+            <div className="flex items-center border rounded-lg overflow-hidden w-full sm:w-auto">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
-                className="rounded-r-none"
+                className="rounded-r-none flex-1 sm:flex-none justify-center"
               >
                 <Grid3X3 className="h-4 w-4" />
               </Button>
@@ -145,7 +145,7 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('list')}
-                className="rounded-l-none"
+                className="rounded-l-none flex-1 sm:flex-none justify-center"
               >
                 <List className="h-4 w-4" />
               </Button>
@@ -157,7 +157,7 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
             variant="outline"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2"
           >
             <Settings className="h-4 w-4" />
             Settings
@@ -168,7 +168,7 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            className="flex items-center gap-2"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh

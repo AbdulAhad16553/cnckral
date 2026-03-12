@@ -1,9 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Wrench } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { HeroImageCarousel } from "@/components/HeroImageCarousel";
 import { FeaturedProductImageCarousel } from "@/components/FeaturedProductImageCarousel";
+import { HeroInfoCards } from "@/components/HeroInfoCards";
 
 interface HeroProps {
   content: {
@@ -147,34 +148,7 @@ const Hero = async ({
         )}
 
         {/* Info cards - CNC Tooling Shop style */}
-        <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {infoCards.map((card, i) => (
-            <div
-              key={i}
-              className="group flex flex-col gap-3 p-6 rounded-xl border border-slate-200 bg-white hover:border-[var(--primary-color)]/30 hover:shadow-md hover:shadow-[var(--primary-color)]/5 transition-all duration-200 text-left"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                  <Wrench className="w-6 h-6 text-slate-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 group-hover:text-[var(--primary-color)] transition-colors">
-                    {card.title}
-                  </h3>
-                  <p className="text-sm text-slate-500">{card.description}</p>
-                </div>
-              </div>
-              <div className="mt-1 space-y-2 text-sm text-slate-600">
-                {card.content?.map((section, idx) => (
-                  <div key={idx}>
-                    <p className="font-semibold text-slate-800">{section.heading}</p>
-                    <p className="text-slate-600">{section.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <HeroInfoCards cards={infoCards} />
       </div>
     </section>
   );

@@ -88,7 +88,6 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
   
   // Cart functionality states
   const [selectedVariation, setSelectedVariation] = useState<any>(null);
-  const [showAddToCart, setShowAddToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
   
   // Quotation dialog state
@@ -222,7 +221,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
     // For non-custom items, only allow if in stock
     else if ((variant as any).stock && (variant as any).stock.totalStock > 0) {
       setSelectedVariation(variant);
-      setShowAddToCart(true);
+      // Ensure quantity starts from 1 when a valid variation is selected
+      setQuantity((prev) => (prev && prev > 0 ? prev : 1));
     }
   };
 
@@ -703,16 +703,17 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 selectedAttributes={selectedAttributes}
               />
 
-              {/* Price List for Filtered Variations */}
-              {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
-                <div className="space-y-4">
-                    <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-5">
+              {/* Variations list and always-visible Add to Cart panel */}
+              <div className="space-y-4">
+                {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
+                  <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-5">
                     <h3 className="text-sm font-semibold text-neutral-700 uppercase tracking-wider mb-4">
-                      {isCustomQuotationItem ? 'Configurations' : 'Available options'} ({filteredVariations.length})
+                      {isCustomQuotationItem ? "Configurations" : "Available options"} ({filteredVariations.length})
                     </h3>
                     <div className="space-y-2">
                       {filteredVariations.map((variant) => {
-                        const variantInStock = (variant as any).stock && (variant as any).stock.totalStock > 0;
+                        const variantInStock =
+                          (variant as any).stock && (variant as any).stock.totalStock > 0;
                         const isSelectable = isCustomQuotationItem || variantInStock;
                         const isSelected = selectedVariation?.name === variant.name;
                         return (
@@ -720,22 +721,30 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                             key={variant.name}
                             className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                               isSelectable
-                                ? 'bg-white hover:shadow-sm cursor-pointer hover:border-neutral-300'
-                                : 'bg-neutral-100/80 opacity-70 cursor-not-allowed'
-                            } ${isSelected ? 'border-neutral-900 ring-1 ring-neutral-900/10 shadow-sm' : 'border-neutral-200'}`}
+                                ? "bg-white hover:shadow-sm cursor-pointer hover:border-neutral-300"
+                                : "bg-neutral-100/80 opacity-70 cursor-not-allowed"
+                            } ${
+                              isSelected
+                                ? "border-neutral-900 ring-1 ring-neutral-900/10 shadow-sm"
+                                : "border-neutral-200"
+                            }`}
                             onClick={() => isSelectable && handleVariationClick(variant)}
                           >
                             <div className="flex-1 flex items-center space-x-3">
                               {variant.image && (
-                                <div className="relative w-12 h-12 rounded-lg overflow-hidden group cursor-pointer" onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Add variant image to gallery for preview if not already there
-                                  const variantImageUrl = getErpnextImageUrl(variant.image);
-                                  const existingIndex = galleryImages.findIndex(img => img.url === variantImageUrl);
-                                  if (existingIndex >= 0) {
-                                    openImagePreview(existingIndex);
-                                  }
-                                }}>
+                                <div
+                                  className="relative w-12 h-12 rounded-lg overflow-hidden group cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const variantImageUrl = getErpnextImageUrl(variant.image);
+                                    const existingIndex = galleryImages.findIndex(
+                                      (img) => img.url === variantImageUrl
+                                    );
+                                    if (existingIndex >= 0) {
+                                      openImagePreview(existingIndex);
+                                    }
+                                  }}
+                                >
                                   <Image
                                     src={getErpnextImageUrl(variant.image)}
                                     alt={variant.item_name}
@@ -756,7 +765,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                                   {variant.attributes?.map((attr, idx) => (
                                     <span key={idx}>
                                       {attr.attribute_value}
-                                      {idx < (variant.attributes?.length || 0) - 1 ? ' • ' : ''}
+                                      {idx < (variant.attributes?.length || 0) - 1 ? " • " : ""}
                                     </span>
                                   ))}
                                 </div>
@@ -768,11 +777,17 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                                   {variant.currency} {Number(variant.price).toLocaleString()}
                                 </span>
                                 {isCustomQuotationItem ? (
-                                  <Badge className="text-xs bg-neutral-100 text-neutral-700 border-neutral-200 rounded-full">Quote</Badge>
+                                  <Badge className="text-xs bg-neutral-100 text-neutral-700 border-neutral-200 rounded-full">
+                                    Quote
+                                  </Badge>
                                 ) : variantInStock ? (
-                                  <Badge className="text-xs bg-emerald-600/10 text-emerald-700 border-emerald-200">{(variant as any).stock.totalStock} in stock</Badge>
+                                  <Badge className="text-xs bg-emerald-600/10 text-emerald-700 border-emerald-200">
+                                    {(variant as any).stock.totalStock} in stock
+                                  </Badge>
                                 ) : (
-                                  <Badge variant="outline" className="text-xs text-red-600 border-red-200">Out of stock</Badge>
+                                  <Badge variant="outline" className="text-xs text-red-600 border-red-200">
+                                    Out of stock
+                                  </Badge>
                                 )}
                               </div>
                             )}
@@ -781,47 +796,115 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                       })}
                     </div>
                   </div>
-                  {!isCustomQuotationItem && showAddToCart && selectedVariation && (
-                    <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-emerald-800 text-sm">Selected variation</h4>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full" onClick={() => { setShowAddToCart(false); setSelectedVariation(null); }}>
+                ) : (
+                  <div className="text-center py-8 rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/80">
+                    <Package className="h-10 w-10 mx-auto text-neutral-400 mb-3" />
+                    <p className="text-sm font-medium text-neutral-600">
+                      Select attributes above to see{" "}
+                      {isCustomQuotationItem ? "configurations" : "available options"}.
+                    </p>
+                  </div>
+                )}
+
+                {!isCustomQuotationItem && (
+                  <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-emerald-800 text-sm">Selected variation</h4>
+                        {selectedVariation && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 rounded-full"
+                            onClick={() => {
+                              setSelectedVariation(null);
+                            }}
+                          >
                             <X className="h-4 w-4" />
                           </Button>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <div>
-                            <p className="font-medium text-slate-900">{selectedVariation.item_name}</p>
-                            <p className="text-xs text-slate-500 font-mono">SKU: {selectedVariation.name}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-slate-900">{selectedVariation.currency} {selectedVariation.price != null ? Number(selectedVariation.price).toLocaleString() : '—'}</p>
-                            <p className="text-xs text-emerald-700">{(selectedVariation as any).stock?.totalStock} in stock</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <div className="flex items-center border border-slate-300 rounded-lg bg-white">
-                            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}><Minus className="h-4 w-4" /></Button>
-                            <span className="px-3 py-1.5 min-w-[44px] text-center font-medium tabular-nums text-sm">{quantity}</span>
-                            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setQuantity(quantity + 1)} disabled={quantity >= ((selectedVariation as any).stock?.totalStock || 0)}><Plus className="h-4 w-4" /></Button>
-                          </div>
-                          <Button onClick={handleAddToCart} className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white">
-                            <ShoppingCart className="mr-2 h-4 w-4" />
-                            Add to Cart
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        {selectedVariation ? (
+                          <>
+                            <div>
+                              <p className="font-medium text-slate-900">
+                                {selectedVariation.item_name}
+                              </p>
+                              <p className="text-xs text-slate-500 font-mono">
+                                SKU: {selectedVariation.name}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-slate-900">
+                                {selectedVariation.currency}{" "}
+                                {selectedVariation.price != null
+                                  ? Number(selectedVariation.price).toLocaleString()
+                                  : "—"}
+                              </p>
+                              <p className="text-xs text-emerald-700">
+                                {(selectedVariation as any).stock?.totalStock} in stock
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-xs text-slate-600">
+                            Select a variation above to enable Add to Cart and see price.
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center border border-slate-300 rounded-lg bg-white">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9"
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            disabled={quantity <= 1 || !selectedVariation}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="px-3 py-1.5 min-w-[44px] text-center font-medium tabular-nums text-sm">
+                            {selectedVariation ? quantity : 0}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9"
+                            onClick={() => setQuantity(quantity + 1)}
+                            disabled={
+                              !selectedVariation ||
+                              quantity >= ((selectedVariation as any).stock?.totalStock || 0)
+                            }
+                          >
+                            <Plus className="h-4 w-4" />
                           </Button>
                         </div>
-                        <p className="text-sm text-slate-600">Subtotal: <span className="font-semibold">{selectedVariation.currency} {(selectedVariation.price != null ? selectedVariation.price * quantity : 0).toLocaleString()}</span></p>
+                        <Button
+                          onClick={handleAddToCart}
+                          className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white"
+                          disabled={!selectedVariation}
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Add to Cart
+                        </Button>
                       </div>
+                      {selectedVariation && (
+                        <p className="text-sm text-slate-600">
+                          Subtotal:{" "}
+                          <span className="font-semibold">
+                            {selectedVariation.currency}{" "}
+                            {(selectedVariation.price != null
+                              ? selectedVariation.price * quantity
+                              : 0
+                            ).toLocaleString()}
+                          </span>
+                        </p>
+                      )}
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8 rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/80">
-                  <Package className="h-10 w-10 mx-auto text-neutral-400 mb-3" />
-                  <p className="text-sm font-medium text-neutral-600">Select options above to see {isCustomQuotationItem ? 'configurations' : 'prices'}.</p>
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -838,13 +921,25 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 Request Quote
               </Button>
             )}
+
+            {/* Simple product Add to Cart */}
             {!isTemplate && isSimpleProductInStock && !isCustomQuotationItem && (
-              <Button size="lg" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl h-12" onClick={handleSimpleProductAddToCart}>
+              <Button
+                size="lg"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl h-12"
+                onClick={handleSimpleProductAddToCart}
+              >
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 Add to Cart
               </Button>
             )}
-            <Button variant="outline" size="lg" className="w-full rounded-xl border-neutral-300 h-12 font-medium" asChild>
+
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full rounded-xl border-neutral-300 h-12 font-medium"
+              asChild
+            >
               <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>
@@ -1031,10 +1126,17 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-center mt-6">
-            <Button variant="outline" className="rounded-xl" onClick={() => setShowAddedToCartDialog(false)}>
+            <Button
+              variant="outline"
+              className="rounded-xl border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+              onClick={() => setShowAddedToCartDialog(false)}
+            >
               Continue shopping
             </Button>
-            <Button className="rounded-xl bg-neutral-900 hover:bg-neutral-800 h-11" asChild>
+            <Button
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white h-11"
+              asChild
+            >
               <Link href="/cart">View cart</Link>
             </Button>
           </DialogFooter>

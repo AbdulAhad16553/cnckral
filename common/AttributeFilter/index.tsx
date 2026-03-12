@@ -193,14 +193,20 @@ export default function AttributeFilter({
                 onValueChange={(value) => handleAttributeChange(attributeName, value)}
                 className="flex flex-wrap gap-3"
               >
-                <div className="grid grid-cols-5 gap-2 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full">
                   {values.map((value, index) => (
-                    <div key={index} className="flex items-center space-x-2 w-full">
-                      <RadioGroupItem 
-                        value={value} 
-                        id={`${attributeName}-${index}`} 
+                    <div
+                      key={index}
+                      className="flex items-start space-x-2 w-full"
+                    >
+                      <RadioGroupItem
+                        value={value}
+                        id={`${attributeName}-${index}`}
                       />
-                      <Label htmlFor={`${attributeName}-${index}`} className="text-sm flex-1">
+                      <Label
+                        htmlFor={`${attributeName}-${index}`}
+                        className="text-sm flex-1 leading-snug break-words"
+                      >
                         {value}
                       </Label>
                     </div>

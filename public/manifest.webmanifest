@@ -1,0 +1,16 @@
+{
+  "name": "CNC KRAL",
+  "short_name": "CNC KRAL",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0368E5",
+  "description": "CNC KRAL - Best CNC supplier in Pakistan for CNC machines, routers, bits and marble tools.",
+  "icons": [
+    {
+      "src": "/cnc_kral.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

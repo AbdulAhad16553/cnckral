@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import CacheInitializer from "@/components/CacheInitializer";
+import PWARegister from "@/components/PWARegister";
 // import ChatBox from "@/components/ChatBox";
 
 // Plus Jakarta Sans - professional, clean, excellent readability
@@ -77,6 +78,8 @@ export default async function RootLayout({
             }
           />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="theme-color" content="#0368E5" />
+          <link rel="manifest" href="/manifest.webmanifest" />
           {/* Organization schema for AI/LLM and search */}
           <script
             type="application/ld+json"
@@ -139,6 +142,7 @@ export default async function RootLayout({
         </head>
         <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
+          <PWARegister />
           {children}
           {/* <ChatBox /> */}
         </body>
@@ -154,6 +158,8 @@ export default async function RootLayout({
         <title>CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan</title>
         <meta name="description" content="CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#0368E5" />
+        <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" href="/cnc_kral.png" type="image/png" />
         <link rel="shortcut icon" href="/cnc_kral.png" type="image/png" />
         <link rel="apple-touch-icon" href="/cnc_kral.png" />
@@ -166,6 +172,7 @@ export default async function RootLayout({
       </head>
         <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
+          <PWARegister />
           {children}
           {/* <ChatBox /> */}
         </body>

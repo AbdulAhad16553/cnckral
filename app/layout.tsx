@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import CacheInitializer from "@/components/CacheInitializer";
-import PWARegister from "@/components/PWARegister";
+// import PWARegister from "@/components/PWARegister";
 // import ChatBox from "@/components/ChatBox";
 
 // Plus Jakarta Sans - professional, clean, excellent readability
@@ -142,7 +142,7 @@ export default async function RootLayout({
         </head>
         <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
-          <PWARegister />
+          {/* <PWARegister /> */}
           {children}
           {/* <ChatBox /> */}
         </body>
@@ -172,7 +172,7 @@ export default async function RootLayout({
       </head>
         <body className={`${plusJakarta.variable} ${plusJakarta.className}`} cz-shortcut-listen="true">
           <CacheInitializer />
-          <PWARegister />
+          {/* <PWARegister /> */}
           {children}
           {/* <ChatBox /> */}
         </body>

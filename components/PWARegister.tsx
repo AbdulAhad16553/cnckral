@@ -1,25 +1,25 @@
-"use client";
+// "use client";
 
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
-const PWARegister = () => {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!("serviceWorker" in navigator)) return;
+// const PWARegister = () => {
+//   useEffect(() => {
+//     if (typeof window === "undefined") return;
+//     if (!("serviceWorker" in navigator)) return;
 
-    const registerServiceWorker = async () => {
-      try {
-        await navigator.serviceWorker.register("/service-worker.js");
-      } catch (error) {
-        console.error("Service worker registration failed:", error);
-      }
-    };
+//     const registerServiceWorker = async () => {
+//       try {
+//         await navigator.serviceWorker.register("/service-worker.js");
+//       } catch (error) {
+//         console.error("Service worker registration failed:", error);
+//       }
+//     };
 
-    registerServiceWorker();
-  }, []);
+//     registerServiceWorker();
+//   }, []);
 
-  return null;
-};
+//   return null;
+// };
 
-export default PWARegister;
+// export default PWARegister;
 

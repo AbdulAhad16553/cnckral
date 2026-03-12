@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Cart from "@/components/Cart";
-import Account from "@/modules/Account";
 import { getCategories } from "@/hooks/getCategories";
 interface StoreData {
   store_name?: string;
@@ -169,13 +168,8 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
               </Link>
               {/* Mobile: wishlist, cart, account - shown on small screens */}
               <div className="flex sm:hidden items-center space-x-2">
-               
-                  <Heart className="w-5 h-5" />
-               
+                <Heart className="w-5 h-5" />
                 <Cart />
-                {storeId && companyId && (
-                  <Account storeId={storeId} companyId={companyId} />
-                )}
               </div>
             </div>
 
@@ -271,45 +265,14 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
             {/* Desktop Right Side Actions - hidden on mobile (shown above) */}
             <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
               <Link
-  href="/wishlist"
-  className="
-    relative p-2
-    text-white/90
-    transition-all duration-300 
-    hover:text-red-300 
-    hover:scale-110 
-    active:scale-95
-    group
-  "
->
-  {/* Glow on Hover */}
-  <span
-    className="
-      absolute inset-0 
-      rounded-full 
-      opacity-0 group-hover:opacity-100 
-      bg-red-400/20 
-      blur-xl 
-      transition-opacity duration-300
-    "
-  ></span>
-
-  {/* Heart Icon */}
-  <Heart
-    className="
-      w-6 h-6 relative z-10 
-      transition-all duration-300
-      group-hover:fill-red-300 group-hover:text-red-300 
-      group-hover:animate-pulse
-    "
-  />
-</Link>
-
-                <Cart />
-                {storeId && companyId && (
-                  <Account storeId={storeId} companyId={companyId} />
-                )}
-              </div>
+                href="/wishlist"
+                className="relative p-2 text-white/90 transition-all duration-300 hover:text-red-300 hover:scale-110 active:scale-95 group"
+              >
+                <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-red-400/20 blur-xl transition-opacity duration-300" />
+                <Heart className="w-6 h-6 relative z-10 transition-all duration-300 group-hover:fill-red-300 group-hover:text-red-300 group-hover:animate-pulse" />
+              </Link>
+              <Cart />
+            </div>
           </div>
         </div>
       </header>

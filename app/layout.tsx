@@ -78,8 +78,9 @@ export default async function RootLayout({
             }
           />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <meta name="theme-color" content="#0368E5" />
-          <link rel="manifest" href="/manifest.webmanifest" />
+          {/* PWA disabled - uncomment these to re-enable installable app */}
+          {/* <meta name="theme-color" content="#0368E5" /> */}
+          {/* <link rel="manifest" href="/manifest.webmanifest" /> */}
           {/* Organization schema for AI/LLM and search */}
           <script
             type="application/ld+json"
@@ -158,8 +159,9 @@ export default async function RootLayout({
         <title>CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan</title>
         <meta name="description" content="CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#0368E5" />
-        <link rel="manifest" href="/manifest.webmanifest" />
+        {/* PWA disabled - uncomment these to re-enable installable app */}
+        {/* <meta name="theme-color" content="#0368E5" /> */}
+        {/* <link rel="manifest" href="/manifest.webmanifest" /> */}
         <link rel="icon" href="/cnc_kral.png" type="image/png" />
         <link rel="shortcut icon" href="/cnc_kral.png" type="image/png" />
         <link rel="apple-touch-icon" href="/cnc_kral.png" />

@@ -37,13 +37,39 @@ const Hero = async ({
   const infoCards = [
     {
       title: "CNC Tool Holder & Collet Maintenance",
-      href: "/contact",
       description: "Keep your tools performing at peak",
+      content: [
+        {
+          heading: "Why it matters",
+          body: "A dirty or worn collet can cause runout (wobble), heat, vibration, and premature bit breakage – even if the bit is new.",
+        },
+        {
+          heading: "How often to check",
+          body: "Inspect and clean tool holders and collets daily in production, or at least every few days in lighter use.",
+        },
+        {
+          heading: "Basic maintenance steps",
+          body: "Clean collet and nut with compressed air and a soft brush, check for cracks or discoloration, tighten with proper torque, keep tapers clean and store tools clean and dry.",
+        },
+      ],
     },
     {
       title: "Why are my CNC bits breaking?",
-      href: "/contact",
       description: "Expert troubleshooting guide",
+      content: [
+        {
+          heading: "Feeds and speeds",
+          body: "Bits break when feed is too slow and RPM too high (rubbing) or feed is too fast and RPM too low (overloading). Adjust so each tooth takes a proper chip.",
+        },
+        {
+          heading: "Depth per pass",
+          body: "Taking too deep a cut for the bit size, especially in hard material, overloads the tool. Use smaller step‑downs and multiple passes.",
+        },
+        {
+          heading: "Right tool and setup",
+          body: "Use the correct bit for the material, replace worn bits, keep collets in good condition, and clamp the workpiece firmly to avoid vibration.",
+        },
+      ],
     },
   ];
 
@@ -123,10 +149,9 @@ const Hero = async ({
         {/* Info cards - CNC Tooling Shop style */}
         <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {infoCards.map((card, i) => (
-            <Link
+            <div
               key={i}
-              href={card.href}
-              className="group flex items-center justify-between p-6 rounded-xl border border-slate-200 bg-white hover:border-[var(--primary-color)]/30 hover:shadow-md hover:shadow-[var(--primary-color)]/5 transition-all duration-200"
+              className="group flex flex-col gap-3 p-6 rounded-xl border border-slate-200 bg-white hover:border-[var(--primary-color)]/30 hover:shadow-md hover:shadow-[var(--primary-color)]/5 transition-all duration-200 text-left"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
@@ -139,10 +164,15 @@ const Hero = async ({
                   <p className="text-sm text-slate-500">{card.description}</p>
                 </div>
               </div>
-              <span className="text-slate-400 group-hover:text-[var(--primary-color)] transition-colors">
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            </Link>
+              <div className="mt-1 space-y-2 text-sm text-slate-600">
+                {card.content?.map((section, idx) => (
+                  <div key={idx}>
+                    <p className="font-semibold text-slate-800">{section.heading}</p>
+                    <p className="text-slate-600">{section.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

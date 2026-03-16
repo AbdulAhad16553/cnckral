@@ -910,7 +910,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
           {/* Primary actions */}
           <div className="space-y-3">
-            {(isCustomQuotationItem || (!isTemplate && product.stock && product.stock.totalStock === 0)) && (
+            {isCustomQuotationItem && (
               <Button
                 size="lg"
                 className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-semibold rounded-xl h-12"

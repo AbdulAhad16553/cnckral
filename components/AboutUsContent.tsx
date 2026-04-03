@@ -105,23 +105,45 @@ export default function AboutUsContent() {
           <li>
             <strong>Website:</strong>{" "}
             <Link
-              href="https://krallaser.com"
+              href="https://cnckral.com"
               className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              krallaser.com
+              cnckral.com
             </Link>
           </li>
           <li>
             <strong>Facebook:</strong>{" "}
             <Link
-              href="https://facebook.com/krallaser"
+              href="https://web.facebook.com/cnckral?modal=focused_switcher_dialog"
               className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              CNC KRAL
+              CNC KRAL on Facebook
+            </Link>
+          </li>
+          <li>
+            <strong>Instagram:</strong>{" "}
+            <Link
+              href="https://www.instagram.com/cnckral.9?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+              className="text-primary hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @cnckral.9
+            </Link>
+          </li>
+          <li>
+            <strong>YouTube:</strong>{" "}
+            <Link
+              href="https://youtube.com/@cnckral?si=1lnbQhqqtfy6fZ0d"
+              className="text-primary hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @cnckral
             </Link>
           </li>
         </ul>

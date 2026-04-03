@@ -252,32 +252,6 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
     }
   };
 
-  // Handle adding variation to cart
-  const handleAddToCart = () => {
-    if (selectedVariation && selectedVariation.stock && selectedVariation.stock.totalStock > 0) {
-      const cartItem = {
-        id: selectedVariation.name,
-        name: selectedVariation.item_name,
-        description: selectedVariation.description || product?.description || "",
-        type: "item",
-        basePrice: selectedVariation.price || 0,
-        salePrice: selectedVariation.price || 0,
-        category: product?.item_group || "product",
-        currency: selectedVariation.currency || "PKR",
-        bundleItems: [],
-        quantity: quantity,
-        image: selectedVariation.image || product?.image,
-        sku: selectedVariation.name,
-        variationId: selectedVariation.name,
-        filterConds: [],
-      };
-
-      AddToCart(cartItem, quantity);
-      setQuantity(1);
-      setShowAddedToCartDialog(true);
-    }
-  };
-
   // Auto-hide added-to-cart dialog after 2.5s (smooth close via Dialog animation)
   useEffect(() => {
     if (!showAddedToCartDialog) return;
@@ -331,6 +305,65 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
       });
     });
   }, [product?.variants, selectedAttributes]);
+
+  /** One filter match → that SKU; several matches → row the user clicked */
+  const activeVariation = useMemo(() => {
+    if (!isTemplate || !product?.variants?.length) return null;
+    if (filteredVariations.length === 0) return null;
+    if (filteredVariations.length === 1) {
+      const v = filteredVariations[0];
+      if (isCustomQuotationItem) return v;
+      const stock = (v as any).stock?.totalStock ?? 0;
+      return stock > 0 ? v : null;
+    }
+    if (
+      selectedVariation &&
+      filteredVariations.some((x) => x.name === selectedVariation.name)
+    ) {
+      return selectedVariation;
+    }
+    return null;
+  }, [
+    isTemplate,
+    product?.variants,
+    filteredVariations,
+    isCustomQuotationItem,
+    selectedVariation,
+  ]);
+
+  const showVariationList =
+    filteredVariations.length > 0 &&
+    (selectedAttributes.length > 0 ||
+      (product?.variants?.length === 1 && filteredVariations.length === 1));
+
+  const handleAddToCart = () => {
+    if (
+      activeVariation &&
+      (activeVariation as any).stock &&
+      (activeVariation as any).stock.totalStock > 0
+    ) {
+      const cartItem = {
+        id: activeVariation.name,
+        name: activeVariation.item_name,
+        description: activeVariation.description || product?.description || "",
+        type: "item",
+        basePrice: activeVariation.price || 0,
+        salePrice: activeVariation.price || 0,
+        category: product?.item_group || "product",
+        currency: activeVariation.currency || "PKR",
+        bundleItems: [],
+        quantity: quantity,
+        image: activeVariation.image || product?.image,
+        sku: activeVariation.name,
+        variationId: activeVariation.name,
+        filterConds: [],
+      };
+
+      AddToCart(cartItem, quantity);
+      setQuantity(1);
+      setShowAddedToCartDialog(true);
+    }
+  };
 
   if (loading) {
     return <ProductSkeleton />;
@@ -705,7 +738,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
               {/* Variations list and always-visible Add to Cart panel */}
               <div className="space-y-4">
-                {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
+                {showVariationList ? (
                   <div className="rounded-2xl border border-neutral-200 bg-neutral-50/80 p-5">
                     <h3 className="text-sm font-semibold text-neutral-700 uppercase tracking-wider mb-4">
                       {isCustomQuotationItem ? "Configurations" : "Available options"} ({filteredVariations.length})
@@ -715,7 +748,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                         const variantInStock =
                           (variant as any).stock && (variant as any).stock.totalStock > 0;
                         const isSelectable = isCustomQuotationItem || variantInStock;
-                        const isSelected = selectedVariation?.name === variant.name;
+                        const isSelected = activeVariation?.name === variant.name;
                         return (
                           <div
                             key={variant.name}
@@ -800,8 +833,9 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                   <div className="text-center py-8 rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/80">
                     <Package className="h-10 w-10 mx-auto text-neutral-400 mb-3" />
                     <p className="text-sm font-medium text-neutral-600">
-                      Select attributes above to see{" "}
-                      {isCustomQuotationItem ? "configurations" : "available options"}.
+                      {selectedAttributes.length > 0 && filteredVariations.length === 0
+                        ? "No options match this combination. Try different attributes."
+                        : `Select attributes above to see ${isCustomQuotationItem ? "configurations" : "available options"}.`}
                     </p>
                   </div>
                 )}
@@ -811,7 +845,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <h4 className="font-semibold text-emerald-800 text-sm">Selected variation</h4>
-                        {selectedVariation && (
+                        {filteredVariations.length > 1 && selectedVariation && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -825,31 +859,33 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                         )}
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        {selectedVariation ? (
+                        {activeVariation ? (
                           <>
                             <div>
                               <p className="font-medium text-slate-900">
-                                {selectedVariation.item_name}
+                                {activeVariation.item_name}
                               </p>
                               <p className="text-xs text-slate-500 font-mono">
-                                SKU: {selectedVariation.name}
+                                SKU: {activeVariation.name}
                               </p>
                             </div>
                             <div className="text-right">
                               <p className="font-semibold text-slate-900">
-                                {selectedVariation.currency}{" "}
-                                {selectedVariation.price != null
-                                  ? Number(selectedVariation.price).toLocaleString()
+                                {activeVariation.currency}{" "}
+                                {activeVariation.price != null
+                                  ? Number(activeVariation.price).toLocaleString()
                                   : "—"}
                               </p>
                               <p className="text-xs text-emerald-700">
-                                {(selectedVariation as any).stock?.totalStock} in stock
+                                {(activeVariation as any).stock?.totalStock} in stock
                               </p>
                             </div>
                           </>
                         ) : (
                           <p className="text-xs text-slate-600">
-                            Select a variation above to enable Add to Cart and see price.
+                            {filteredVariations.length === 1
+                              ? "This option is out of stock."
+                              : "Choose attributes above, then pick an option if more than one match."}
                           </p>
                         )}
                       </div>
@@ -860,12 +896,12 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                             size="icon"
                             className="h-9 w-9"
                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                            disabled={quantity <= 1 || !selectedVariation}
+                            disabled={quantity <= 1 || !activeVariation}
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
                           <span className="px-3 py-1.5 min-w-[44px] text-center font-medium tabular-nums text-sm">
-                            {selectedVariation ? quantity : 0}
+                            {activeVariation ? quantity : 0}
                           </span>
                           <Button
                             variant="ghost"
@@ -873,8 +909,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                             className="h-9 w-9"
                             onClick={() => setQuantity(quantity + 1)}
                             disabled={
-                              !selectedVariation ||
-                              quantity >= ((selectedVariation as any).stock?.totalStock || 0)
+                              !activeVariation ||
+                              quantity >= ((activeVariation as any).stock?.totalStock || 0)
                             }
                           >
                             <Plus className="h-4 w-4" />
@@ -883,19 +919,19 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                         <Button
                           onClick={handleAddToCart}
                           className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white"
-                          disabled={!selectedVariation}
+                          disabled={!activeVariation}
                         >
                           <ShoppingCart className="mr-2 h-4 w-4" />
                           Add to Cart
                         </Button>
                       </div>
-                      {selectedVariation && (
+                      {activeVariation && (
                         <p className="text-sm text-slate-600">
                           Subtotal:{" "}
                           <span className="font-semibold">
-                            {selectedVariation.currency}{" "}
-                            {(selectedVariation.price != null
-                              ? selectedVariation.price * quantity
+                            {activeVariation.currency}{" "}
+                            {(activeVariation.price != null
+                              ? activeVariation.price * quantity
                               : 0
                             ).toLocaleString()}
                           </span>
@@ -915,7 +951,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 size="lg"
                 className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-semibold rounded-xl h-12"
                 onClick={() => setShowQuotationDialog(true)}
-                disabled={isTemplate && isCustomQuotationItem && !selectedVariation}
+                disabled={isTemplate && isCustomQuotationItem && !activeVariation}
               >
                 <Quote className="mr-2 h-4 w-4" />
                 Request Quote
@@ -998,10 +1034,10 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 onAttributeChange={handleAttributeChange}
                 selectedAttributes={selectedAttributes}
               />
-              {selectedAttributes.length > 0 && filteredVariations.length > 0 ? (
+              {showVariationList ? (
                 <div className="mt-4 space-y-3">
                   {filteredVariations.map((variant) => {
-                    const isSelected = selectedVariation?.name === variant.name;
+                    const isSelected = activeVariation?.name === variant.name;
                     return (
                       <div
                         key={variant.name}
@@ -1149,7 +1185,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
           open={showQuotationDialog}
           onClose={() => setShowQuotationDialog(false)}
           product={product}
-          selectedVariation={selectedVariation}
+          selectedVariation={activeVariation}
         />
       )}
     </div>

@@ -37,24 +37,21 @@ export const getCategories = async (storeId: string) => {
 
 export const getAllCategories = async (storeId: string) => {
   try {
-    // Fetch all categories from ERPNext (including parent categories)
+    // All Item Groups from ERPNext (parents + leaves, no storefront filters)
     const erpnextCategories = await productService.getCategories();
-    
-    // Transform ERPNext categories to match our interface
-    const categories: Category[] = erpnextCategories
-      .filter(category => Number(category.custom__is_website_item) !== 1)
-      .map(category => ({
-        id: category.name,
-        name: category.item_group_name,
-        slug: category.name.toLowerCase().replace(/\s+/g, '-'),
-        image_id: category.image,
-        featured: false,
-        parent_id: category.parent_item_group
-      }));
+
+    const categories: Category[] = erpnextCategories.map((category) => ({
+      id: category.name,
+      name: category.item_group_name,
+      slug: category.name.toLowerCase().replace(/\s+/g, "-"),
+      image_id: category.image,
+      featured: false,
+      parent_id: category.parent_item_group,
+    }));
 
     return { categories };
   } catch (error) {
-    console.error('Error fetching all categories from ERPNext:', error);
+    console.error("Error fetching all categories from ERPNext:", error);
     throw error;
   }
 };

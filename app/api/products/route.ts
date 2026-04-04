@@ -33,9 +33,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const filters: { disabled: 0 | 1; custom_quotation_item?: 0 | 1 } = { disabled: 0 };
-    if (quoteFilter !== undefined) filters.custom_quotation_item = quoteFilter as 0 | 1;
-    
+    const filters: { disabled: 0 | 1; custom_quotation_item?: 0 | 1 } = {
+      disabled: 0,
+    };
+    if (quoteFilter !== undefined)
+      filters.custom_quotation_item = quoteFilter as 0 | 1;
+
     const products = await productService.getProducts(filters, limit, offset);
     
     const productCodes = products.map(p => p.name);
@@ -196,7 +199,7 @@ export async function GET(request: NextRequest) {
     });
 
     const totalCountCacheKey = `products-total-count-${mode}`;
-    let totalProducts = productCache.get(totalCountCacheKey);
+    let totalProducts = productCache.get(totalCountCacheKey) as any[] | undefined;
     if (!totalProducts) {
       const allFiltered = await productService.getProducts(filters, 5000, 0);
       totalProducts = allFiltered;

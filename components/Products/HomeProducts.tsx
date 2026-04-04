@@ -7,18 +7,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ProgressiveImage } from "@/components/ui/progressive-image";
-import {
-  formatPrice,
-  getEffectivePrice,
-  hasDiscount,
-  getBasePriceForDisplay,
-  getPriceRange,
-} from "@/lib/currencyUtils";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
+import { ShoppingCart, Heart, Eye } from "lucide-react";
 import ProductImagePreview from "@/components/ProductImagePreview";
 import { useBatchItemImages } from "@/hooks/useBatchItemImages";
 import ProductSkeleton from "@/common/Skeletons/Products";
+import { cn } from "@/lib/utils";
+import {
+  ProductCardMarketplacePrice,
+  ProductCardReviewsRow,
+} from "@/components/Products/ProductCardMarketplace";
 
 interface HomeProductsProps {
   companyId: string;
@@ -27,6 +25,12 @@ interface HomeProductsProps {
   storeCurrency: string;
   className?: string;
   initialProducts?: any[];
+  /** Two-column feed cards + tighter UI on small screens (mobile home explore). */
+  exploreMobile?: boolean;
+  /** Max products to render (default 8). */
+  productLimit?: number;
+  sectionTitle?: string;
+  sectionSubtitle?: string;
 }
 
 const HomeProducts: React.FC<HomeProductsProps> = ({
@@ -35,7 +39,11 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
   currentStock = [],
   storeCurrency,
   className = "",
-  initialProducts = []
+  initialProducts = [],
+  exploreMobile = false,
+  productLimit = 8,
+  sectionTitle = "Featured Products",
+  sectionSubtitle,
 }) => {
   const router = useRouter();
   const [products, setProducts] = useState<any[]>(initialProducts || []);
@@ -160,18 +168,22 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
     <div className={className}>
       {/* Header */}
       <motion.div
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
+        className={cn(
+          "mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+          exploreMobile ? "hidden md:flex" : "max-md:hidden"
+        )}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Featured Products</h2>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{sectionTitle}</h2>
           <p className="text-sm text-slate-600 mt-0.5">
-            Showing {Math.min(products.length, 8)} of our best products
+            {sectionSubtitle ??
+              `Showing ${Math.min(products.length, productLimit)} of our best products`}
           </p>
         </div>
-        <Link href="/shop">
+        <Link href="/parts">
           <Button className="text-white shadow-soft hover:shadow-soft-lg transition-all duration-250" style={{ backgroundColor: 'var(--primary-color)' }}>
             View All Products
           </Button>
@@ -180,7 +192,11 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
 
       {/* Products Grid with stagger animation */}
       <motion.div
-        className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6"
+        className={cn(
+          exploreMobile
+            ? "max-md:columns-2 max-md:gap-x-2 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-6"
+            : "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6"
+        )}
         initial="hidden"
         animate="visible"
         variants={{
@@ -194,17 +210,13 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
           },
         }}
       >
-        {products.slice(0, 8).map((product: any, index: number) => {
+        {products.slice(0, productLimit).map((product: any, index: number) => {
           // Resolve image via batch image loader (same approach as /shop)
           const imageUrl = getImageUrl(product.sku);
           const productHasImage = hasImage(product.sku);
 
           const productStock = calculateProductStock(product);
           const isOutOfStock = product.type === "variable" ? false : productStock <= 0;
-          const effectivePrice = getEffectivePrice(product);
-          const productHasDiscount = hasDiscount(product);
-          const basePriceForDisplay = getBasePriceForDisplay(product);
-          const priceRange = getPriceRange(product);
           const hasVariations = product.product_variations && product.product_variations.length > 0;
           
           // Create unique key
@@ -223,16 +235,36 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
               }}
             >
             <motion.div
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              whileHover={
+                exploreMobile
+                  ? undefined
+                  : { y: -6, transition: { duration: 0.2 } }
+              }
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className={exploreMobile ? "mb-2 break-inside-avoid md:mb-0 md:break-inside-auto" : undefined}
             >
             <Card
-              className="group overflow-hidden border border-slate-200/80 shadow-card hover:shadow-card-hover transition-shadow duration-300"
+              className={cn(
+                "group overflow-hidden border border-neutral-100 bg-white transition-shadow duration-300",
+                exploreMobile
+                  ? "rounded-2xl shadow-[0_1px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] md:rounded-lg md:border-slate-200/80 md:shadow-card md:hover:shadow-card-hover"
+                  : "rounded-xl border-slate-200/90 shadow-[0_1px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] sm:rounded-2xl"
+              )}
             >
               <CardContent className="p-0">
                 {/* Product Image */}
-                <div className="relative aspect-square overflow-hidden">
-                  <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
+                <div
+                  className={cn(
+                    "relative aspect-square overflow-hidden",
+                    exploreMobile && "max-md:rounded-t-2xl"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.5rem)] flex-col gap-1",
+                      exploreMobile && "max-md:top-1 max-md:left-1 max-md:scale-90 origin-top-left"
+                    )}
+                  >
                     {hasVariations && (
                       <Badge
                         variant="outline"
@@ -281,7 +313,12 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                   </Link>
 
                   {/* Quick Actions */}
-                  <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div
+                    className={cn(
+                      "absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity",
+                      exploreMobile && "max-md:hidden"
+                    )}
+                  >
                     <Button
                       size="icon"
                       variant="outline"
@@ -302,103 +339,72 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                 </div>
 
                 {/* Product Info */}
-                <div className="p-4 space-y-3">
-                  {/* Rating */}
-                  <div className="flex items-center gap-1">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${
-                            i < 4
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-gray-500">(24)</span>
-                  </div>
+                <div
+                  className={cn(
+                    "space-y-3 p-4",
+                    exploreMobile && "max-md:space-y-1 max-md:p-2"
+                  )}
+                >
+                  {exploreMobile && index % 3 === 0 && (
+                    <p className="md:hidden rounded-md bg-pink-50 px-2 py-1 text-[10px] font-semibold leading-tight text-pink-950">
+                      Deals · Free shipping on orders Rs. 10,000+
+                    </p>
+                  )}
 
                   {/* Product Name */}
                   <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <h3 className="font-medium text-sm line-clamp-2 hover:text-primary transition-colors">
+                    <h3
+                      className={cn(
+                        "line-clamp-2 font-medium text-sm leading-snug text-neutral-900 transition-colors hover:text-[var(--primary-color)]",
+                        exploreMobile &&
+                          "max-md:text-[11px] max-md:font-normal max-md:leading-snug"
+                      )}
+                    >
                       {product.name}
                     </h3>
                   </Link>
 
-                  {/* Price */}
-                  <div className="flex items-center gap-2">
-                    {hasVariations ? (
-                      priceRange ? (
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-primary text-lg">
-                            From {formatPrice(
-                              priceRange.min,
-                              product.currency || storeCurrency
-                            )}
-                          </span>
-                          {priceRange.min !== priceRange.max && (
-                            <span className="text-sm text-gray-600">
-                              Up to {formatPrice(
-                                priceRange.max,
-                                product.currency || storeCurrency
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-primary text-lg">
-                            {formatPrice(
-                              effectivePrice,
-                              product.currency || storeCurrency
-                            )}
-                          </span>
-                          <span className="text-sm text-gray-600">
-                            {product.product_variations.length} variants available
-                          </span>
-                        </div>
-                      )
-                    ) : (
-                      <>
-                        <span className="font-semibold text-primary text-lg">
-                          {formatPrice(
-                            effectivePrice,
-                            product.currency || storeCurrency
-                          )}
-                        </span>
-                        {productHasDiscount && (
-                          <span className="text-sm text-gray-500 line-through">
-                            {formatPrice(
-                              basePriceForDisplay,
-                              product.currency || storeCurrency
-                            )}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </div>
+                  <ProductCardReviewsRow
+                    sku={product.sku || product.name || ""}
+                    className={exploreMobile ? "hidden md:flex" : undefined}
+                  />
+                  {exploreMobile && (
+                    <ProductCardReviewsRow
+                      sku={product.sku || product.name || ""}
+                      compact
+                      className="md:hidden"
+                    />
+                  )}
+
+                  {/* Price — marketplace promo row */}
+                  <ProductCardMarketplacePrice
+                    product={product}
+                    storeCurrency={storeCurrency}
+                    compact={exploreMobile ? true : false}
+                  />
+                  {hasVariations && (
+                    <p
+                      className={cn(
+                        "text-xs text-neutral-500",
+                        exploreMobile && "max-md:text-[10px]"
+                      )}
+                    >
+                      {product.product_variations.length} options
+                    </p>
+                  )}
 
                   {/* Stock Information */}
-                  <div className="flex items-center gap-2 text-sm">
+                  <div
+                    className={cn(
+                      "flex items-center gap-2 text-sm",
+                      exploreMobile && "max-md:hidden"
+                    )}
+                  >
                     {productStock > 0 ? (
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <span className="text-green-700 font-medium">
-                          {productStock} in stock
-                        </span>
-                        {product.type === "variable" && (
-                          <span className="text-gray-500 text-xs">
-                            ({product.product_variations?.length || 0} variants)
-                          </span>
-                        )}
-                      </div>
-                    ) : product.type === "variable" ? (
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="text-blue-700 font-medium">
-                          {product.product_variations?.length || 0} variants available
+                          Available
                         </span>
                       </div>
                     ) : (
@@ -420,8 +426,13 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
       </motion.div>
 
       {/* View All Button - Bottom */}
-      <div className="flex justify-center mt-8">
-        <Link href="/shop">
+      <div
+        className={cn(
+          "mt-8 flex justify-center",
+          exploreMobile && "hidden md:flex"
+        )}
+      >
+        <Link href="/parts">
           <Button size="lg" className="px-8 py-3 text-white shadow-soft hover:shadow-soft-lg transition-all duration-250 hover:-translate-y-0.5" style={{ backgroundColor: 'var(--primary-color)' }}>
             View All Products
           </Button>

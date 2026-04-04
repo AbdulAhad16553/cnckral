@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Categories from "../Categories";
 import ProductImagePreview from "@/components/ProductImagePreview";
 import { useBatchItemImages } from "@/hooks/useBatchItemImages";
-import { SortAsc, Wrench, Shield, Package } from "lucide-react";
+import { SortAsc, Wrench, Shield, Package, Search } from "lucide-react";
 import Link from "next/link";
 
 interface NecessaryProps {
@@ -49,8 +49,20 @@ const CategoriesContent = ({
   necessary,
 }: CategoriesContentProps) => {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [listSearch, setListSearch] = useState("");
 
   const safeCatProducts = Array.isArray(catProducts) ? catProducts : [];
+
+  const searchNorm = listSearch.trim().toLowerCase();
+  const productsAfterSearch = useMemo(() => {
+    if (!searchNorm) return safeCatProducts;
+    return safeCatProducts.filter((p: any) => {
+      const raw = [p.name, p.sku, p.short_description, p.detailed_desc]
+        .filter((x: unknown) => typeof x === "string")
+        .join(" ");
+      return raw.replace(/<[^>]*>/g, " ").toLowerCase().includes(searchNorm);
+    });
+  }, [safeCatProducts, searchNorm]);
 
   const sortProducts = (products: any[], sortOption: SortOption) => {
     if (!products || products.length === 0) return products;
@@ -83,10 +95,10 @@ const CategoriesContent = ({
   };
 
   const sortedProducts = useMemo(
-    () => sortProducts(safeCatProducts, sortBy),
-    [safeCatProducts, sortBy]
+    () => sortProducts(productsAfterSearch, sortBy),
+    [productsAfterSearch, sortBy]
   );
-  const hasProducts = sortedProducts.length > 0;
+  const hasProducts = safeCatProducts.length > 0;
   const hasSubCategories = Array.isArray(catSubCats) && catSubCats.length > 0;
 
   const itemNamesKey =
@@ -97,7 +109,7 @@ const CategoriesContent = ({
   );
   const { isLoading: isImageLoading, getImageUrl, hasImage } = useBatchItemImages({
     itemNames,
-    enabled: hasProducts && !hasSubCategories,
+    enabled: hasProducts && !hasSubCategories && sortedProducts.length > 0,
   });
 
   return (
@@ -166,11 +178,23 @@ const CategoriesContent = ({
           <>
             {/* Sort bar */}
             <motion.div
-              className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200/80"
+              className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between mb-8 pb-4 border-b border-slate-200/80"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: 0.1 }}
             >
+              <div className="relative w-full sm:max-w-md">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" aria-hidden />
+                <input
+                  type="search"
+                  value={listSearch}
+                  onChange={(e) => setListSearch(e.target.value)}
+                  placeholder="Search in this category…"
+                  className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-200"
+                  aria-label="Search products in category"
+                />
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-4 w-full sm:w-auto">
               <span className="text-sm text-slate-500 tabular-nums">
                 {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
               </span>
@@ -188,9 +212,15 @@ const CategoriesContent = ({
                 </select>
                 <SortAsc className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               </div>
+              </div>
             </motion.div>
 
             {/* Product grid with stagger animation */}
+            {sortedProducts.length === 0 ? (
+              <p className="text-slate-500 py-10 text-center text-sm">
+                No products match your search. Try different keywords.
+              </p>
+            ) : (
             <motion.div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6 mb-20"
               variants={container}
@@ -228,6 +258,7 @@ const CategoriesContent = ({
                 );
               })}
             </motion.div>
+            )}
 
             {/* Trust / info section */}
             <motion.section

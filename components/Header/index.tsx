@@ -6,12 +6,15 @@ import Image from "next/image";
 import {
   Mail,
   Phone,
-  ChevronDown,
   Heart,
+  Bell,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { OPEN_MOBILE_CATEGORY_DRAWER } from "@/lib/mobileCategoryDrawerEvent";
 import Cart from "@/components/Cart";
-import { getCategories } from "@/hooks/getCategories";
+import HeaderMobileSearch from "@/components/Header/HeaderMobileSearch";
+import HeaderDesktopSearch from "@/components/Header/HeaderDesktopSearch";
+import MobileCategoryDrawer from "@/components/Header/MobileCategoryDrawer";
+import { getAllCategories } from "@/hooks/getCategories";
 interface StoreData {
   store_name?: string;
   store_detail?: {
@@ -30,9 +33,10 @@ interface StoreData {
 }
 
 const Header = ({ storeData }: { storeData: StoreData }) => {
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [categories, setCategories] = useState<
-    Array<{ id: string; name: string; slug: string }>
+    Array<{ id: string; name: string; slug: string; parent_id?: string }>
   >([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
 
@@ -58,7 +62,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
 
     setIsLoadingCategories(true);
     try {
-      const { categories: fetchedCategories } = await getCategories(storeId);
+      const { categories: fetchedCategories } = await getAllCategories(storeId);
       setCategories(fetchedCategories || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -117,67 +121,83 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
     };
   }, []);
 
+  // Bottom nav "Categories" tab opens the same drawer as the old header button
+  useEffect(() => {
+    const onOpenDrawer = () => setCategoryDrawerOpen(true);
+    window.addEventListener(OPEN_MOBILE_CATEGORY_DRAWER, onOpenDrawer);
+    return () => window.removeEventListener(OPEN_MOBILE_CATEGORY_DRAWER, onOpenDrawer);
+  }, []);
+
   return (
     <>
-      {/* Top Bar - grey background, white text */}
-      <div className="bg-gray-600 text-white py-2 text-xs sm:text-sm">
-        <div className="page-container flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-            <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-2">
-              <Phone className="w-3.5 h-3.5" />
+      {/* Top Bar - grey background, white text (compact on small screens) */}
+      <div className="bg-gray-600 text-white py-1.5 sm:py-2 text-[11px] sm:text-sm">
+        <div className="page-container flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 sm:gap-x-6">
+            <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-1.5 sm:gap-2">
+              <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span>{topBarPhone}</span>
             </a>
-            <a href={`mailto:${topBarEmail}`} className="hover:text-white transition-colors flex items-center gap-2">
-              <Mail className="w-3.5 h-3.5" />
-              <span>{topBarEmail}</span>
+            <a href={`mailto:${topBarEmail}`} className="hover:text-white transition-colors flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+              <span className="truncate">{topBarEmail}</span>
             </a>
           </div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-            <span className="whitespace-pre-wrap">
-              Free shipping on orders over Rs. 10,000
-            </span>
-            <Link href="/contact" className="hover:text-white transition-colors">
+          <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-6 gap-y-0.5 text-[11px] sm:text-sm">
+            <span className="hidden sm:inline">Free shipping on orders over Rs. 10,000</span>
+            <span className="sm:hidden text-white/90">Free ship Rs. 10k+</span>
+            <Link href="/contact" className="hover:text-white transition-colors font-medium">
               Contact Us
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Header - matches Learn More / Contact Us button gradient */}
-      <header className="gradient-blue-grey-combined border-b border-white/20 sticky top-0 z-50 shadow-sm">
-        <div className="page-container">
-          {/* Main Header Content */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 py-3 sm:py-4">
-            {/* Logo + Mobile Actions */}
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex-shrink-0 group">
-                {/* <Image
-                  src="/HORIZONTAL Logo CNC KRAL.png"
-                  alt={`${storeName} Logo`}
-                  width={60}
-                  height={46}
-                  className="h-8 w-auto sm:h-9 object-contain transition-transform duration-300 group-hover:scale-105"
-                /> */}
+      {/* Main Header — mobile: white AliExpress-style row (logo · bell) + pill search; desktop: gradient */}
+      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white pt-[env(safe-area-inset-top,0px)] shadow-sm md:border-white/20 md:bg-[linear-gradient(135deg,#0368E5_0%,#363E47_100%)] md:shadow-sm">
+        <div className="page-container py-3 md:py-4">
+          {/* Mobile: row 1 logo | categories | bell — row 2 full-width search */}
+          <div className="flex flex-col gap-3 md:hidden">
+            <div className="flex items-center justify-between gap-3">
+              <Link href="/" className="group min-w-0 shrink-0">
                 <Image
-                    src="/HORIZONTAL Logo CNC KRAL.png"
-                    alt={`${storeName || "Store"} Logo`}
-                    width={160}
-                    height={50}
-                    className="max-h-12 object-contain brightness-0 invert"
-                  />
+                  src="/HORIZONTAL Logo CNC KRAL.png"
+                  alt={`${storeName || "Store"} Logo`}
+                  width={160}
+                  height={50}
+                  className="h-9 w-auto max-w-[10rem] object-contain object-left"
+                  priority
+                />
               </Link>
-              {/* Mobile: wishlist, cart, account - shown on small screens */}
-              <div className="flex sm:hidden items-center space-x-2">
-                <Heart className="w-5 h-5" />
-                <Cart />
-              </div>
+              <Link
+                href="/orders"
+                className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-900 active:bg-neutral-100"
+                aria-label="Orders and notifications"
+              >
+                <Bell className="h-6 w-6" strokeWidth={1.75} aria-hidden />
+              </Link>
+            </div>
+            <HeaderMobileSearch />
+          </div>
+
+          {/* Desktop */}
+          <div className="hidden md:flex md:flex-row md:items-center md:justify-between md:gap-6">
+            <div className="flex shrink-0 items-center gap-4">
+              <Link href="/" className="group min-w-0">
+                <Image
+                  src="/HORIZONTAL Logo CNC KRAL.png"
+                  alt={`${storeName || "Store"} Logo`}
+                  width={160}
+                  height={50}
+                  className="max-h-12 w-auto object-contain brightness-0 invert"
+                />
+              </Link>
             </div>
 
-            {/* Navigation - visible on all screens, scrollable on mobile */}
-            <nav className="flex items-center gap-1 sm:gap-4 lg:gap-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 py-1 sm:py-0 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+            <nav className="flex min-w-0 flex-1 items-center justify-center gap-4 lg:gap-8 overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
               <Link
                 href="/"
-                className="flex-shrink-0 text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base py-1.5"
+                className="flex-shrink-0 text-white/90 hover:text-white font-medium transition-colors text-base py-1.5"
               >
                 Home
               </Link>
@@ -185,12 +205,11 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 <Link
                   ref={categoryButtonRef}
                   href="/category"
-                  className="flex items-center space-x-1 text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base py-1.5"
+                  className="flex items-center space-x-1 text-white/90 hover:text-white font-medium transition-colors text-base py-1.5"
                   onMouseEnter={handleCategoryMouseEnter}
                   onMouseLeave={handleCategoryMouseLeave}
                 >
                   <span>Categories</span>
-    
                 </Link>
                 {isCategoryMenuOpen && (
                   <div
@@ -256,14 +275,21 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
               </Link>
               <Link
                 href="/contact"
-                className="flex-shrink-0 text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base py-1.5"
+                className="flex-shrink-0 text-white/90 hover:text-white font-medium transition-colors text-base py-1.5"
               >
                 Contact
               </Link>
             </nav>
 
-            {/* Desktop Right Side Actions - hidden on mobile (shown above) */}
-            <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
+            <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+              <Link
+                href="/orders"
+                className="relative p-2 text-white/90 transition-colors hover:text-white"
+                aria-label="Orders and notifications"
+              >
+                <Bell className="h-6 w-6" />
+              </Link>
+              <HeaderDesktopSearch />
               <Link
                 href="/wishlist"
                 className="relative p-2 text-white/90 transition-all duration-300 hover:text-red-300 hover:scale-110 active:scale-95 group"
@@ -276,6 +302,12 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
           </div>
         </div>
       </header>
+
+      <MobileCategoryDrawer
+        open={categoryDrawerOpen}
+        onClose={() => setCategoryDrawerOpen(false)}
+        categories={categories}
+      />
 
     </>
   );

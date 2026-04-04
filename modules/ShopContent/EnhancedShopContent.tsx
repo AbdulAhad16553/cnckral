@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,16 @@ interface EnhancedShopContentProps {
   categories?: any[];
   hideOnPage?: boolean;
   mode?: "all" | "machine" | "parts";
+}
+
+/** Applies ?q= from URL into shop search (header mobile search). */
+function PartsSearchQuerySync({ onQuery }: { onQuery: (q: string) => void }) {
+  const params = useSearchParams();
+  const q = params.get("q")?.trim() ?? "";
+  useEffect(() => {
+    onQuery(q);
+  }, [q, onQuery]);
+  return null;
 }
 
 const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({ 
@@ -94,8 +105,18 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
     sortBy !== 'newest'
   ].filter(Boolean).length;
 
+  const hidePartsMobileToolbar = mode === "parts";
+
+  const applyQueryFromUrl = React.useCallback((q: string) => {
+    setSearchTerm(q);
+    setDebouncedSearchTerm(q);
+  }, []);
+
   return (
     <div className="space-y-6">
+      <Suspense fallback={null}>
+        <PartsSearchQuerySync onQuery={applyQueryFromUrl} />
+      </Suspense>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{headingTitle}</h1>
@@ -130,9 +151,13 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
             />
           </div>
 
-          {/* View Mode Toggle (hidden on Machines page; always list) */}
+          {/* View Mode Toggle (hidden on Machines page; on /parts hidden on mobile) */}
           {!isMachineMode && (
-            <div className="flex items-center border rounded-lg overflow-hidden w-full sm:w-auto">
+            <div
+              className={`flex items-center border rounded-lg overflow-hidden w-full sm:w-auto ${
+                hidePartsMobileToolbar ? "hidden md:flex" : ""
+              }`}
+            >
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
@@ -152,23 +177,27 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
             </div>
           )}
 
-          {/* Settings */}
+          {/* Settings (/parts: hidden on mobile) */}
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2"
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 ${
+              hidePartsMobileToolbar ? "hidden md:inline-flex" : ""
+            }`}
           >
             <Settings className="h-4 w-4" />
             Settings
           </Button>
 
-          {/* Refresh */}
+          {/* Refresh (/parts: hidden on mobile) */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2"
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 ${
+              hidePartsMobileToolbar ? "hidden md:inline-flex" : ""
+            }`}
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -295,9 +324,13 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
 
       {/* Main Content */}
       <div className={isMachineMode ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 lg:grid-cols-4 gap-6"}>
-        {/* Sidebar (hidden on Machines page) */}
+        {/* Sidebar (hidden on Machines page; /parts: hidden on mobile — use top category dropdown) */}
         {!isMachineMode && (
-          <div className="lg:col-span-1">
+          <div
+            className={`lg:col-span-1 ${
+              hidePartsMobileToolbar ? "hidden lg:block" : ""
+            }`}
+          >
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

@@ -1,5 +1,4 @@
 import Hero from "@/modules/Hero";
-import HomeProducts from "@/components/Products/HomeProducts";
 import HeroAnimationWrapper from "@/components/HeroAnimationWrapper";
 import AnimatedSection from "@/components/AnimatedSection";
 import { CategoryStrip } from "@/components/CategoryStrip";
@@ -10,6 +9,7 @@ import AEOFAQSection from "@/components/AEOFAQSection";
 import { headers } from "next/headers";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import Layout from "@/components/Layout";
+import HomeProducts from "@/components/Products/HomeProducts";
 import { getCategories } from "@/hooks/getCategories";
 import { getStorePage } from "@/hooks/getStorePage";
 
@@ -141,14 +141,13 @@ export default async function Home() {
     };
   };
 
-  // Fetch products and pick a random one each request
-  const limit = 12;
+  const catalogLimit = 100;
   let featuredProduct = null;
   const homeProducts: any[] = [];
 
   try {
     const firstResponse = await fetch(
-      `${fullStoreUrl}/api/products?page=1&limit=${limit}`,
+      `${fullStoreUrl}/api/products?page=1&limit=${catalogLimit}`,
       { next: { revalidate: 60 } }
     );
 
@@ -156,42 +155,16 @@ export default async function Home() {
       const firstData = await firstResponse.json();
       const products = firstData.products || [];
       const normalizedProducts = products.map(buildFeaturedProductPayload);
-      homeProducts.push(...normalizedProducts.slice(0, 8));
-      const totalProducts =
-        firstData.pagination?.totalProducts || products.length || 0;
-
-      const randomIndex = totalProducts > 0 ? Math.floor(Math.random() * totalProducts) : 0;
-      const targetPage = Math.max(1, Math.floor(randomIndex / limit) + 1);
-      const targetIndex = randomIndex % limit;
-
-      if (targetPage === 1 || totalProducts <= products.length) {
-        const chosen = normalizedProducts[Math.min(targetIndex, normalizedProducts.length - 1)];
-        if (chosen) {
-          featuredProduct = chosen;
-        }
-      } else {
-        // Fetch the target page to pick that product
-        const pageResponse = await fetch(
-          `${fullStoreUrl}/api/products?page=${targetPage}&limit=${limit}`,
-          { next: { revalidate: 60 } }
-        );
-        if (pageResponse.ok) {
-          const pageData = await pageResponse.json();
-          const pageProducts = pageData.products || [];
-          const normalizedPageProducts = pageProducts.map(buildFeaturedProductPayload);
-          const chosen = normalizedPageProducts[Math.min(targetIndex, normalizedPageProducts.length - 1)];
-          if (chosen) {
-            featuredProduct = chosen;
-          }
-          // Only fill home products if we didn't get any from the first page
-          if (homeProducts.length === 0) {
-            homeProducts.push(...normalizedPageProducts.slice(0, 8));
-          }
-        }
+      homeProducts.push(...normalizedProducts);
+      if (normalizedProducts.length > 0) {
+        featuredProduct =
+          normalizedProducts[
+            Math.floor(Math.random() * normalizedProducts.length)
+          ];
       }
     }
   } catch (error) {
-    console.error("Error fetching random hero product:", error);
+    console.error("Error fetching home catalog:", error);
   }
 
   // Fallback to empty product if nothing found
@@ -216,62 +189,72 @@ export default async function Home() {
 
   return (
     <Layout>
-      <HeroAnimationWrapper>
-        <Hero
-          content={{
-            title: "Laser Technology That Defines Excellence",
-            content: "At CNC KRAL, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
-            heroImage: undefined,
-          }}
-          storeData={data?.store?.stores[0]}
-          categories={categories}
-          products={featuredProduct ? [featuredProduct] : []}
-          hideOnPage={false}
+      {/* Mobile home: site header + product grid */}
+      <div className="page-container md:hidden py-4 pb-6">
+        <HomeProducts
+          companyId={companyId}
+          storeId={storeId}
+          storeCurrency={storeCurrency}
+          initialProducts={initialHomeProducts}
+          className="w-full"
+          productLimit={100}
+          sectionTitle="All products"
+          sectionSubtitle="Browse our catalog"
         />
-      </HeroAnimationWrapper>
-
-      {/* Category strip - CNC Tooling Shop style */}
-      <div className="bg-white page-container py-12 lg:py-14 border-b border-[var(--secondary-color)]/10">
-        <AnimatedSection delay={0.05}>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Shop by Category</h2>
-          </div>
-          <CategoryStrip categories={categories || []} />
-        </AnimatedSection>
       </div>
 
-      {/* Need help + Resource links */}
-      <div className="bg-brand-tint page-container py-12 lg:py-14">
-        <AnimatedSection delay={0.08}>
-          <NeedHelpSection />
-        </AnimatedSection>
-        <AnimatedSection delay={0.1}>
-          <div className="mt-12">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Resources</h2>
-            <ResourceLinks />
-          </div>
-        </AnimatedSection>
-      </div>
-
-      {/* Featured Products */}
-      <div className="bg-white page-container py-12 lg:py-14 border-b border-[var(--secondary-color)]/10">
-        <AnimatedSection delay={0.12}>
-          <HomeProducts
-            companyId={companyId}
-            storeId={storeId}
-            storeCurrency={storeCurrency}
-            initialProducts={initialHomeProducts}
-            className="w-full"
+      <div className="hidden md:block">
+        <HeroAnimationWrapper>
+          <Hero
+            content={{
+              title: "Laser Technology That Defines Excellence",
+              content: "At CNC KRAL, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
+              heroImage: undefined,
+            }}
+            storeData={data?.store?.stores[0]}
+            categories={categories}
+            products={featuredProduct ? [featuredProduct] : []}
+            hideOnPage={false}
+            homeFeaturedProducts={{
+              companyId,
+              storeId,
+              storeCurrency,
+              initialProducts: initialHomeProducts,
+            }}
+            homeFeaturedProductLimit={8}
           />
-        </AnimatedSection>
-      </div>
+        </HeroAnimationWrapper>
 
-      {/* AEO FAQ - Answer Engine Optimization for AI/LLM visibility */}
-      <AEOFAQSection />
+        {/* Category strip - CNC Tooling Shop style */}
+        <div className="bg-white page-container py-12 lg:py-14 border-b border-[var(--secondary-color)]/10">
+          <AnimatedSection delay={0.05}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Shop by Category</h2>
+            </div>
+            <CategoryStrip categories={categories || []} />
+          </AnimatedSection>
+        </div>
 
-      {/* Newsletter */}
-      <div className="page-container py-12 lg:py-14">
-        <NewsletterSection />
+        {/* Need help + Resource links */}
+        <div className="bg-brand-tint page-container py-12 lg:py-14">
+          <AnimatedSection delay={0.08}>
+            <NeedHelpSection />
+          </AnimatedSection>
+          <AnimatedSection delay={0.1}>
+            <div className="mt-12">
+              <h2 className="text-xl font-bold text-slate-900 mb-6">Resources</h2>
+              <ResourceLinks />
+            </div>
+          </AnimatedSection>
+        </div>
+
+        {/* AEO FAQ - Answer Engine Optimization for AI/LLM visibility */}
+        <AEOFAQSection />
+
+        {/* Newsletter */}
+        <div className="page-container py-12 lg:py-14">
+          <NewsletterSection />
+        </div>
       </div>
     </Layout>
   );

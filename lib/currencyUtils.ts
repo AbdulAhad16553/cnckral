@@ -253,3 +253,4 @@ export function formatPriceRange(priceRange: { min: number; max: number } | null
   
   return `${formatPrice(priceRange.min, currencyString)} - ${formatPrice(priceRange.max, currencyString)}`;
 }
+

@@ -20,6 +20,10 @@ import {
 } from "@/lib/currencyUtils";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
+import {
+  ProductCardMarketplacePrice,
+  ProductCardReviewsRow,
+} from "@/components/Products/ProductCardMarketplace";
 import ProductSkeleton from "@/common/Skeletons/Products";
 import MachinePageSkeleton from "@/common/Skeletons/MachinePage";
 import PartsPageSkeleton from "@/common/Skeletons/PartsPage";
@@ -66,7 +70,8 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
   const paginatedProducts = usePaginatedProducts({
     pageSize,
     autoLoad: true,
-    mode: quoteFilter
+    mode: quoteFilter,
+    loadFullCatalog: true,
   });
 
   const {
@@ -80,18 +85,24 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     isLoadingMore
   } = paginatedProducts;
 
-  // Apply category/search/sort filters
+  // Apply category/search/sort filters (client-side; catalog is fully loaded)
   const visibleProducts = React.useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
-    // Filter by category and search
+    const searchBlob = (p: any) => {
+      const raw = [p.name, p.sku, p.short_description, p.detailed_desc]
+        .filter((x) => typeof x === "string")
+        .join(" ");
+      return raw.replace(/<[^>]*>/g, " ").toLowerCase();
+    };
+
     let filtered = products.filter((product) => {
-      const matchesCategory = selectedCategory && selectedCategory !== "all" ? product.item_group === selectedCategory : true;
-      const matchesSearch = normalizedSearch
-        ? (product.name?.toLowerCase().includes(normalizedSearch) ||
-          product.short_description?.toLowerCase().includes(normalizedSearch) ||
-          product.sku?.toLowerCase().includes(normalizedSearch))
-        : true;
+      const matchesCategory =
+        selectedCategory && selectedCategory !== "all"
+          ? product.item_group === selectedCategory
+          : true;
+      const matchesSearch =
+        !normalizedSearch || searchBlob(product).includes(normalizedSearch);
       return matchesCategory && matchesSearch;
     });
 
@@ -145,7 +156,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     }
 
     return sorted;
-  }, [products, selectedCategory, searchTerm, sortBy]);
+  }, [products, selectedCategory, searchTerm, sortBy, quoteFilter]);
 
   // Extract image IDs for batch optimization
   const imageIds = React.useMemo(() => {
@@ -648,12 +659,12 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
           return (
             <Card
               key={uniqueKey}
-              className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
+              className="group overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] sm:rounded-2xl"
             >
               <CardContent className="p-0">
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden">
-                  <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
+                  <div className="absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.5rem)] flex-col gap-1">
                     {hasVariations && (
                       <Badge
                         variant="outline"
@@ -723,83 +734,29 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                 </div>
 
                 {/* Product Info */}
-                <div className="p-4 space-y-3">
-                  {/* Rating */}
-                  <div className="flex items-center gap-1">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${
-                            i < 4
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-gray-500">(24)</span>
-                  </div>
-
-                  {/* Product Name */}
+                <div className="space-y-2 p-3 sm:p-4 sm:space-y-3">
                   <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <h3 className="font-medium text-sm line-clamp-2 hover:text-primary transition-colors">
+                    <h3 className="line-clamp-2 text-sm font-normal leading-snug text-neutral-900 transition-colors hover:text-[var(--primary-color)]">
                       {product.name}
                     </h3>
                   </Link>
 
-                  {/* Price */}
-                  <div className="flex items-center gap-2">
-                    {hasVariations ? (
-                      priceRange ? (
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-primary text-lg">
-                            From {formatPrice(
-                              priceRange.min,
-                              product.currency || storeCurrency
-                            )}
-                          </span>
-                          {priceRange.min !== priceRange.max && (
-                            <span className="text-sm text-gray-600">
-                              Up to {formatPrice(
-                                priceRange.max,
-                                product.currency || storeCurrency
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-primary text-lg">
-                            {formatPrice(
-                              effectivePrice,
-                              product.currency || storeCurrency
-                            )}
-                          </span>
-                          <span className="text-sm text-gray-600">
-                            {product.product_variations.length} variants available
-                          </span>
-                        </div>
-                      )
-                    ) : (
-                      <>
-                        <span className="font-semibold text-primary text-lg">
-                          {formatPrice(
-                            effectivePrice,
-                            product.currency || storeCurrency
-                          )}
-                        </span>
-                        {productHasDiscount && (
-                          <span className="text-sm text-gray-500 line-through">
-                            {formatPrice(
-                              basePriceForDisplay,
-                              product.currency || storeCurrency
-                            )}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </div>
+                  <ProductCardReviewsRow
+                    sku={product.sku || product.name || ""}
+                    compact
+                    className="max-sm:flex-wrap"
+                  />
+
+                  <ProductCardMarketplacePrice
+                    product={product}
+                    storeCurrency={storeCurrency}
+                    compact
+                  />
+                  {hasVariations && (
+                    <p className="text-[10px] text-neutral-500 sm:text-xs">
+                      {product.product_variations.length} options
+                    </p>
+                  )}
 
                   {/* Stock Information */}
                   <div className="flex items-center gap-2 text-sm">
@@ -807,19 +764,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <span className="text-green-700 font-medium">
-                          {productStock} in stock
-                        </span>
-                        {product.type === "variable" && (
-                          <span className="text-gray-500 text-xs">
-                            ({product.product_variations?.length || 0} variants)
-                          </span>
-                        )}
-                      </div>
-                    ) : product.type === "variable" ? (
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="text-blue-700 font-medium">
-                          {product.product_variations?.length || 0} variants available
+                          Available
                         </span>
                       </div>
                     ) : (

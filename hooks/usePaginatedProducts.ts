@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { productsCache, cacheUtils } from '@/lib/clientCache';
+import { useState, useEffect, useCallback } from "react";
+import { productsCache } from "@/lib/clientCache";
 
 interface PaginationInfo {
   currentPage: number;
@@ -19,7 +19,7 @@ interface Product {
   base_price: number;
   sale_price: number;
   currency: string;
-  type: 'simple' | 'variable';
+  type: "simple" | "variable";
   product_variations?: any[];
   product_images?: any[];
   stock?: any;
@@ -30,7 +30,11 @@ interface UsePaginatedProductsOptions {
   initialPage?: number;
   pageSize?: number;
   autoLoad?: boolean;
-  mode?: 'all' | 'machine' | 'parts';
+  mode?: "all" | "machine" | "parts";
+  /**
+   * When true (default), loads every page from `/api/products` once so the UI can filter/search on the client.
+   */
+  loadFullCatalog?: boolean;
 }
 
 interface UsePaginatedProductsReturn {
@@ -46,6 +50,8 @@ interface UsePaginatedProductsReturn {
   isLoadingMore: boolean;
 }
 
+const BATCH_LIMIT = 500;
+
 export const usePaginatedProducts = (
   options: UsePaginatedProductsOptions = {}
 ): UsePaginatedProductsReturn => {
@@ -53,7 +59,8 @@ export const usePaginatedProducts = (
     initialPage = 1,
     pageSize = 12,
     autoLoad = true,
-    mode = 'all'
+    mode = "all",
+    loadFullCatalog = true,
   } = options;
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -62,52 +69,106 @@ export const usePaginatedProducts = (
   const [error, setError] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const loadPage = useCallback(async (page: number) => {
+  const loadFullCatalogFn = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const cacheKey = `products-v2-page-${page}-limit-${pageSize}-mode-${mode}`;
-      const cachedData = productsCache.get(cacheKey);
-      if (cachedData) {
-        console.log(`⚡ Serving products page ${page} from client cache`);
-        setProducts(cachedData.products);
-        setPagination(cachedData.pagination);
-        setLoading(false);
-        return;
+      const modeParam = mode !== "all" ? `&mode=${mode}` : "";
+      const nocacheParam =
+        process.env.NODE_ENV === "development" ? "&nocache=1" : "";
+
+      const acc: Product[] = [];
+      let page = 1;
+
+      while (true) {
+        const response = await fetch(
+          `/api/products?page=${page}&limit=${BATCH_LIMIT}${modeParam}${nocacheParam}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch products");
+        }
+
+        const batch = Array.isArray(data.products) ? data.products : [];
+        acc.push(...batch);
+
+        if (batch.length === 0) break;
+        if (batch.length < BATCH_LIMIT) break;
+        page += 1;
+        if (page > 400) break;
       }
 
-      console.log(`🔄 Loading products page ${page} from server...`);
-      
-      const modeParam = mode !== 'all' ? `&mode=${mode}` : '';
-      const nocacheParam = process.env.NODE_ENV === 'development' ? '&nocache=1' : '';
-      const response = await fetch(`/api/products?page=${page}&limit=${pageSize}${modeParam}${nocacheParam}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch products');
-      }
-
-      console.log(`✅ Loaded ${data.products.length} products for page ${page} (${data.loadTime}ms)`);
-      
-      // Cache the response
-      productsCache.set(cacheKey, {
-        products: data.products,
-        pagination: data.pagination
+      setProducts(acc);
+      setPagination({
+        currentPage: 1,
+        totalPages: 1,
+        totalProducts: acc.length,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: acc.length || BATCH_LIMIT,
+        offset: 0,
       });
-      
-      setProducts(data.products);
-      setPagination(data.pagination);
     } catch (err) {
-      console.error('Error loading products:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load products');
+      console.error("Error loading catalog:", err);
+      setError(err instanceof Error ? err.message : "Failed to load products");
     } finally {
       setLoading(false);
     }
-  }, [pageSize, mode]);
+  }, [mode]);
+
+  const loadPage = useCallback(
+    async (page: number) => {
+      if (loadFullCatalog) {
+        await loadFullCatalogFn();
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const cacheKey = `products-v2-page-${page}-limit-${pageSize}-mode-${mode}`;
+        const cachedData = productsCache.get(cacheKey);
+        if (cachedData) {
+          setProducts(cachedData.products);
+          setPagination(cachedData.pagination);
+          setLoading(false);
+          return;
+        }
+
+        const modeParam = mode !== "all" ? `&mode=${mode}` : "";
+        const nocacheParam =
+          process.env.NODE_ENV === "development" ? "&nocache=1" : "";
+        const response = await fetch(
+          `/api/products?page=${page}&limit=${pageSize}${modeParam}${nocacheParam}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch products");
+        }
+
+        productsCache.set(cacheKey, {
+          products: data.products,
+          pagination: data.pagination,
+        });
+
+        setProducts(data.products);
+        setPagination(data.pagination);
+      } catch (err) {
+        console.error("Error loading products:", err);
+        setError(err instanceof Error ? err.message : "Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loadFullCatalog, loadFullCatalogFn, pageSize, mode]
+  );
 
   const loadNextPage = useCallback(async () => {
-    if (!pagination?.hasNextPage || isLoadingMore) return;
+    if (loadFullCatalog || !pagination?.hasNextPage || isLoadingMore) return;
 
     try {
       setIsLoadingMore(true);
@@ -115,73 +176,78 @@ export const usePaginatedProducts = (
 
       const nextPage = pagination.currentPage + 1;
       const cacheKey = `products-v2-page-${nextPage}-limit-${pageSize}-mode-${mode}`;
-      
-      // Check client-side cache first
+
       const cachedData = productsCache.get(cacheKey);
       if (cachedData) {
-        console.log(`⚡ Loading next page ${nextPage} from client cache`);
-        setProducts(prev => [...prev, ...cachedData.products]);
+        setProducts((prev) => [...prev, ...cachedData.products]);
         setPagination(cachedData.pagination);
         setIsLoadingMore(false);
         return;
       }
 
-      const modeParam = mode !== 'all' ? `&mode=${mode}` : '';
-      const nocacheParam = process.env.NODE_ENV === 'development' ? '&nocache=1' : '';
-      const response = await fetch(`/api/products?page=${nextPage}&limit=${pageSize}${modeParam}${nocacheParam}`);
+      const modeParam = mode !== "all" ? `&mode=${mode}` : "";
+      const nocacheParam =
+        process.env.NODE_ENV === "development" ? "&nocache=1" : "";
+      const response = await fetch(
+        `/api/products?page=${nextPage}&limit=${pageSize}${modeParam}${nocacheParam}`
+      );
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch products');
+        throw new Error(data.error || "Failed to fetch products");
       }
 
-      console.log(`✅ Loaded ${data.products.length} more products`);
-      
-      // Cache the response
       productsCache.set(cacheKey, {
         products: data.products,
-        pagination: data.pagination
+        pagination: data.pagination,
       });
-      
-      // Append new products to existing ones
-      setProducts(prev => [...prev, ...data.products]);
+
+      setProducts((prev) => [...prev, ...data.products]);
       setPagination(data.pagination);
     } catch (err) {
-      console.error('Error loading next page:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load more products');
+      console.error("Error loading more products:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to load more products"
+      );
     } finally {
       setIsLoadingMore(false);
     }
-  }, [pagination, pageSize, isLoadingMore]);
+  }, [loadFullCatalog, pagination, pageSize, isLoadingMore, mode]);
 
   const loadPrevPage = useCallback(async () => {
-    if (!pagination?.hasPrevPage) return;
-
-    const prevPage = pagination.currentPage - 1;
-    await loadPage(prevPage);
-  }, [pagination, loadPage]);
+    if (!pagination?.hasPrevPage || loadFullCatalog) return;
+    await loadPage(pagination.currentPage - 1);
+  }, [pagination, loadPage, loadFullCatalog]);
 
   const refresh = useCallback(async () => {
+    if (loadFullCatalog) {
+      await loadFullCatalogFn();
+      return;
+    }
     if (pagination) {
       const cacheKey = `products-v2-page-${pagination.currentPage}-limit-${pageSize}-mode-${mode}`;
       productsCache.delete(cacheKey);
     }
-    
     if (pagination) {
       await loadPage(pagination.currentPage);
     } else {
       await loadPage(initialPage);
     }
-  }, [pagination, loadPage, initialPage, pageSize, mode]);
+  }, [
+    loadFullCatalog,
+    loadFullCatalogFn,
+    pagination,
+    loadPage,
+    initialPage,
+    pageSize,
+    mode,
+  ]);
 
-  // Auto-load initial page
   useEffect(() => {
     if (autoLoad) {
       loadPage(initialPage);
     }
   }, [autoLoad, initialPage, loadPage]);
-
-  // Note: Cache cleanup is handled globally, not per hook to avoid clearing cache during navigation
 
   return {
     products,
@@ -192,12 +258,11 @@ export const usePaginatedProducts = (
     loadNextPage,
     loadPrevPage,
     refresh,
-    hasMore: pagination?.hasNextPage || false,
-    isLoadingMore
+    hasMore: loadFullCatalog ? false : pagination?.hasNextPage || false,
+    isLoadingMore,
   };
 };
 
-// Hook for infinite scroll
 export const useInfiniteProducts = (
   pageSize: number = 12
 ): UsePaginatedProductsReturn => {
@@ -216,55 +281,56 @@ export const useInfiniteProducts = (
       setError(null);
 
       const nextPage = currentPage + 1;
-      console.log(`🔄 Loading more products (page ${nextPage})...`);
-      
-      const response = await fetch(`/api/products?page=${nextPage}&limit=${pageSize}`);
+
+      const response = await fetch(
+        `/api/products?page=${nextPage}&limit=${pageSize}`
+      );
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch products');
+        throw new Error(data.error || "Failed to fetch products");
       }
 
-      console.log(`✅ Loaded ${data.products.length} more products`);
-      
-      // Append new products to existing ones
-      setAllProducts(prev => [...prev, ...data.products]);
+      setAllProducts((prev) => [...prev, ...data.products]);
       setPagination(data.pagination);
       setCurrentPage(nextPage);
     } catch (err) {
-      console.error('Error loading more products:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load more products');
+      console.error("Error loading more products:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to load more products"
+      );
     } finally {
       setIsLoadingMore(false);
     }
   }, [currentPage, pagination, pageSize, isLoadingMore]);
 
-  const loadPage = useCallback(async (page: number) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const loadPage = useCallback(
+    async (page: number) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      console.log(`🔄 Loading products page ${page}...`);
-      
-      const response = await fetch(`/api/products?page=${page}&limit=${pageSize}`);
-      const data = await response.json();
+        const response = await fetch(
+          `/api/products?page=${page}&limit=${pageSize}`
+        );
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch products');
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch products");
+        }
+
+        setAllProducts(data.products);
+        setPagination(data.pagination);
+        setCurrentPage(page);
+      } catch (err) {
+        console.error("Error loading products:", err);
+        setError(err instanceof Error ? err.message : "Failed to load products");
+      } finally {
+        setLoading(false);
       }
-
-      console.log(`✅ Loaded ${data.products.length} products for page ${page}`);
-      
-      setAllProducts(data.products);
-      setPagination(data.pagination);
-      setCurrentPage(page);
-    } catch (err) {
-      console.error('Error loading products:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  }, [pageSize]);
+    },
+    [pageSize]
+  );
 
   const loadNextPage = loadMore;
   const loadPrevPage = useCallback(async () => {
@@ -279,7 +345,6 @@ export const useInfiniteProducts = (
     await loadPage(1);
   }, [loadPage]);
 
-  // Load initial page
   useEffect(() => {
     loadPage(1);
   }, [loadPage]);
@@ -294,7 +359,7 @@ export const useInfiniteProducts = (
     loadPrevPage,
     refresh,
     hasMore: pagination?.hasNextPage || false,
-    isLoadingMore
+    isLoadingMore,
   };
 };
 

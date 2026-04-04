@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { HeroImageCarousel } from "@/components/HeroImageCarousel";
 import { FeaturedProductImageCarousel } from "@/components/FeaturedProductImageCarousel";
 import { HeroInfoCards } from "@/components/HeroInfoCards";
+import HomeProducts from "@/components/Products/HomeProducts";
 
 interface HeroProps {
   content: {
@@ -16,6 +17,15 @@ interface HeroProps {
   categories: any[];
   products: any[];
   hideOnPage: boolean;
+  /** When set (home page), renders Featured Products under the welcome block */
+  homeFeaturedProducts?: {
+    companyId: string;
+    storeId: string;
+    storeCurrency: string;
+    initialProducts: any[];
+  };
+  /** Desktop featured grid limit (mobile uses separate block on page). */
+  homeFeaturedProductLimit?: number;
 }
 
 const Hero = async ({
@@ -23,6 +33,8 @@ const Hero = async ({
   storeData,
   products,
   hideOnPage,
+  homeFeaturedProducts,
+  homeFeaturedProductLimit = 8,
 }: HeroProps) => {
   const storeName =  "CNC KRAL";
 
@@ -98,6 +110,20 @@ const Hero = async ({
             </Link>
           )}
         </div>
+
+        {/* Featured Products — directly under welcome, before the rest of the page */}
+        {homeFeaturedProducts && (
+          <div className="mt-12 lg:mt-14 hidden md:block w-full px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+            <HomeProducts
+              companyId={homeFeaturedProducts.companyId}
+              storeId={homeFeaturedProducts.storeId}
+              storeCurrency={homeFeaturedProducts.storeCurrency}
+              initialProducts={homeFeaturedProducts.initialProducts}
+              className="w-full"
+              productLimit={homeFeaturedProductLimit}
+            />
+          </div>
+        )}
 
         {/* Featured product ellipse card */}
         {featuredProduct && featuredProduct.id !== "no-product" && (

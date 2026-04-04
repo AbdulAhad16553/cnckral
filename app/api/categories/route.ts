@@ -5,15 +5,14 @@ export async function GET(request: NextRequest) {
   try {
     // Fetch categories from ERPNext (no store ID required)
     const categories = await productService.getCategories();
-    
-    // Transform ERPNext categories to match frontend interface
-    const transformedCategories = categories.map(category => ({
+
+    const transformedCategories = categories.map((category) => ({
       id: category.name,
       name: category.item_group_name,
-      slug: category.name.toLowerCase().replace(/\s+/g, '-'),
+      slug: category.name.toLowerCase().replace(/\s+/g, "-"),
       image_id: category.image,
       featured: false,
-      parent_id: category.parent_item_group
+      parent_id: category.parent_item_group,
     }));
 
     return NextResponse.json({ categories: transformedCategories });

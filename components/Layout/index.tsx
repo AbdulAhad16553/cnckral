@@ -5,6 +5,7 @@ import { getUrlWithScheme } from '@/lib/getUrlWithScheme'
 import Image from 'next/image'
 import { Toaster } from 'sonner'
 import Header from '../Header'
+import MobileBottomNav from '../MobileBottomNav'
 
 const normalizePhoneNumber = (phone: string): string => {
     phone = phone.trim()
@@ -73,11 +74,14 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
     return (
         <>
             <Header storeData={storeDataWithLogo} />
-            <main className='min-h-screen'>{children}</main>
+            <main className="min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+                {children}
+            </main>
+            <MobileBottomNav />
             {showFooter && (
-                <Footer
-                    storeData={storeDataWithLogo}
-                />
+                <div className="hidden md:block">
+                    <Footer storeData={storeDataWithLogo} />
+                </div>
             )}
             <Toaster />
             {whatsappLink && (
@@ -85,7 +89,7 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="fixed bottom-6 right-6 z-50 w-12 h-12"
+                    className="fixed z-50 w-12 h-12 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] right-4 md:bottom-6 md:right-6"
                 >
                     <Image
                         src="/whatsapp-icon.svg" // place the file in your `public/` folder

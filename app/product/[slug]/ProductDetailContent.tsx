@@ -657,7 +657,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
               )}
               {!isTemplate && !isCustomQuotationItem && product.stock && product.stock.totalStock > 0 && (
                 <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-semibold rounded-full px-3">
-                  In Stock · {product.stock.totalStock} {product.stock_uom}
+                  Available
                 </Badge>
               )}
               {!isTemplate && !isCustomQuotationItem && product.stock && product.stock.totalStock === 0 && (
@@ -815,7 +815,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                                   </Badge>
                                 ) : variantInStock ? (
                                   <Badge className="text-xs bg-emerald-600/10 text-emerald-700 border-emerald-200">
-                                    {(variant as any).stock.totalStock} in stock
+                                    Available
                                   </Badge>
                                 ) : (
                                   <Badge variant="outline" className="text-xs text-red-600 border-red-200">
@@ -876,8 +876,16 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                                   ? Number(activeVariation.price).toLocaleString()
                                   : "—"}
                               </p>
-                              <p className="text-xs text-emerald-700">
-                                {(activeVariation as any).stock?.totalStock} in stock
+                              <p
+                                className={`text-xs font-medium ${
+                                  (activeVariation as any).stock?.totalStock > 0
+                                    ? "text-emerald-700"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {(activeVariation as any).stock?.totalStock > 0
+                                  ? "Available"
+                                  : "Out of stock"}
                               </p>
                             </div>
                           </>
@@ -998,8 +1006,12 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 {!isTemplate && product.stock && !isCustomQuotationItem && (
                   <div className="flex justify-between gap-4 px-6 py-4">
                     <dt className="text-neutral-500 font-medium">Availability</dt>
-                    <dd className={`font-medium text-right ${product.stock.totalStock > 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                      {product.stock.totalStock} {product.stock_uom}
+                    <dd
+                      className={`font-medium text-right ${
+                        product.stock.totalStock > 0 ? "text-emerald-600" : "text-red-600"
+                      }`}
+                    >
+                      {product.stock.totalStock > 0 ? "Available" : "Out of stock"}
                     </dd>
                   </div>
                 )}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,6 +31,13 @@ interface HomeProductsProps {
   productLimit?: number;
   sectionTitle?: string;
   sectionSubtitle?: string;
+  /** Mobile home: reveal more rows while scrolling; then fetch next catalog pages */
+  mobileInfiniteScroll?: boolean;
+  mobileBatchSize?: number;
+  /** Total products in ERP (from /api/products pagination) for knowing when to fetch more */
+  catalogTotalProducts?: number;
+  /** Page size when requesting additional pages (match server prefetch) */
+  catalogFetchLimit?: number;
 }
 
 const HomeProducts: React.FC<HomeProductsProps> = ({
@@ -44,21 +51,43 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
   productLimit = 8,
   sectionTitle = "Featured Products",
   sectionSubtitle,
+  mobileInfiniteScroll = false,
+  mobileBatchSize = 12,
+  catalogTotalProducts = 0,
+  catalogFetchLimit = 100,
 }) => {
   const router = useRouter();
   const [products, setProducts] = useState<any[]>(initialProducts || []);
   const [loading, setLoading] = useState(!(initialProducts && initialProducts.length > 0));
   const [error, setError] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(() =>
+    mobileInfiniteScroll
+      ? Math.min(mobileBatchSize, (initialProducts || []).length)
+      : (initialProducts || []).length
+  );
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [remoteExhausted, setRemoteExhausted] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const loadingMoreRef = useRef(false);
+  const nextCatalogPageRef = useRef(2);
+  const remoteExhaustedRef = useRef(false);
+  const loadMoreRef = useRef<() => Promise<void>>(async () => {});
+  const productsRef = useRef(products);
+  const visibleCountRef = useRef(visibleCount);
+  productsRef.current = products;
+  visibleCountRef.current = visibleCount;
+  remoteExhaustedRef.current = remoteExhausted;
 
-  // Prepare batch image loading like /shop
+  // Prefer image_url from /api/products for instant preview; batch only when missing
   const itemNames = React.useMemo(() => products.map(p => p.sku).filter(Boolean), [products]);
+  const needsBatchImages = products.some((p: any) => !p.image_url);
   const {
     isLoading: isImageLoading,
     getImageUrl,
     hasImage,
   } = useBatchItemImages({
     itemNames,
-    enabled: products.length > 0
+    enabled: products.length > 0 && needsBatchImages,
   });
 
   // Use server-provided initialProducts; only fetch if empty (avoids duplicate API call)
@@ -69,6 +98,12 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
     if (hasInitialData) {
       setProducts(initialProducts);
       setLoading(false);
+      if (mobileInfiniteScroll) {
+        setVisibleCount(Math.min(mobileBatchSize, initialProducts.length));
+        nextCatalogPageRef.current = 2;
+        setRemoteExhausted(false);
+        remoteExhaustedRef.current = false;
+      }
       return;
     }
 
@@ -80,7 +115,14 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
         const data = await response.json();
 
         if (!response.ok) throw new Error(data.error || 'Failed to fetch products');
-        if (!isCancelled) setProducts((data.products || []).slice(0, 8));
+        const list = data.products || [];
+        if (!isCancelled) {
+          setProducts(mobileInfiniteScroll ? list : list.slice(0, 8));
+          if (mobileInfiniteScroll) {
+            setVisibleCount(Math.min(mobileBatchSize, list.length));
+            nextCatalogPageRef.current = 2;
+          }
+        }
       } catch (err) {
         if (!isCancelled) setError(err instanceof Error ? err.message : 'Failed to load products');
       } finally {
@@ -90,8 +132,89 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
 
     fetchProducts();
     return () => { isCancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- only use initialProducts on mount
-  }, []);
+  }, [initialProducts, mobileInfiniteScroll, mobileBatchSize]);
+
+  const totalCatalog = catalogTotalProducts > 0 ? catalogTotalProducts : products.length;
+
+  const productsToShow = useMemo(() => {
+    if (mobileInfiniteScroll) {
+      return products.slice(0, Math.min(visibleCount, products.length));
+    }
+    return products.slice(0, productLimit);
+  }, [mobileInfiniteScroll, products, visibleCount, productLimit]);
+
+  const loadMore = useCallback(async () => {
+    if (!mobileInfiniteScroll || loadingMoreRef.current) return;
+
+    const prods = productsRef.current;
+    const vis = visibleCountRef.current;
+
+    if (vis < prods.length) {
+      setVisibleCount((v) => Math.min(v + mobileBatchSize, prods.length));
+      return;
+    }
+
+    if (prods.length >= totalCatalog || remoteExhaustedRef.current) return;
+
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    try {
+      const page = nextCatalogPageRef.current;
+      const res = await fetch(
+        `/api/products?page=${page}&limit=${catalogFetchLimit}`
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to load more");
+
+      const batch = Array.isArray(data.products) ? data.products : [];
+      if (batch.length === 0) {
+        setRemoteExhausted(true);
+        remoteExhaustedRef.current = true;
+        return;
+      }
+
+      const keys = new Set(prods.map((p: any) => p.sku || p.id));
+      const extra = batch.filter((p: any) => !keys.has(p.sku || p.id));
+      const merged = extra.length > 0 ? [...prods, ...extra] : prods;
+
+      if (extra.length > 0) {
+        setProducts(merged);
+        productsRef.current = merged;
+      } else {
+        setRemoteExhausted(true);
+        remoteExhaustedRef.current = true;
+      }
+
+      setVisibleCount((v) =>
+        Math.min(v + mobileBatchSize, merged.length)
+      );
+      nextCatalogPageRef.current = page + 1;
+    } catch {
+      setRemoteExhausted(true);
+      remoteExhaustedRef.current = true;
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
+    }
+  }, [mobileInfiniteScroll, mobileBatchSize, catalogFetchLimit, totalCatalog]);
+
+  loadMoreRef.current = loadMore;
+
+  useEffect(() => {
+    if (!mobileInfiniteScroll) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        void loadMoreRef.current();
+      },
+      { root: null, rootMargin: "280px", threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [mobileInfiniteScroll, productsToShow.length, products.length]);
 
   // Calculate product stock
   const calculateProductStock = (product: any) => {
@@ -210,10 +333,12 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
           },
         }}
       >
-        {products.slice(0, productLimit).map((product: any, index: number) => {
-          // Resolve image via batch image loader (same approach as /shop)
-          const imageUrl = getImageUrl(product.sku);
-          const productHasImage = hasImage(product.sku);
+        {productsToShow.map((product: any, index: number) => {
+          const imageUrl =
+            product.image_url ||
+            (needsBatchImages ? getImageUrl(product.sku) : "/placeholder.svg");
+          const productHasImage =
+            !!product.image_url || (needsBatchImages && hasImage(product.sku));
 
           const productStock = calculateProductStock(product);
           const isOutOfStock = product.type === "variable" ? false : productStock <= 0;
@@ -304,7 +429,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                       productName={product.name}
                       imageUrl={imageUrl}
                       hasImage={productHasImage}
-                      isLoading={isImageLoading}
+                      isLoading={needsBatchImages ? isImageLoading : false}
                       width={400}
                       height={400}
                       className="w-full h-full"
@@ -425,20 +550,40 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
         })}
       </motion.div>
 
-      {/* View All Button - Bottom */}
-      <div
-        className={cn(
-          "mt-8 flex justify-center",
-          exploreMobile && "hidden md:flex"
-        )}
-      >
-        <Link href="/parts">
-          <Button size="lg" className="px-8 py-3 text-white shadow-soft hover:shadow-soft-lg transition-all duration-250 hover:-translate-y-0.5" style={{ backgroundColor: 'var(--primary-color)' }}>
-            View All Products
-          </Button>
-        </Link>
-      </div>
-      
+      {/* View All — hidden on mobile home when infinite scroll is enabled */}
+      {!mobileInfiniteScroll && (
+        <div
+          className={cn(
+            "mt-8 flex justify-center",
+            exploreMobile && "hidden md:flex"
+          )}
+        >
+          <Link href="/parts">
+            <Button size="lg" className="px-8 py-3 text-white shadow-soft hover:shadow-soft-lg transition-all duration-250 hover:-translate-y-0.5" style={{ backgroundColor: 'var(--primary-color)' }}>
+              View All Products
+            </Button>
+          </Link>
+        </div>
+      )}
+
+      {mobileInfiniteScroll && (
+        <div
+          ref={sentinelRef}
+          className="mt-6 flex min-h-[52px] flex-col items-center justify-center gap-2 py-4"
+          aria-hidden
+        >
+          {loadingMore && (
+            <p className="text-sm text-slate-500">Loading more…</p>
+          )}
+          {!loadingMore &&
+            products.length > 0 &&
+            (remoteExhausted ||
+              (products.length >= totalCatalog &&
+                visibleCount >= products.length)) && (
+              <p className="text-xs text-slate-400">You&apos;re all caught up</p>
+            )}
+        </div>
+      )}
     </div>
   );
 };

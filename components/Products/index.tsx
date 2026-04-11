@@ -87,12 +87,13 @@ const Products = ({
 }: ProductsProps) => {
   const router = useRouter();
 
-  // Extract item names for batch image loading
   const itemNames = React.useMemo(() => {
     return products?.map((product: any) => product.sku).filter(Boolean) || [];
   }, [products]);
 
-  // Batch load images for all items
+  const needsBatchImages =
+    !!products?.length && products.some((p: any) => !p.image_url);
+
   const {
     isLoading: isImageLoading,
     getImageUrl,
@@ -100,7 +101,7 @@ const Products = ({
     isImageLoaded
   } = useBatchItemImages({
     itemNames,
-    enabled: products && products.length > 0
+    enabled: !!products?.length && needsBatchImages,
   });
 
   if (!products || products.length === 0) {
@@ -140,9 +141,11 @@ const Products = ({
             (image: any) => image.position === "featured"
           );
           
-          // Get image URL from batch loading
-          const imageUrl = getImageUrl(product.sku);
-          const productHasImage = hasImage(product.sku);
+          const imageUrl =
+            product.image_url ||
+            (needsBatchImages ? getImageUrl(product.sku) : "/placeholder.svg");
+          const productHasImage =
+            !!product.image_url || (needsBatchImages && hasImage(product.sku));
 
           // Calculate real stock for this product
           const productStock = calculateProductStock(product, currentStock);
@@ -180,7 +183,7 @@ const Products = ({
                       productName={product.name}
                       imageUrl={imageUrl}
                       hasImage={productHasImage}
-                      isLoading={isImageLoading}
+                      isLoading={needsBatchImages ? isImageLoading : false}
                       width={128}
                       height={128}
                       className="w-full h-full"
@@ -357,7 +360,7 @@ const Products = ({
                       productName={product.name}
                       imageUrl={imageUrl}
                       hasImage={productHasImage}
-                      isLoading={isImageLoading}
+                      isLoading={needsBatchImages ? isImageLoading : false}
                       width={400}
                       height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

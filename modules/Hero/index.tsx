@@ -140,6 +140,7 @@ const Hero = async ({
                     alt={featuredProduct.name || "Featured product"}
                     className="w-full h-full"
                     itemCode={featuredProduct.sku || featuredProduct.id}
+                    imageUrl={featuredProduct.image_url}
                   />
                 </div>
 

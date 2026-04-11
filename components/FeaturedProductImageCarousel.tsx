@@ -6,12 +6,26 @@ import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/imageUtils";
 
 const INTERVAL_MS = 4000;
 
+function erpImagePathFromUrl(url: string): string | null {
+  const t = url.trim();
+  if (!t) return null;
+  if (t.startsWith("/files/") || t.startsWith("/private/")) return t;
+  try {
+    const u = new URL(t);
+    return u.pathname || null;
+  } catch {
+    return null;
+  }
+}
+
 interface FeaturedProductImageCarouselProps {
   images: Array<{ image_id?: string }>;
   alt: string;
   className?: string;
   /** When images array is empty, fetch product image by item code (SKU) from API */
   itemCode?: string;
+  /** Full image URL from /api/products — shown immediately, avoids batch fetch */
+  imageUrl?: string;
 }
 
 export function FeaturedProductImageCarousel({
@@ -19,16 +33,25 @@ export function FeaturedProductImageCarousel({
   alt,
   className = "",
   itemCode,
+  imageUrl,
 }: FeaturedProductImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [fallbackImagePath, setFallbackImagePath] = useState<string | null>(null);
 
-  const list = images?.filter((img) => img?.image_id && String(img.image_id).trim()) ?? [];
+  const listFromProps = images?.filter((img) => img?.image_id && String(img.image_id).trim()) ?? [];
+  const pathFromCatalog = imageUrl ? erpImagePathFromUrl(imageUrl) : null;
+  const listFromImageUrl =
+    listFromProps.length === 0 &&
+    pathFromCatalog &&
+    (pathFromCatalog.startsWith("/files/") || pathFromCatalog.startsWith("/private/"))
+      ? [{ image_id: pathFromCatalog }]
+      : [];
+  const list = listFromProps.length > 0 ? listFromProps : listFromImageUrl;
   const hasMultiple = list.length > 1;
 
-  // Fallback: when no images from props, fetch by item code (SKU)
+  // Fallback: when no images from props or catalog URL, fetch by item code (SKU)
   useEffect(() => {
-    if (list.length > 0 || !itemCode) return;
+    if (list.length > 0 || !itemCode || imageUrl) return;
     let cancelled = false;
     (async () => {
       try {
@@ -47,7 +70,7 @@ export function FeaturedProductImageCarousel({
       }
     })();
     return () => { cancelled = true; };
-  }, [list.length, itemCode]);
+  }, [list.length, itemCode, imageUrl]);
 
   useEffect(() => {
     if (!hasMultiple) return;

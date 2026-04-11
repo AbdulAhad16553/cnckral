@@ -138,12 +138,15 @@ export default async function Home() {
       currency: product?.currency || storeCurrency,
       product_variations,
       product_images,
+      /** From /api/products — use for instant card preview (no batch-image API) */
+      image_url: product?.image_url,
     };
   };
 
   const catalogLimit = 100;
   let featuredProduct = null;
   const homeProducts: any[] = [];
+  let homeCatalogTotalProducts = 0;
 
   try {
     const firstResponse = await fetch(
@@ -154,6 +157,8 @@ export default async function Home() {
     if (firstResponse.ok) {
       const firstData = await firstResponse.json();
       const products = firstData.products || [];
+      homeCatalogTotalProducts =
+        Number(firstData.pagination?.totalProducts) || products.length;
       const normalizedProducts = products.map(buildFeaturedProductPayload);
       homeProducts.push(...normalizedProducts);
       if (normalizedProducts.length > 0) {
@@ -200,6 +205,10 @@ export default async function Home() {
           productLimit={100}
           sectionTitle="All products"
           sectionSubtitle="Browse our catalog"
+          mobileInfiniteScroll
+          mobileBatchSize={12}
+          catalogTotalProducts={homeCatalogTotalProducts}
+          catalogFetchLimit={catalogLimit}
         />
       </div>
 

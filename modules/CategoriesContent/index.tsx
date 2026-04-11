@@ -107,9 +107,13 @@ const CategoriesContent = ({
     () => (sortedProducts ?? []).map((p: any) => p.sku).filter(Boolean) || [],
     [itemNamesKey]
   );
+  const needsBatchImages =
+    hasProducts &&
+    !hasSubCategories &&
+    sortedProducts.some((p: any) => !p.image_url);
   const { isLoading: isImageLoading, getImageUrl, hasImage } = useBatchItemImages({
     itemNames,
-    enabled: hasProducts && !hasSubCategories && sortedProducts.length > 0,
+    enabled: hasProducts && !hasSubCategories && sortedProducts.length > 0 && needsBatchImages,
   });
 
   return (
@@ -228,8 +232,12 @@ const CategoriesContent = ({
               animate="visible"
             >
               {sortedProducts.map((product: any) => {
-                const imageUrl = getImageUrl(product.sku);
-                const productHasImage = hasImage(product.sku);
+                const imageUrl =
+                  product.image_url ||
+                  (needsBatchImages ? getImageUrl(product.sku) : "/placeholder.svg");
+                const productHasImage =
+                  !!product.image_url ||
+                  (needsBatchImages && hasImage(product.sku));
                 const productCode = product.sku || product.id || product.name;
                 return (
                   <motion.div key={product.id || product.sku} variants={item}>
@@ -243,7 +251,7 @@ const CategoriesContent = ({
                           productName={product.name}
                           imageUrl={imageUrl}
                           hasImage={productHasImage}
-                          isLoading={isImageLoading}
+                          isLoading={needsBatchImages ? isImageLoading : false}
                           width={260}
                           height={185}
                           className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"

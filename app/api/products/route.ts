@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
         const stockInfo = stockData && stockData.length > 0
           ? { totalStock: stockData.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0), bins: stockData }
           : null;
-        stockCache.set(cacheKey, stockInfo, 2 * 60 * 1000);
+        stockCache.set(ckey, stockInfo, 2 * 60 * 1000);
         return { itemCode, stock: stockInfo };
       } catch {
         return { itemCode, stock: null };

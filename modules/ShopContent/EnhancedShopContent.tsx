@@ -11,6 +11,7 @@ import { Grid3X3, List, Filter, RefreshCw, Settings } from "lucide-react";
 import PaginatedProducts from "@/components/Products/PaginatedProducts";
 import Categories from "../Categories";
 import PerformanceDashboard from "@/components/PerformanceDashboard";
+import { subscribeShopSearchQuery } from "@/lib/catalogSearchBridge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EnhancedShopContentProps {
@@ -110,6 +111,13 @@ const EnhancedShopContent: React.FC<EnhancedShopContentProps> = ({
   const applyQueryFromUrl = React.useCallback((q: string) => {
     setSearchTerm(q);
     setDebouncedSearchTerm(q);
+  }, []);
+
+  useEffect(() => {
+    return subscribeShopSearchQuery((q) => {
+      setSearchTerm(q);
+      setDebouncedSearchTerm(q);
+    });
   }, []);
 
   return (

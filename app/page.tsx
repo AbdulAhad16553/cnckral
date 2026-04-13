@@ -8,8 +8,10 @@ import { NewsletterSection } from "@/components/NewsletterSection";
 import AEOFAQSection from "@/components/AEOFAQSection";
 import { headers } from "next/headers";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
+import { Suspense } from "react";
 import Layout from "@/components/Layout";
 import HomeProducts from "@/components/Products/HomeProducts";
+import ProductSkeleton from "@/common/Skeletons/Products";
 import { getCategories } from "@/hooks/getCategories";
 import { getStorePage } from "@/hooks/getStorePage";
 
@@ -196,20 +198,23 @@ export default async function Home() {
     <Layout>
       {/* Mobile home: site header + product grid */}
       <div className="page-container md:hidden py-4 pb-6">
-        <HomeProducts
-          companyId={companyId}
-          storeId={storeId}
-          storeCurrency={storeCurrency}
-          initialProducts={initialHomeProducts}
-          className="w-full"
-          productLimit={100}
-          sectionTitle="All products"
-          sectionSubtitle="Browse our catalog"
-          mobileInfiniteScroll
-          mobileBatchSize={12}
-          catalogTotalProducts={homeCatalogTotalProducts}
-          catalogFetchLimit={catalogLimit}
-        />
+        <Suspense fallback={<ProductSkeleton />}>
+          <HomeProducts
+            companyId={companyId}
+            storeId={storeId}
+            storeCurrency={storeCurrency}
+            initialProducts={initialHomeProducts}
+            className="w-full"
+            productLimit={100}
+            sectionTitle="All products"
+            sectionSubtitle="Browse our catalog"
+            mobileInfiniteScroll
+            mobileBatchSize={12}
+            catalogTotalProducts={homeCatalogTotalProducts}
+            catalogFetchLimit={catalogLimit}
+            mobileCatalogSearch
+          />
+        </Suspense>
       </div>
 
       <div className="hidden md:block">

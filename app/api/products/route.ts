@@ -3,7 +3,7 @@ import { productService } from '@/lib/erpnext/services/productService';
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
 import { productCache, stockCache, priceCache } from '@/lib/cache';
 import { trackPaginationPerformance, trackPaginationCacheHit, trackPaginationCacheMiss } from '@/lib/paginationPerformance';
-import { getErpnextImageUrl } from '@/lib/erpnextImageUtils';
+import { getErpnextImageUrl, getCatalogThumbnailSrc } from '@/lib/erpnextImageUtils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -135,6 +135,8 @@ export async function GET(request: NextRequest) {
             sku: variant.name,
             name: variant.item_name,
             image: variant.image,
+            image_url: variant.image ? getErpnextImageUrl(variant.image) : undefined,
+            thumbnail_url: getCatalogThumbnailSrc(variant.image ?? undefined),
             stock: variantStockInfo
           };
         });
@@ -189,9 +191,11 @@ export async function GET(request: NextRequest) {
         product_images: imagePath ? [{
           id: `img-${index}`,
           image_id: imagePath,
-          position: 1
+          position: 1,
+          thumbnail_url: getCatalogThumbnailSrc(imagePath),
         }] : [],
         image_url: imagePath ? getErpnextImageUrl(imagePath) : undefined,
+        thumbnail_url: getCatalogThumbnailSrc(imagePath),
         product_variations: variations,
         stock: stockInfo,
         ...(priceRange && { price_range: priceRange })

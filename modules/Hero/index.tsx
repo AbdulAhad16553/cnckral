@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -114,14 +114,16 @@ const Hero = async ({
         {/* Featured Products — directly under welcome, before the rest of the page */}
         {homeFeaturedProducts && (
           <div className="mt-12 lg:mt-14 hidden md:block w-full px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-            <HomeProducts
-              companyId={homeFeaturedProducts.companyId}
-              storeId={homeFeaturedProducts.storeId}
-              storeCurrency={homeFeaturedProducts.storeCurrency}
-              initialProducts={homeFeaturedProducts.initialProducts}
-              className="w-full"
-              productLimit={homeFeaturedProductLimit}
-            />
+            <Suspense fallback={null}>
+              <HomeProducts
+                companyId={homeFeaturedProducts.companyId}
+                storeId={homeFeaturedProducts.storeId}
+                storeCurrency={homeFeaturedProducts.storeCurrency}
+                initialProducts={homeFeaturedProducts.initialProducts}
+                className="w-full"
+                productLimit={homeFeaturedProductLimit}
+              />
+            </Suspense>
           </div>
         )}
 

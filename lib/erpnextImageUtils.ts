@@ -107,6 +107,49 @@ export const getErpnextImageUrl = (imagePath?: string | number | null): string =
   return getErpnextFileUrl(imagePath);
 };
 
+/** Default grid/card size; matches common ProgressiveImage usage */
+const CATALOG_THUMB_W = 224;
+const CATALOG_THUMB_H = 224;
+
+/**
+ * Same-origin URL that serves a resized WebP (or fallback) via `/api/optimized-image`.
+ * Use in catalog JSON / `<img src>` — full `image_url` stays the direct ERPNext file.
+ */
+export function getCatalogThumbnailSrc(
+  imagePath?: string | null,
+  w: number = CATALOG_THUMB_W,
+  h: number = CATALOG_THUMB_H,
+  q: number = 80
+): string | undefined {
+  if (imagePath == null) return undefined;
+  const p =
+    typeof imagePath === "string"
+      ? imagePath.trim()
+      : String(imagePath).trim();
+  if (!p || p === "/placeholder.svg") return undefined;
+  if (p.slice(0, 7) === "http://" || p.slice(0, 8) === "https://") {
+    try {
+      const u = new URL(p);
+      const pathOnly = u.pathname + (u.search || "");
+      const sp = new URLSearchParams();
+      sp.set("image_id", pathOnly.startsWith("/") ? pathOnly : `/${pathOnly}`);
+      sp.set("w", String(w));
+      sp.set("h", String(h));
+      sp.set("q", String(q));
+      return `/api/optimized-image?${sp.toString()}`;
+    } catch {
+      return undefined;
+    }
+  }
+  const id = p.startsWith("/") ? p : `/${p}`;
+  const sp = new URLSearchParams();
+  sp.set("image_id", id);
+  sp.set("w", String(w));
+  sp.set("h", String(h));
+  sp.set("q", String(q));
+  return `/api/optimized-image?${sp.toString()}`;
+}
+
 /**
  * Generate all variations of file/image URLs
  */
@@ -155,6 +198,7 @@ export const getAttachmentUrls = (
 export default {
   getErpnextFileUrl,
   getErpnextImageUrl,
+  getCatalogThumbnailSrc,
   getErpnextFileUrls,
   isValidPath,
   getImagePreviewUrl,

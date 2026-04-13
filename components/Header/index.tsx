@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -177,7 +177,16 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 <Bell className="h-6 w-6" strokeWidth={1.75} aria-hidden />
               </Link>
             </div>
-            <HeaderMobileSearch />
+            <Suspense
+              fallback={
+                <div
+                  className="md:hidden h-12 w-full min-w-0 rounded-full border border-neutral-900 bg-white/80"
+                  aria-hidden
+                />
+              }
+            >
+              <HeaderMobileSearch />
+            </Suspense>
           </div>
 
           {/* Desktop */}
@@ -289,7 +298,16 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
               >
                 <Bell className="h-6 w-6" />
               </Link>
-              <HeaderDesktopSearch />
+              <Suspense
+                fallback={
+                  <div
+                    className="hidden md:block h-9 w-full max-w-xs rounded-lg bg-white/10 border border-white/20"
+                    aria-hidden
+                  />
+                }
+              >
+                <HeaderDesktopSearch />
+              </Suspense>
               <Link
                 href="/wishlist"
                 className="relative p-2 text-white/90 transition-all duration-300 hover:text-red-300 hover:scale-110 active:scale-95 group"

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Wrench, ShoppingCart, Info, Phone } from "lucide-react";
 import { useCartCount } from "@/hooks/useCartCount";
 import { cn } from "@/lib/utils";
-import { openMobileCategoryDrawer } from "@/lib/mobileCategoryDrawerEvent";
 
 const tabs = [
   {
@@ -15,10 +14,10 @@ const tabs = [
     match: (p: string) => p === "/",
   },
   {
-    action: "categories" as const,
+    href: "/category",
     label: "Categories",
     icon: LayoutGrid,
-    match: () => false,
+    match: (p: string) => p === "/category" || p.startsWith("/category/"),
   },
   {
     href: "/machine",
@@ -59,28 +58,6 @@ export default function MobileBottomNav() {
         {tabs.map((tab) => {
           const { label, icon: Icon, match } = tab;
           const active = match(pathname);
-
-          if ("action" in tab && tab.action === "categories") {
-            return (
-              <button
-                key="categories"
-                type="button"
-                onClick={() => openMobileCategoryDrawer()}
-                className={cn(
-                  "relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-1 transition-colors text-neutral-500"
-                )}
-              >
-                <Icon
-                  className="h-5 w-5 shrink-0 stroke-2"
-                  aria-hidden
-                />
-                <span className="max-w-full truncate px-0.5 text-[9px] font-medium leading-none">
-                  {label}
-                </span>
-              </button>
-            );
-          }
-
           const { href } = tab as { href: string };
           const showCartBadge = href === "/cart" && cartCount > 0;
 

@@ -67,9 +67,7 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
     return sum + itemPrice * (item.quantity ?? 1);
   }, 0);
 
-  const shipping = subtotal > 0 ? 10 : 0;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
+  const total = subtotal;
 
   const handleInputChange = (field: string, value: string) => {
     setCustomerForm((prev) => ({ ...prev, [field]: value }));
@@ -206,16 +204,10 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
                 {formatPrice(subtotal, storeCurrency)}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between gap-3 text-sm">
               <span className="text-slate-600">Shipping</span>
-              <span className="font-medium text-slate-900 tabular-nums">
-                {formatPrice(shipping, storeCurrency)}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Tax</span>
-              <span className="font-medium text-slate-900 tabular-nums">
-                {formatPrice(tax, storeCurrency)}
+              <span className="font-medium text-slate-700 text-right">
+                According to your location
               </span>
             </div>
           </div>

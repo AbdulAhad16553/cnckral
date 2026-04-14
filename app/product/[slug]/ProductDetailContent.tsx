@@ -607,9 +607,9 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
             </div>
           )}
 
-          {/* Description / Machine gallery (HSG-style for all quotation items) */}
-          <section className={isCustomQuotationItem ? "pt-0" : "pt-4 border-t border-slate-200"}>
-            {isCustomQuotationItem ? (
+          {/* Machine gallery + trust (quotation items only — description for regular items is under Add to cart) */}
+          {isCustomQuotationItem && (
+          <section className="pt-0">
               <>
                 <MachineProductGallery
                   product={{
@@ -631,10 +631,8 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                   </footer>
                 </div>
               </>
-            ) : (
-              <ProductDescription description={product.description} />
-            )}
           </section>
+          )}
         </div>
 
         {/* Right: Sticky product info & actions (hidden for quote items – use hero + variations below) */}
@@ -987,6 +985,11 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
               <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>
+
+          {/* Description — below primary actions (Add to cart / Contact) */}
+          <section className="pt-2 border-t border-slate-200">
+            <ProductDescription description={product.description} />
+          </section>
 
           {/* Specifications */}
           <Card className="rounded-2xl border-neutral-200/80 shadow-sm overflow-hidden">

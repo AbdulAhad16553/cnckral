@@ -196,9 +196,9 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 <Image
                   src="/HORIZONTAL Logo CNC KRAL.png"
                   alt={`${storeName || "Store"} Logo`}
-                  width={160}
-                  height={50}
-                  className="max-h-12 w-auto object-contain brightness-0 invert"
+                  width={132}
+                  height={42}
+                  className="max-h-9 w-auto max-w-[8.5rem] object-contain brightness-0 invert"
                 />
               </Link>
             </div>

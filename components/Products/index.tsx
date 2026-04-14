@@ -173,34 +173,36 @@ const Products = ({
             return (
               <Card
                 key={product.id}
-                className="flex flex-row h-32 overflow-hidden hover:shadow-lg transition-all duration-300"
+                className="relative flex flex-row h-32 overflow-hidden hover:shadow-lg transition-all duration-300"
               >
+                <Link
+                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  className="absolute inset-0 z-[1] cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent]"
+                  aria-label={`View ${product.name}`}
+                />
+                <div className="relative z-[2] flex h-full w-full flex-row pointer-events-none">
                 {/* Product Image */}
                 <div className="w-32 h-32 flex-shrink-0">
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <ProductImagePreview
-                      itemName={product.sku}
-                      productName={product.name}
-                      imageUrl={imageUrl}
-                      hasImage={productHasImage}
-                      isLoading={needsBatchImages ? isImageLoading : false}
-                      width={128}
-                      height={128}
-                      className="w-full h-full"
-                      showPreview={true}
-                    />
-                  </Link>
+                  <ProductImagePreview
+                    itemName={product.sku}
+                    productName={product.name}
+                    imageUrl={imageUrl}
+                    hasImage={productHasImage}
+                    isLoading={needsBatchImages ? isImageLoading : false}
+                    width={128}
+                    height={128}
+                    className="w-full h-full"
+                    showPreview={false}
+                  />
                 </div>
 
                 {/* Product Info */}
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <div className="flex items-start justify-between mb-2">
-                      <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                        <h3 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-2">
-                          {product.name}
-                        </h3>
-                      </Link>
+                      <h3 className="font-semibold text-lg line-clamp-2 pr-2">
+                        {product.name}
+                      </h3>
                       <div className="flex flex-col items-end gap-1">
                         {/* Variation Count Badge */}
                         {product.product_variations && product.product_variations.length > 0 && (
@@ -284,7 +286,7 @@ const Products = ({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="pointer-events-auto flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -305,6 +307,7 @@ const Products = ({
                     </div>
                   </div>
                 </div>
+                </div>
               </Card>
             );
           }
@@ -313,9 +316,15 @@ const Products = ({
           return (
             <Card
               key={product.id}
-              className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
+              className="group relative hover:shadow-lg transition-all duration-300 overflow-hidden"
             >
-              <CardContent className="p-0">
+              <CardContent className="relative p-0">
+                <Link
+                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
+                  aria-label={`View ${product.name}`}
+                />
+                <div className="relative z-[2] pointer-events-none">
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden">
                   {/* Status Badge - Moved inside the relative container */}
@@ -354,19 +363,17 @@ const Products = ({
                       )}
                   </div>
 
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <ProductImagePreview
-                      itemName={product.sku}
-                      productName={product.name}
-                      imageUrl={imageUrl}
-                      hasImage={productHasImage}
-                      isLoading={needsBatchImages ? isImageLoading : false}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      showPreview={true}
-                    />
-                  </Link>
+                  <ProductImagePreview
+                    itemName={product.sku}
+                    productName={product.name}
+                    imageUrl={imageUrl}
+                    hasImage={productHasImage}
+                    isLoading={needsBatchImages ? isImageLoading : false}
+                    width={400}
+                    height={400}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    showPreview={false}
+                  />
 
                   {/* Quick Actions */}
                   <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -409,11 +416,9 @@ const Products = ({
                   </div>
 
                   {/* Product Name */}
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <h3 className="font-medium text-sm line-clamp-2 hover:text-primary transition-colors">
-                      {product.name}
-                    </h3>
-                  </Link>
+                  <h3 className="font-medium text-sm line-clamp-2">
+                    {product.name}
+                  </h3>
 
                   {/* Price */}
                   <div className="flex items-center gap-2">
@@ -519,6 +524,7 @@ const Products = ({
                       </span>
                     </div>
                   )}
+                </div>
                 </div>
               </CardContent>
             </Card>

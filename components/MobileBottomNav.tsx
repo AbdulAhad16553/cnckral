@@ -51,7 +51,7 @@ export default function MobileBottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 z-[60] border-t border-neutral-200 bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)]"
+      className="md:hidden fixed bottom-0 inset-x-0 z-[60] border-t border-neutral-200 bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] [-webkit-tap-highlight-color:transparent]"
       aria-label="Main navigation"
     >
       <div className="flex h-14 max-w-lg mx-auto items-stretch justify-around px-0.5">
@@ -65,8 +65,9 @@ export default function MobileBottomNav() {
             <Link
               key={href}
               href={href}
+              prefetch={false}
               className={cn(
-                "relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-1 transition-colors",
+                "relative flex min-w-0 flex-1 select-none flex-col items-center justify-center gap-0.5 py-1 touch-manipulation transition-colors",
                 active ? "text-[var(--primary-color,#0368E5)]" : "text-neutral-500"
               )}
             >

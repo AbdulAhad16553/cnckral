@@ -445,13 +445,19 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
             >
             <Card
               className={cn(
-                "group overflow-hidden border border-neutral-100 bg-white transition-shadow duration-300",
+                "group relative overflow-hidden border border-neutral-100 bg-white transition-shadow duration-300",
                 exploreMobile
                   ? "rounded-2xl shadow-[0_1px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] md:rounded-lg md:border-slate-200/80 md:shadow-card md:hover:shadow-card-hover"
                   : "rounded-xl border-slate-200/90 shadow-[0_1px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] sm:rounded-2xl"
               )}
             >
-              <CardContent className="p-0">
+              <CardContent className="relative p-0">
+                <Link
+                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
+                  aria-label={`View ${product.name}`}
+                />
+                <div className="relative z-[2] pointer-events-none">
                 {/* Product Image */}
                 <div
                   className={cn(
@@ -498,19 +504,17 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                       )}
                   </div>
 
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <ProductImagePreview
-                      itemName={product.sku}
-                      productName={product.name}
-                      imageUrl={imageUrl}
-                      hasImage={productHasImage}
-                      isLoading={needsBatchImages ? isImageLoading : false}
-                      width={400}
-                      height={400}
-                      className="w-full h-full"
-                      showPreview={true}
-                    />
-                  </Link>
+                  <ProductImagePreview
+                    itemName={product.sku}
+                    productName={product.name}
+                    imageUrl={imageUrl}
+                    hasImage={productHasImage}
+                    isLoading={needsBatchImages ? isImageLoading : false}
+                    width={400}
+                    height={400}
+                    className="w-full h-full"
+                    showPreview={false}
+                  />
 
                   {/* Quick Actions */}
                   <div
@@ -552,17 +556,15 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                   )}
 
                   {/* Product Name */}
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <h3
-                      className={cn(
-                        "line-clamp-2 font-medium text-sm leading-snug text-neutral-900 transition-colors hover:text-[var(--primary-color)]",
-                        exploreMobile &&
-                          "max-md:text-[11px] max-md:font-normal max-md:leading-snug"
-                      )}
-                    >
-                      {product.name}
-                    </h3>
-                  </Link>
+                  <h3
+                    className={cn(
+                      "line-clamp-2 font-medium text-sm leading-snug text-neutral-900",
+                      exploreMobile &&
+                        "max-md:text-[11px] max-md:font-normal max-md:leading-snug"
+                    )}
+                  >
+                    {product.name}
+                  </h3>
 
                   <ProductCardReviewsRow
                     sku={product.sku || product.name || ""}
@@ -616,6 +618,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                       </div>
                     )}
                   </div>
+                </div>
                 </div>
               </CardContent>
             </Card>

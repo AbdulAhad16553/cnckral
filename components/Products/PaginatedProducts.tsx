@@ -358,25 +358,29 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
               return (
                 <Card
                   key={uniqueKey}
-                  className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200 rounded-xl"
+                  className="relative overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200 rounded-xl"
                 >
+                  <Link
+                    href={`/product/${encodeURIComponent(product.sku)}`}
+                    className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
+                    aria-label={`View ${product.name}`}
+                  />
+                  <div className="relative z-[2] pointer-events-none">
                   {/* Image at top with tall frame – fit inside card, no overflow */}
                   <div className="w-full h-64 sm:h-80 bg-slate-50 border-b overflow-hidden flex items-center justify-center">
-                    <Link href={`/product/${encodeURIComponent(product.sku)}`} className="w-full h-full flex items-center justify-center">
-                      <ProductImagePreview
-                        itemName={product.sku}
-                        productName={product.name}
-                        imageUrl={imageUrl}
-                        hasImage={productHasImage}
-                        isLoading={needsBatchImages ? isImageLoading : false}
-                        width={960}
-                        height={540}
-                        className="w-full h-full"
-                        objectFit="contain"
-                        fill
-                        showPreview={true}
-                      />
-                    </Link>
+                    <ProductImagePreview
+                      itemName={product.sku}
+                      productName={product.name}
+                      imageUrl={imageUrl}
+                      hasImage={productHasImage}
+                      isLoading={needsBatchImages ? isImageLoading : false}
+                      width={960}
+                      height={540}
+                      className="w-full h-full"
+                      objectFit="contain"
+                      fill
+                      showPreview={false}
+                    />
                   </div>
 
                   {/* Professional quotation layout */}
@@ -385,11 +389,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                     <div className="space-y-3 flex-1">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
-                          <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                            <h3 className="font-semibold text-lg sm:text-xl text-slate-900 hover:text-primary transition-colors">
-                              {product.name}
-                            </h3>
-                          </Link>
+                          <h3 className="font-semibold text-lg sm:text-xl text-slate-900">
+                            {product.name}
+                          </h3>
                           {product.sku && (
                             <p className="text-xs text-slate-500 tracking-wide uppercase">
                               Item code: <span className="font-medium">{product.sku}</span>
@@ -512,6 +514,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       </div>
                     </div>
                   </div>
+                  </div>
                 </Card>
               );
             }
@@ -520,34 +523,36 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
             return (
               <Card
                 key={uniqueKey}
-                className="flex flex-row h-32 overflow-hidden hover:shadow-lg transition-all duration-300"
+                className="relative flex flex-row h-32 overflow-hidden hover:shadow-lg transition-all duration-300"
               >
+                <Link
+                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  className="absolute inset-0 z-[1] cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent]"
+                  aria-label={`View ${product.name}`}
+                />
+                <div className="relative z-[2] flex h-full w-full flex-row pointer-events-none">
                 {/* Product Image */}
                 <div className="w-32 h-32 flex-shrink-0">
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <ProductImagePreview
-                      itemName={product.sku}
-                      productName={product.name}
-                      imageUrl={imageUrl}
-                      hasImage={productHasImage}
-                      isLoading={needsBatchImages ? isImageLoading : false}
-                      width={128}
-                      height={128}
-                      className="w-full h-full"
-                      showPreview={true}
-                    />
-                  </Link>
+                  <ProductImagePreview
+                    itemName={product.sku}
+                    productName={product.name}
+                    imageUrl={imageUrl}
+                    hasImage={productHasImage}
+                    isLoading={needsBatchImages ? isImageLoading : false}
+                    width={128}
+                    height={128}
+                    className="w-full h-full"
+                    showPreview={false}
+                  />
                 </div>
 
                 {/* Product Info */}
                 <div className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <div className="flex items-start justify-between mb-2">
-                      <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                        <h3 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-2">
-                          {product.name}
-                        </h3>
-                      </Link>
+                      <h3 className="font-semibold text-lg line-clamp-2 pr-2">
+                        {product.name}
+                      </h3>
                       <div className="flex flex-col items-end gap-1">
                         {hasVariations && (
                           <Badge
@@ -630,7 +635,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="pointer-events-auto flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -651,6 +656,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                     </div>
                   </div>
                 </div>
+                </div>
               </Card>
             );
           }
@@ -659,9 +665,15 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
           return (
             <Card
               key={uniqueKey}
-              className="group overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] sm:rounded-2xl"
+              className="group relative overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] sm:rounded-2xl"
             >
-              <CardContent className="p-0">
+              <CardContent className="relative p-0">
+                <Link
+                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
+                  aria-label={`View ${product.name}`}
+                />
+                <div className="relative z-[2] pointer-events-none">
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden">
                   <div className="absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.5rem)] flex-col gap-1">
@@ -698,19 +710,17 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       )}
                   </div>
 
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <ProductImagePreview
-                      itemName={product.sku}
-                      productName={product.name}
-                      imageUrl={imageUrl}
-                      hasImage={productHasImage}
-                      isLoading={needsBatchImages ? isImageLoading : false}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      showPreview={true}
-                    />
-                  </Link>
+                  <ProductImagePreview
+                    itemName={product.sku}
+                    productName={product.name}
+                    imageUrl={imageUrl}
+                    hasImage={productHasImage}
+                    isLoading={needsBatchImages ? isImageLoading : false}
+                    width={400}
+                    height={400}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    showPreview={false}
+                  />
 
                   {/* Quick Actions */}
                   <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -735,11 +745,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
 
                 {/* Product Info */}
                 <div className="space-y-2 p-3 sm:p-4 sm:space-y-3">
-                  <Link href={`/product/${encodeURIComponent(product.sku)}`}>
-                    <h3 className="line-clamp-2 text-sm font-normal leading-snug text-neutral-900 transition-colors hover:text-[var(--primary-color)]">
-                      {product.name}
-                    </h3>
-                  </Link>
+                  <h3 className="line-clamp-2 text-sm font-normal leading-snug text-neutral-900">
+                    {product.name}
+                  </h3>
 
                   <ProductCardReviewsRow
                     sku={product.sku || product.name || ""}
@@ -776,6 +784,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       </div>
                     )}
                   </div>
+                </div>
                 </div>
               </CardContent>
             </Card>

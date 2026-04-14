@@ -51,7 +51,7 @@ export default function MobileBottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 z-[60] border-t border-neutral-200 bg-white/98 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] [-webkit-tap-highlight-color:transparent]"
+      className="md:hidden fixed bottom-0 inset-x-0 z-[60] border-t border-neutral-200 bg-slate-50 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] [-webkit-tap-highlight-color:transparent]"
       aria-label="Main navigation"
     >
       <div className="flex min-h-[52px] h-14 max-w-lg mx-auto items-stretch justify-around px-0.5">
@@ -69,7 +69,9 @@ export default function MobileBottomNav() {
                 "relative flex min-w-0 min-h-[48px] flex-1 select-none flex-col items-center justify-center gap-0.5 py-1",
                 "touch-manipulation active:opacity-70 active:transition-none",
                 "transition-colors duration-100",
-                active ? "text-[var(--primary-color,#0368E5)]" : "text-neutral-500"
+                active
+                  ? "text-[var(--primary-color,#0368E5)] bg-white"
+                  : "text-neutral-500"
               )}
             >
               <span className="relative">

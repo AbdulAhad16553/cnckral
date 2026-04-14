@@ -245,96 +245,96 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-2xl border-slate-200 shadow-xl">
+        <DialogContent className="w-[calc(100vw-1.25rem)] sm:max-w-md rounded-xl sm:rounded-2xl border-slate-200 p-4 sm:p-6 shadow-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">
+            <DialogTitle className="text-lg sm:text-xl font-semibold text-slate-900">
               Shipping details
             </DialogTitle>
-            <DialogDescription className="text-slate-600">
+            <DialogDescription className="text-xs sm:text-sm text-slate-600">
               Enter your contact and delivery details to place the order.
             </DialogDescription>
           </DialogHeader>
-          <form className="space-y-4" onSubmit={submitOrder}>
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-slate-700">Customer name</Label>
+          <form className="space-y-3 sm:space-y-4" onSubmit={submitOrder}>
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-xs sm:text-sm text-slate-700">Customer name</Label>
               <Input
                 id="name"
                 value={customerForm.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 placeholder="John Doe"
                 required
-                className="rounded-lg border-slate-200"
+                className="h-9 sm:h-10 rounded-lg border-slate-200 text-sm"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-700">Email (optional)</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs sm:text-sm text-slate-700">Email (optional)</Label>
                 <Input
                   id="email"
                   type="email"
                   value={customerForm.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="you@example.com"
-                  className="rounded-lg border-slate-200"
+                  className="h-9 sm:h-10 rounded-lg border-slate-200 text-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-slate-700">Phone</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="phone" className="text-xs sm:text-sm text-slate-700">Phone</Label>
                 <Input
                   id="phone"
                   value={customerForm.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   placeholder="+92 300 0000000"
                   required
-                  className="rounded-lg border-slate-200"
+                  className="h-9 sm:h-10 rounded-lg border-slate-200 text-sm"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="address" className="text-slate-700">Shipping address</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="address" className="text-xs sm:text-sm text-slate-700">Shipping address</Label>
               <Textarea
                 id="address"
                 value={customerForm.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="Street, house no, area"
                 required
-                className="rounded-lg border-slate-200 min-h-[80px]"
+                className="rounded-lg border-slate-200 min-h-[64px] sm:min-h-[80px] text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="city" className="text-slate-700">City</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="city" className="text-xs sm:text-sm text-slate-700">City</Label>
               <Input
                 id="city"
                 value={customerForm.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
                 placeholder="City"
-                className="rounded-lg border-slate-200"
+                className="h-9 sm:h-10 rounded-lg border-slate-200 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-slate-700">Notes (optional)</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="notes" className="text-xs sm:text-sm text-slate-700">Notes (optional)</Label>
               <Textarea
                 id="notes"
                 value={customerForm.notes}
                 onChange={(e) => handleInputChange('notes', e.target.value)}
                 placeholder="Any delivery instructions"
-                className="rounded-lg border-slate-200 min-h-[60px]"
+                className="rounded-lg border-slate-200 min-h-[52px] sm:min-h-[60px] text-sm"
               />
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <DialogFooter className="gap-2 sm:gap-0 pt-1.5 sm:pt-2">
               <Button
                 variant="outline"
                 type="button"
                 onClick={() => setDialogOpen(false)}
                 disabled={isSubmitting}
-                className="rounded-lg"
+                className="rounded-lg h-9 sm:h-10 text-sm"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="min-w-[160px] rounded-lg bg-[var(--primary-color)] hover:bg-[var(--primary-hover)]"
+                className="min-w-[140px] sm:min-w-[160px] h-9 sm:h-10 rounded-lg text-sm bg-[var(--primary-color)] hover:bg-[var(--primary-hover)]"
               >
                 {isSubmitting ? 'Processing…' : 'Place order'}
               </Button>

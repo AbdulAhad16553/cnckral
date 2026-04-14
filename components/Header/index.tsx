@@ -130,20 +130,20 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
 
   return (
     <>
-      {/* Top Bar - grey background, white text (compact on small screens) */}
-      <div className="bg-gray-600 text-white py-1.5 sm:py-2 text-[11px] sm:text-sm">
-        <div className="page-container flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 sm:gap-x-6">
-            <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-1.5 sm:gap-2">
-              <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+      {/* Top Bar - grey background, white text (extra compact height on mobile) */}
+      <div className="bg-gray-600 text-white py-1 sm:py-2 text-[10px] sm:text-sm leading-tight">
+        <div className="page-container flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0 sm:gap-x-6 sm:gap-y-0.5">
+            <a href={`tel:${topBarPhone}`} className="hover:text-white transition-colors flex items-center gap-1 sm:gap-2">
+              <Phone className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span>{topBarPhone}</span>
             </a>
-            <a href={`mailto:${topBarEmail}`} className="hover:text-white transition-colors flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <a href={`mailto:${topBarEmail}`} className="hover:text-white transition-colors flex items-center gap-1 sm:gap-2 min-w-0">
+              <Mail className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span className="truncate">{topBarEmail}</span>
             </a>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-6 gap-y-0.5 text-[11px] sm:text-sm">
+          <div className="flex flex-wrap items-center gap-x-2.5 sm:gap-x-6 gap-y-0 text-[10px] sm:text-sm">
             <span className="hidden sm:inline">Free shipping on orders over Rs. 10,000</span>
             <span className="sm:hidden text-white/90">Free ship Rs. 10k+</span>
             <Link href="/contact" className="hover:text-white transition-colors font-medium">

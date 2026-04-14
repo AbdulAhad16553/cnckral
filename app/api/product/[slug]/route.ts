@@ -88,6 +88,7 @@
 // }
 import { NextRequest, NextResponse } from 'next/server';
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
+import { attachProductStockFromErp } from '@/lib/product/attachProductStock';
 
 export async function GET(
   request: NextRequest,
@@ -116,38 +117,9 @@ export async function GET(
     const attachments = attachRes?.data ?? [];
     product.attachments = attachments;
 
-    // 2️⃣ Skip stock for machines (custom quotation items) - major speedup
-    const isMachine = product.custom_quotation_item === 1 || product.custom_custom_quotation_item === 1;
-    let stockInfo = null;
+    await attachProductStockFromErp(product, itemCode);
+    const stockInfo = product.stock ?? null;
 
-    if (!isMachine) {
-      try {
-        const { data: stockData } = await erpnextClient.getItemStock(itemCode);
-        if (stockData && stockData.length > 0) {
-          stockInfo = {
-            totalStock: stockData.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0),
-            bins: stockData
-          };
-        }
-      } catch {
-        /* no stock */
-      }
-
-      if (product.variants && product.variants.length > 0) {
-        const stockPromises = product.variants.map(async (variant: any) => {
-          try {
-            const { data: d } = await erpnextClient.getItemStock(variant.name);
-            const total = d?.reduce((t: number, b: any) => t + (b.actual_qty || 0), 0) ?? 0;
-            return { ...variant, stock: d?.length ? { totalStock: total, bins: d } : null };
-          } catch {
-            return { ...variant, stock: null };
-          }
-        });
-        product.variants = await Promise.all(stockPromises);
-      }
-    }
-
-    // 5️⃣ Return Response
     return NextResponse.json(
       {
         success: true,

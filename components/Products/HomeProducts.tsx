@@ -550,7 +550,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                   )}
                 >
                   {exploreMobile && index % 3 === 0 && (
-                    <p className="md:hidden rounded-md bg-pink-50 px-2 py-1 text-[10px] font-semibold leading-tight text-pink-950">
+                    <p className="md:hidden rounded-md bg-pink-50 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-pink-950">
                       Deals · Free shipping on orders Rs. 10,000+
                     </p>
                   )}

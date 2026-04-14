@@ -168,15 +168,15 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
   return (
     <div className="lg:sticky lg:top-24">
       <Card className="rounded-2xl border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-4">
-          <CardTitle className="text-lg font-semibold text-slate-900">Order summary</CardTitle>
-          <p className="text-xs text-slate-500 mt-0.5">
+        <CardHeader className="border-b border-slate-100 bg-slate-50/50 px-4 py-3 pb-3 sm:px-6 sm:py-4 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg font-semibold text-slate-900">Order summary</CardTitle>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
             {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
           </p>
         </CardHeader>
         <CardContent className="p-0">
           {/* Item list */}
-          <div className="max-h-[240px] overflow-y-auto px-6 py-4">
+          <div className="max-h-[200px] sm:max-h-[240px] overflow-y-auto px-4 py-3 sm:px-6 sm:py-4">
             <ul className="space-y-3">
               {cartItems.map((item, index) => {
                 const itemPrice = item.salePrice ?? item.price ?? 0;
@@ -199,7 +199,7 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
 
           <Separator className="bg-slate-100" />
 
-          <div className="px-6 py-4 space-y-3">
+          <div className="px-4 py-3 space-y-2 sm:px-6 sm:py-4 sm:space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Subtotal</span>
               <span className="font-medium text-slate-900 tabular-nums">
@@ -222,16 +222,16 @@ const OrderSummary = ({ storeCurrency, necessary }: OrderSummaryProps) => {
 
           <Separator className="bg-slate-100" />
 
-          <div className="px-6 py-4 flex justify-between items-baseline">
-            <span className="text-base font-semibold text-slate-900">Total</span>
-            <span className="text-lg font-bold text-slate-900 tabular-nums">
+          <div className="px-4 py-3 sm:px-6 sm:py-4 flex justify-between items-baseline">
+            <span className="text-sm sm:text-base font-semibold text-slate-900">Total</span>
+            <span className="text-base sm:text-lg font-bold text-slate-900 tabular-nums">
               {formatPrice(total, storeCurrency)}
             </span>
           </div>
 
-          <div className="px-6 pb-6 pt-0 space-y-3">
+          <div className="px-4 pb-5 pt-0 space-y-3 sm:px-6 sm:pb-6">
             <Button
-              className="w-full rounded-xl h-12 font-semibold bg-[var(--primary-color)] hover:bg-[var(--primary-hover)] text-white"
+              className="w-full rounded-xl h-11 sm:h-12 font-semibold bg-[var(--primary-color)] hover:bg-[var(--primary-hover)] text-white"
               onClick={handleProceed}
             >
               Proceed to checkout

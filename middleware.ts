@@ -23,6 +23,6 @@ export const config = {
         "/checkout",
         "/profile",
         "/category/:path*",
-        "/product/:path*",
+        // Excluded: /product/* — avoids an extra fetchStore round-trip on every product view (Layout already loads store data)
     ],
 };

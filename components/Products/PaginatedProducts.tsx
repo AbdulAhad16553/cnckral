@@ -690,24 +690,6 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                         On Sale
                       </Badge>
                     )}
-                    {isOutOfStock && !product.enable_quote_request && (
-                      <Badge
-                        variant="destructive"
-                        className="text-xs font-bold"
-                      >
-                        Out of Stock
-                      </Badge>
-                    )}
-                    {productStock > 0 &&
-                      productStock <= 5 &&
-                      product.status !== "on-sale" && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs font-bold bg-orange-100 text-orange-800 border-orange-300"
-                        >
-                          Low Stock
-                        </Badge>
-                      )}
                   </div>
 
                   <ProductImagePreview

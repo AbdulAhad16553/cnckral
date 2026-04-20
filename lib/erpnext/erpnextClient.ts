@@ -183,6 +183,7 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
           "custom_is_website_item",
           // needed to classify Machines vs Parts
           "custom_quotation_item",
+          "_user_tags",
         ],
         1000
       );
@@ -222,6 +223,7 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
                 "custom_is_website_item",
                 // also expose quotation flag on variants
                 "custom_quotation_item",
+                "_user_tags",
               ],
               500
             );

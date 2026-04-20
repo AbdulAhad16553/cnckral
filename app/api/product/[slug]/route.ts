@@ -89,6 +89,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
 import { attachProductStockFromErp } from '@/lib/product/attachProductStock';
+import { parseErpTags } from '@/lib/erpnext/tags';
 
 export async function GET(
   request: NextRequest,
@@ -116,6 +117,7 @@ export async function GET(
     const product = response.data;
     const attachments = attachRes?.data ?? [];
     product.attachments = attachments;
+    product.tags = parseErpTags((product as any)._user_tags);
 
     await attachProductStockFromErp(product, itemCode);
     const stockInfo = product.stock ?? null;

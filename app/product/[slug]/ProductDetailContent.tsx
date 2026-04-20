@@ -47,6 +47,7 @@ interface Product {
     attached_to_name: string;
     is_private: number;
   }>;
+  tags?: string[];
   variants?: Array<{
     name: string;
     item_name: string;
@@ -499,6 +500,19 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
             <p className="mt-2 text-sm text-neutral-500 font-mono">
               Ref: {product.name}
             </p>
+            {product.tags && product.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {product.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="outline"
+                    className="rounded-full border-neutral-300 bg-white text-xs text-neutral-700"
+                  >
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           <motion.div
@@ -670,6 +684,19 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 {product.item_name}
               </h1>
               <p className="text-neutral-500 text-sm font-mono tracking-wide">Ref: {product.name}</p>
+              {product.tags && product.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {product.tags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="rounded-full border-neutral-300 bg-white text-xs text-neutral-700"
+                    >
+                      #{tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Price */}

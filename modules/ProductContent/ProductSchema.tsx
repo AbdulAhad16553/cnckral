@@ -67,6 +67,7 @@ const ProductSchema = ({ product, storeCurrency, storeData }: ProductSchemaProps
       }
     ],
     category: "Industrial Equipment > Laser Equipment > Marking Machines",
+    keywords: Array.isArray((product as any).tags) ? (product as any).tags.join(", ") : undefined,
     productionDate: product.created_at,
     additionalProperty: [
       {

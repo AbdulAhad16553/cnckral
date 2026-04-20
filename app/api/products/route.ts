@@ -4,6 +4,7 @@ import { erpnextClient } from '@/lib/erpnext/erpnextClient';
 import { productCache, stockCache, priceCache } from '@/lib/cache';
 import { trackPaginationPerformance, trackPaginationCacheHit, trackPaginationCacheMiss } from '@/lib/paginationPerformance';
 import { getErpnextImageUrl, getCatalogThumbnailSrc } from '@/lib/erpnextImageUtils';
+import { parseErpTags } from '@/lib/erpnext/tags';
 
 export async function GET(request: NextRequest) {
   try {
@@ -173,6 +174,7 @@ export async function GET(request: NextRequest) {
       }
 
       const imagePath = product.website_image || product.image;
+      const tags = parseErpTags((product as any)._user_tags);
       return {
         id: product.name,
         name: product.item_name,
@@ -198,6 +200,7 @@ export async function GET(request: NextRequest) {
         thumbnail_url: getCatalogThumbnailSrc(imagePath),
         product_variations: variations,
         stock: stockInfo,
+        tags,
         ...(priceRange && { price_range: priceRange })
       };
     });

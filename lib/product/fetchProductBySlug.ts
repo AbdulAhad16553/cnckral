@@ -1,6 +1,7 @@
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
 import { attachProductStockFromErp } from '@/lib/product/attachProductStock';
 import { productCache } from '@/lib/cache';
+import { parseErpTags } from '@/lib/erpnext/tags';
 
 export async function fetchProductBySlug(slug: string) {
   const itemCode = decodeURIComponent(slug);
@@ -17,6 +18,7 @@ export async function fetchProductBySlug(slug: string) {
 
   const product = response.data;
   product.attachments = attachRes?.data ?? [];
+  product.tags = parseErpTags((product as any)._user_tags);
 
   await attachProductStockFromErp(product, itemCode);
   // Keep a short hot-cache for repeated PDP navigations.

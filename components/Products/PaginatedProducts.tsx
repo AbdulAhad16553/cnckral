@@ -93,7 +93,8 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
       const raw = [p.name, p.sku, p.short_description, p.detailed_desc]
         .filter((x) => typeof x === "string")
         .join(" ");
-      return raw.replace(/<[^>]*>/g, " ").toLowerCase();
+      const tags = Array.isArray(p.tags) ? p.tags.join(" ") : "";
+      return `${raw} ${tags}`.replace(/<[^>]*>/g, " ").toLowerCase();
     };
 
     let filtered = products.filter((product) => {
@@ -730,6 +731,18 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                   <h3 className="line-clamp-2 text-sm font-normal leading-snug text-neutral-900">
                     {product.name}
                   </h3>
+                  {Array.isArray(product.tags) && product.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {product.tags.slice(0, 3).map((tag: string) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-700"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <ProductCardReviewsRow
                     sku={product.sku || product.name || ""}

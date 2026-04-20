@@ -70,13 +70,6 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
-          <title>{"CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan"}</title>
-          <meta
-            name="description"
-            content={
-              "CNC KRAL is the best CNC supplier in Pakistan. We supply CNC machines, CNC routers, CNC bits, marble tools, and precision cutting tools for woodworking, metalworking, and stone carving. Based in Lahore."
-            }
-          />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {/* PWA disabled - uncomment these to re-enable installable app */}
           {/* <meta name="theme-color" content="#0368E5" /> */}

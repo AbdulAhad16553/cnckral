@@ -27,13 +27,42 @@ export async function generateMetadata() {
   const data = await response.json();
 
   const { page } = await getStorePage(data?.store?.stores[0].id, "home");
+  const rawTitle = page?.meta_title?.trim();
+  const rawDescription = page?.meta_description?.trim();
+  const isGenericHomeTitle =
+    !rawTitle ||
+    /^home\s*-\s*store\s*page$/i.test(rawTitle) ||
+    /^home$/i.test(rawTitle);
+  const isGenericHomeDescription =
+    !rawDescription ||
+    /^home\s*-\s*store\s*page$/i.test(rawDescription);
+
+  const title = isGenericHomeTitle
+    ? "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan"
+    : rawTitle;
+  const description = isGenericHomeDescription
+    ? "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore."
+    : rawDescription;
 
   return {
-    title: page?.meta_title || "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan",
-    description: page?.meta_description || "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore.",
+    title,
+    description,
     generator: data?.store?.stores?.[0]?.store_name || "CNC KRAL",
     applicationName: data?.store?.stores?.[0]?.store_name || "CNC KRAL",
     keywords: "best CNC supplier Pakistan, best CNC machine Pakistan, best CNC router Pakistan, CNC bits, marble tools",
+    openGraph: {
+      title,
+      description,
+      url: "https://cnckral.com",
+      siteName: "CNC KRAL",
+      type: "website",
+      locale: "en_PK",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 

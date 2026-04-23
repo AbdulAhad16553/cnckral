@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { productService } from "@/lib/erpnext/services/productService";
 
 const SITE_URL = "https://cnckral.com";
+export const dynamic = "force-dynamic";
 
 const STATIC_ROUTES = [
   "",

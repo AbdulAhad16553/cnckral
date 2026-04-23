@@ -9,8 +9,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Shop | Elegant Emporium",
-  description: "Discover our curated collection of premium products",
+  title: "Shop CNC Products | CNC KRAL",
+  description: "Browse CNC machines, routers, bits, and spare parts from CNC KRAL in Pakistan.",
+  robots: {
+    index: true,
+    follow: true,
+    noimageindex: true,
+  },
 };
 
 export default async function ShopPage() {

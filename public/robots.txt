@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Sitemap: https://cnckral.com/sitemap.xml
+Sitemap: https://cnckral.com/image-sitemap.xml
 
 # AI/LLM: see https://cnckral.com/llms.txt for brand and content summary

@@ -677,7 +677,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                 <div className="relative z-[2] pointer-events-none">
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden">
-                  <div className="absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.75rem)] flex-wrap gap-1.5">
+                  <div className="absolute top-2 right-2 z-10 flex max-w-[calc(100%-0.75rem)] flex-wrap gap-1.5 justify-end">
                     {hasVariations && (
                       <Badge
                         variant="outline"

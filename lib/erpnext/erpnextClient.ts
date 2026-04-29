@@ -52,8 +52,17 @@ class ERPNextClient {
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        console.error(`ERPNext API Error ${response.status}:`, err.message);
-        return { data: null, status: response.status, message: err.message };
+        console.error(
+          `ERPNext API Error ${response.status}:`,
+          url,
+          "| method:",
+          options.method || "GET",
+          "| body:",
+          options.body,
+          "| error:",
+          err
+        );
+        return { data: null, status: response.status, message: (err as any).message };
       }
 
       const json = await response.json();

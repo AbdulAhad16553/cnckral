@@ -467,8 +467,8 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                 >
                   <div
                     className={cn(
-                      "absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.75rem)] flex-wrap gap-1.5",
-                      exploreMobile && "max-md:top-1 max-md:left-1 max-md:scale-90 origin-top-left"
+                      "absolute top-2 right-2 z-10 flex max-w-[calc(100%-0.75rem)] flex-wrap gap-1.5 justify-end",
+                      exploreMobile && "max-md:top-1 max-md:right-1 max-md:scale-90 origin-top-right"
                     )}
                   >
                     {hasVariations && (

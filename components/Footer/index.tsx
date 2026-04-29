@@ -25,7 +25,6 @@ import {
 import { getStorePage } from "@/hooks/getStorePage"
 import { getSocialLink } from "@/hooks/getSocialLinks"
 import type { ReactElement } from "react"
-import axios from "axios"
 interface FooterProps {
   storeData: {
     store_detail?: {
@@ -68,46 +67,10 @@ const Footer = async ({ storeData }: FooterProps) => {
   const { page } = await getStorePage(storeId, "about-us")
   const { socialLinks } = await getSocialLink(storeId)
 
-  // Fetch company contact details from ERPNext API
   let companyContactDetails = {
-    email: storeData?.store_contact_detail?.email,
-    phone: storeData?.store_contact_detail?.phone,
+    email: "cnckral@gmail.com",
+    phone: "0322 4414443",
     address: storeData?.store_contact_detail?.address,
-  }
-
-  try {
-    const ERP_BASE_URL = process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN
-      ? `https://${process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN}/api/resource`
-      : null
-    const API_KEY = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY
-    const API_SECRET = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET
-
-    if (ERP_BASE_URL && API_KEY && API_SECRET) {
-      const companyName = "CNC KRAL"
-      const encodedName = encodeURIComponent(companyName)
-      const response = await axios.get(
-        `${ERP_BASE_URL}/Company/${encodedName}?fields=["email","phone_no"]`,
-        {
-          headers: { Authorization: `token ${API_KEY}:${API_SECRET}` },
-          validateStatus: () => true,
-        }
-      )
-
-      if (response.status === 200 && response.data?.data) {
-        companyContactDetails = {
-          email: response.data.data.email || companyContactDetails.email || "cnckral@gmail.com",
-          phone: response.data.data.phone_no || companyContactDetails.phone || "0322 4414443",
-          address: "76 C Gulshan e Rehman Sultan Ahmad Road ichra, Lahore, Pakistan",
-        }
-      }
-    }
-  } catch (error) {
-    // Use fallback values; do not throw so layout still renders
-    companyContactDetails = {
-      email: companyContactDetails.email || "cnckral@gmail.com",
-      phone: companyContactDetails.phone || "0322 4414443",
-      address: "76 C Gulshan e Rehman Sultan Ahmad Road ichra, Lahore, Pakistan",
-    }
   }
 
   // Use the short description from the page or a fallback description

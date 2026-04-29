@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Layout from "@/components/Layout";
 import EnhancedShopContent from "@/modules/ShopContent/EnhancedShopContent";
-import { headers } from "next/headers";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import { getAllCategories } from "@/hooks/getCategories";
 
 export const dynamic = "force-dynamic";
@@ -14,23 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default async function MachinePage() {
-  const Headers = await headers();
-  const host = Headers.get("host");
-  if (!host) {
-    throw new Error("Host header is missing or invalid");
-  }
-
-  const fullStoreUrl = getUrlWithScheme(host);
-
-  const [storeRes, categoriesRes] = await Promise.all([
-    fetch(`${fullStoreUrl}/api/fetchStore`, { cache: "no-store" }),
-    getAllCategories("default-store"),
-  ]);
-  const data = await storeRes.json();
-
-  const storeId = data?.store?.stores[0].id ?? "default-store";
-  const companyId = data?.store?.stores[0].company_id ?? "CNC KRAL";
-  const storeCurrency = data?.store?.stores[0].store_detail?.currency ?? "Rs.";
+  const storeId = "default-store";
+  const companyId = "CNC KRAL";
+  const storeCurrency = "PKR";
+  const categoriesRes = await getAllCategories(storeId);
   const { categories } = categoriesRes;
 
   return (

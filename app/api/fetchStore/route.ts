@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { erpnextClient } from "@/lib/erpnext/erpnextClient";
+import { GET as getProductsCatalog } from "../products/route";
 
 // Minimal store shape to keep existing pages working while using ERPNext
 const getFallbackStorePayload = () => {
@@ -23,66 +23,75 @@ const getFallbackStorePayload = () => {
   };
 };
 
-// ---- Fetch Template Items using ERPNext client (safe JSON filters) ----
-async function getTemplateItems(limit = 100) {
-  let templates: any[] = [];
-  let start = 0;
-
-  while (true) {
-    const { data } = await erpnextClient.getList<any>(
-      "Item",
-      { has_variants: 1 },
-      ["name", "item_name", "item_group", "stock_uom", "image"],
-      limit,
-      start
-    );
-
-    const page = data || [];
-    if (page.length === 0) break;
-
-    templates = templates.concat(page);
-    start += limit;
-  }
-
-  return templates;
-}
-
-// ---- Fetch Variant Items for a Template using ERPNext client ----
-async function getVariantsForTemplate(templateName: string) {
-  const { data } = await erpnextClient.getList<any>(
-    "Item",
-    { variant_of: templateName },
-    ["name", "item_name", "variant_of", "attributes", "image"],
-    200,
-    0
-  );
-  return data || [];
-}
+const CACHE_TTL_MS = 10 * 60 * 1000;
+let cachedResponse: { expiresAt: number; payload: any } | null = null;
+let inFlightBuild: Promise<any> | null = null;
 
 // ---- API Route ----
 export async function GET(req: NextRequest) {
   try {
-    // 1️⃣ Get all template items
-    const templates = await getTemplateItems();
+    const now = Date.now();
+    if (cachedResponse && cachedResponse.expiresAt > now) {
+      return NextResponse.json(cachedResponse.payload, {
+        headers: {
+          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=300",
+        },
+      });
+    }
 
-    // 2️⃣ Get variants (with images)
-    const templatesWithVariants = await Promise.all(
-      templates.map(async (template) => {
-        const variants = await getVariantsForTemplate(template.name);
+    if (!inFlightBuild) {
+      inFlightBuild = (async () => {
+        // Reuse the catalog endpoint response (already includes product_variations).
+        const url = req.nextUrl.clone();
+        url.pathname = "/api/products";
+        url.search = "";
+        url.searchParams.set("page", "1");
+        url.searchParams.set("limit", "5000");
+        url.searchParams.set("mode", "all");
+        const inner = new NextRequest(url, { headers: req.headers });
+        const catalogRes = await getProductsCatalog(inner);
+        const catalogJson = await catalogRes.json();
+        const products = Array.isArray(catalogJson?.products) ? catalogJson.products : [];
+
+        // Keep only:
+        // 1) templates/variable products
+        // 2) true single products (simple with no variant parent marker)
+        const templatesWithVariants = products
+          .filter((p: any) => {
+            if (!p) return false;
+            if (p.type === "variable") return true;
+            if (p.type !== "simple") return false;
+            const parentOfVariant = p.variant_of || p.parent_template || p.template || p._template?.variant_of;
+            return !parentOfVariant;
+          })
+          .map((p: any) => ({
+            ...p,
+            product_variations: Array.isArray(p.product_variations) ? p.product_variations : [],
+          }));
+
         return {
-          ...template,
-          variants,
+          success: true,
+          total_templates: templatesWithVariants.length,
+          total_items: templatesWithVariants.length,
+          templates: templatesWithVariants,
+          ...getFallbackStorePayload(),
         };
-      })
-    );
+      })();
+    }
+
+    const payload = await inFlightBuild;
+    cachedResponse = { expiresAt: now + CACHE_TTL_MS, payload };
+    inFlightBuild = null;
 
     return NextResponse.json({
-      success: true,
-      total_templates: templatesWithVariants.length,
-      templates: templatesWithVariants,
-      ...getFallbackStorePayload(),
+      ...payload,
+    }, {
+      headers: {
+        "Cache-Control": "public, s-maxage=600, stale-while-revalidate=300",
+      },
     });
   } catch (error: any) {
+    inFlightBuild = null;
     console.error(
       "❌ Error fetching products with images:",
       error.response?.data || error.message

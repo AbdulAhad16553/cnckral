@@ -300,12 +300,12 @@ async createSalesOrder(data: any): Promise<ERPNextResponse<any>> {
   }
 
   // ========================================
-  // 🔹 Get Stock Balance
+  // 🔹 Get Stock from Bin (Stock Balance DocType not available)
   // ========================================
   async getStockBalance(filters?: Record<string, any>): Promise<ERPNextResponse<any[]>> {
     try {
       const { data } = await this.getList<any>(
-        "Stock Balance",
+        "Bin",
         filters,
         ["item_code", "warehouse", "actual_qty", "reserved_qty", "projected_qty"],
         1000

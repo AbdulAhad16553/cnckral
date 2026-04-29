@@ -1,5 +1,5 @@
 import { erpnextClient } from '../erpnextClient';
-import { productCache } from '@/lib/cache';
+import { productCache, categoryCache } from '@/lib/cache';
 
 export interface ERPNextProduct {
   name: string;
@@ -164,9 +164,14 @@ export class ProductService {
   // Get product categories (Item Groups)
   async getCategories(): Promise<ERPNextItemGroup[]> {
     try {
+      const cacheKey = "erpnext-categories";
+      const cached = categoryCache.get(cacheKey);
+      if (cached) return cached;
+
       const response = await erpnextClient.getItemGroups();
       const categories = response.data || [];
       console.log('🔍 ProductService - Categories fetched:', categories.length, 'categories');
+      categoryCache.set(cacheKey, categories, 30 * 60 * 1000);
       return categories;
     } catch (error) {
       console.error('Error fetching categories:', error);

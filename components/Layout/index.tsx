@@ -1,7 +1,5 @@
 import React from 'react'
 import Footer from '../Footer'
-import { headers } from 'next/headers'
-import { getUrlWithScheme } from '@/lib/getUrlWithScheme'
 import Image from 'next/image'
 import { Toaster } from 'sonner'
 import Header from '../Header'
@@ -20,23 +18,21 @@ interface LayoutProps {
 }
 
 const Layout = async ({ children, showFooter = true }: LayoutProps) => {
-
-    const Headers = await headers()
-    const host = Headers.get("host");
-    if (!host) {
-        throw new Error("Host header is missing or invalid");
-    }
-
-    const fullStoreUrl = getUrlWithScheme(host);
-    const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
-    const data = await response.json();
-    const contact = data?.store?.stores?.[0]?.store_contact_detail?.phone;
+    const storeBase = {
+        id: "default-store",
+        store_name: "CNC KRAL",
+        company_id: "CNC KRAL",
+        store_detail: { currency: "PKR" },
+        store_contact_detail: { phone: "" },
+        store_components: [],
+    };
+    const contact = storeBase.store_contact_detail.phone;
     const whatsappLink = contact ? `https://wa.me/${normalizePhoneNumber(contact).replace('+', '')}` : null
 
     // Fetch company logo from ERPNext API
     let companyLogo = null;
     try {
-        const companyId = data?.store?.stores?.[0]?.company_id || "CNC KRAL";
+        const companyId = storeBase.company_id;
         const erpDomain = process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN;
         const apiKey = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY;
         const apiSecret = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET;
@@ -50,7 +46,7 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
                         Authorization: `token ${apiKey}:${apiSecret}`,
                         Accept: "application/json",
                     },
-                    cache: 'no-store'
+                    next: { revalidate: 300 }
                 }
             );
 
@@ -67,7 +63,7 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
 
     // Add company logo to storeData
     const storeDataWithLogo = {
-        ...data?.store?.stores?.[0],
+        ...storeBase,
         company_logo: companyLogo
     };
 

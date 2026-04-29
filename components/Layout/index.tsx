@@ -22,7 +22,7 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
         id: "default-store",
         store_name: "CNC KRAL",
         company_id: "CNC KRAL",
-        store_detail: { currency: "PKR" },
+        store_detail: { footer_logo_id: "", currency: "PKR" },
         store_contact_detail: { phone: "" },
         store_components: [],
     };

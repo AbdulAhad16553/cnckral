@@ -21,37 +21,44 @@ export default function ProductDescription({ description }: ProductDescriptionPr
     );
   }
 
-  // Parse HTML content and extract structured data
+  // Parse HTML content using text extraction that works in both SSR and browser.
   const parseDescription = (htmlContent: string) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    
-    // Extract main description
-    const mainDesc = doc.querySelector('p')?.textContent || '';
-    
-    // Extract key features from ordered list
+    const decodeAndStrip = (text: string) =>
+      text
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const firstParagraphMatch = htmlContent.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+    const mainDesc = decodeAndStrip(firstParagraphMatch?.[1] || htmlContent);
+
     const features: string[] = [];
-    const featureList = doc.querySelector('ol');
-    if (featureList) {
-      const listItems = featureList.querySelectorAll('li');
-      listItems.forEach(item => {
-        features.push(item.textContent || '');
-      });
+    const featureListMatch = htmlContent.match(/<ol[^>]*>([\s\S]*?)<\/ol>/i);
+    if (featureListMatch?.[1]) {
+      const listItemMatches = featureListMatch[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi);
+      for (const item of listItemMatches) {
+        const value = decodeAndStrip(item[1] || "");
+        if (value) features.push(value);
+      }
     }
-    
-    // Extract detailed specifications
+
     const specs: { label: string; value: string }[] = [];
-    const specElements = doc.querySelectorAll('p');
-    specElements.forEach(p => {
-      const text = p.textContent || '';
-      if (text.includes(':') && !text.includes('Key Features')) {
-        const [label, value] = text.split(':').map(s => s.trim());
-        if (label && value) {
-          specs.push({ label, value });
+    const paragraphMatches = htmlContent.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi);
+    for (const p of paragraphMatches) {
+      const text = decodeAndStrip(p[1] || "");
+      if (text.includes(":") && !/key features/i.test(text)) {
+        const [label, ...rest] = text.split(":");
+        const value = rest.join(":").trim();
+        if (label?.trim() && value) {
+          specs.push({ label: label.trim(), value });
         }
       }
-    });
-    
+    }
+
     return { mainDesc, features, specs };
   };
 

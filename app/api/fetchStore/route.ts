@@ -1,9 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import axios from "axios";
-
-const ERP_BASE_URL = `https://${process.env.NEXT_PUBLIC_ERPNEXT_DOMAIN}/api/resource`;
-const API_KEY = process.env.NEXT_PUBLIC_ERPNEXT_API_KEY!;
-const API_SECRET = process.env.NEXT_PUBLIC_ERPNEXT_API_SECRET!;
+import { erpnextClient } from "@/lib/erpnext/erpnextClient";
 
 // Minimal store shape to keep existing pages working while using ERPNext
 const getFallbackStorePayload = () => {
@@ -27,42 +23,40 @@ const getFallbackStorePayload = () => {
   };
 };
 
-// ---- Fetch Template Items ----
+// ---- Fetch Template Items using ERPNext client (safe JSON filters) ----
 async function getTemplateItems(limit = 100) {
   let templates: any[] = [];
   let start = 0;
 
   while (true) {
-    const res = await axios.get(
-      `${ERP_BASE_URL}/Item?filters=[["has_variants","=","1"]]&fields=["name","item_name","item_group","stock_uom","image"]&limit_start=${start}&limit_page_length=${limit}`,
-      {
-        headers: {
-          Authorization: `token ${API_KEY}:${API_SECRET}`,
-        },
-      }
+    const { data } = await erpnextClient.getList<any>(
+      "Item",
+      { has_variants: 1 },
+      ["name", "item_name", "item_group", "stock_uom", "image"],
+      limit,
+      start
     );
 
-    const data = res.data?.data || [];
-    if (data.length === 0) break;
+    const page = data || [];
+    if (page.length === 0) break;
 
-    templates = [...templates, ...data];
+    templates = templates.concat(page);
     start += limit;
   }
 
   return templates;
 }
 
-// ---- Fetch Variant Items for a Template ----
+// ---- Fetch Variant Items for a Template using ERPNext client ----
 async function getVariantsForTemplate(templateName: string) {
-  const res = await axios.get(
-    `${ERP_BASE_URL}/Item?filters=[["variant_of","=","${templateName}"]]&fields=["name","item_name","variant_of","attributes","image"]&limit_page_length=200`,
-    {
-      headers: {
-        Authorization: `token ${API_KEY}:${API_SECRET}`,
-      },
-    }
+  const { data } = await erpnextClient.getList<any>(
+    "Item",
+    { variant_of: templateName },
+    ["name", "item_name", "variant_of", "attributes", "image"],
+    200,
+    0
   );
-  return res.data?.data || [];
+  return data || [];
 }
 
 // ---- API Route ----

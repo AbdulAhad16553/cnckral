@@ -677,17 +677,20 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                 <div className="relative z-[2] pointer-events-none">
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden">
-                  <div className="absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.5rem)] flex-col gap-1">
+                  <div className="absolute top-2 left-2 z-10 flex max-w-[calc(100%-0.75rem)] flex-wrap gap-1.5">
                     {hasVariations && (
                       <Badge
                         variant="outline"
-                        className="text-xs font-bold bg-blue-100 text-blue-800 border-blue-300"
+                        className="rounded-full border-blue-200 bg-blue-50/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-900 shadow-sm"
                       >
                         {product.product_variations.length} variants
                       </Badge>
                     )}
                     {product.status === "on-sale" && !isOutOfStock && (
-                      <Badge variant="sale" className="text-xs font-bold">
+                      <Badge
+                        variant="sale"
+                        className="rounded-full bg-emerald-500/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
+                      >
                         On Sale
                       </Badge>
                     )}

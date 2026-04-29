@@ -22,11 +22,9 @@ const Layout = async ({ children, showFooter = true }: LayoutProps) => {
         id: "default-store",
         store_name: "CNC KRAL",
         company_id: "CNC KRAL",
-        store_detail: { footer_logo_id: "", currency: "PKR" },
-        store_contact_detail: { phone: "" },
         store_components: [],
     };
-    const contact = storeBase.store_contact_detail.phone;
+    const contact = "";
     const whatsappLink = contact ? `https://wa.me/${normalizePhoneNumber(contact).replace('+', '')}` : null
 
     // Fetch company logo from ERPNext API

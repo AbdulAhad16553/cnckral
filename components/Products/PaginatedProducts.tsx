@@ -27,6 +27,7 @@ import {
 import ProductSkeleton from "@/common/Skeletons/Products";
 import MachinePageSkeleton from "@/common/Skeletons/MachinePage";
 import PartsPageSkeleton from "@/common/Skeletons/PartsPage";
+import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
 
 interface PaginatedProductsProps {
   companyId: string;
@@ -362,7 +363,10 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                   className="relative overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200 rounded-xl"
                 >
                   <Link
-                    href={`/product/${encodeURIComponent(product.sku)}`}
+                    href={`/product/${getProductSlug(product)}`}
+                    onMouseEnter={() => warmProductNavigation(router, product)}
+                    onTouchStart={() => warmProductNavigation(router, product)}
+                    onClick={() => warmProductNavigation(router, product)}
                     className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                     aria-label={`View ${product.name}`}
                   />
@@ -527,7 +531,10 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                 className="relative flex flex-row h-32 overflow-hidden hover:shadow-lg transition-all duration-300"
               >
                 <Link
-                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  href={`/product/${getProductSlug(product)}`}
+                  onMouseEnter={() => warmProductNavigation(router, product)}
+                  onTouchStart={() => warmProductNavigation(router, product)}
+                  onClick={() => warmProductNavigation(router, product)}
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />
@@ -640,7 +647,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => router.push(`/product/${encodeURIComponent(product.sku)}`)}
+                        onClick={() => {
+                          const slug = getProductSlug(product);
+                          warmProductNavigation(router, product);
+                          router.push(`/product/${slug}`);
+                        }}
                       >
                         View Details
                       </Button>
@@ -648,7 +659,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => router.push(`/product/${encodeURIComponent(product.sku)}`)}
+                          onClick={() => {
+                            const slug = getProductSlug(product);
+                            warmProductNavigation(router, product);
+                            router.push(`/product/${slug}`);
+                          }}
                         >
                           <ShoppingCart className="h-4 w-4 mr-1" />
                           Select Options
@@ -670,7 +685,10 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
             >
               <CardContent className="relative p-0">
                 <Link
-                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  href={`/product/${getProductSlug(product)}`}
+                  onMouseEnter={() => warmProductNavigation(router, product)}
+                  onTouchStart={() => warmProductNavigation(router, product)}
+                  onClick={() => warmProductNavigation(router, product)}
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />

@@ -18,6 +18,8 @@ import {
   ProductCardReviewsRow,
 } from "@/components/Products/ProductCardMarketplace";
 import { subscribeHomeCatalogSearchQuery } from "@/lib/catalogSearchBridge";
+import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
+import { useRouter } from "next/navigation";
 
 function filterProductsByQuery(products: any[], q: string): any[] {
   const needle = q.trim().toLowerCase();
@@ -72,6 +74,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
   catalogFetchLimit = 100,
   mobileCatalogSearch = false,
 }) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const qFromUrl = mobileCatalogSearch
     ? (searchParams.get("q") || "").trim()
@@ -453,7 +456,10 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
             >
               <CardContent className="relative p-0">
                 <Link
-                  href={`/product/${encodeURIComponent(product.sku)}`}
+                  href={`/product/${getProductSlug(product)}`}
+                  onMouseEnter={() => warmProductNavigation(router, product)}
+                  onTouchStart={() => warmProductNavigation(router, product)}
+                  onClick={() => warmProductNavigation(router, product)}
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />

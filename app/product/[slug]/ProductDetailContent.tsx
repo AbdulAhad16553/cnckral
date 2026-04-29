@@ -26,6 +26,7 @@ import ProductDescription from '@/components/ProductDescription';
 import MachineProductGallery from '@/components/MachineProductGallery';
 import QuotationDialog from '@/components/QuotationDialog';
 import { ProductSkeleton } from '@/components/ui/product-skeleton';
+import { getSavedProductPreview, saveProductPreview } from '@/lib/productNavigation';
 
 interface Product {
   name: string;
@@ -70,8 +71,9 @@ interface ProductDetailContentProps {
 }
 
 export default function ProductDetailContent({ slug, initialProduct }: ProductDetailContentProps) {
-  const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
-  const [loading, setLoading] = useState(!initialProduct);
+  const previewProduct = getSavedProductPreview(slug);
+  const [product, setProduct] = useState<Product | null>(initialProduct ?? previewProduct ?? null);
+  const [loading, setLoading] = useState(!(initialProduct ?? previewProduct));
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -261,10 +263,16 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
   }, [showAddedToCartDialog]);
 
   useEffect(() => {
-    if (initialProduct) return; // Server already provided data
+    if (initialProduct) {
+      saveProductPreview(encodeURIComponent(slug), initialProduct);
+    }
+  }, [initialProduct, slug]);
+
+  useEffect(() => {
+    if (initialProduct) return; // Server already provided final data
     const fetchProduct = async () => {
       try {
-        setLoading(true);
+        if (!product) setLoading(true);
         setError(null);
         const response = await fetch(`/api/product/${slug}`, {
           cache: "no-store",
@@ -273,6 +281,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to fetch product');
         setProduct(data.product);
+        saveProductPreview(encodeURIComponent(slug), data.product);
       } catch (err) {
         console.error('Error fetching product:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch product');

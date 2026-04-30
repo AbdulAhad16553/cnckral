@@ -1,9 +1,10 @@
+import { cache } from "react";
 import { erpnextClient } from '@/lib/erpnext/erpnextClient';
 import { attachProductStockFromErp } from '@/lib/product/attachProductStock';
 import { productCache } from '@/lib/cache';
 import { parseErpTags } from '@/lib/erpnext/tags';
 
-export async function fetchProductBySlug(slug: string) {
+async function fetchProductBySlugUncached(slug: string) {
   const itemCode = decodeURIComponent(slug);
   const cacheKey = `product-detail:${itemCode}`;
   const cached = productCache.get(cacheKey);
@@ -26,3 +27,6 @@ export async function fetchProductBySlug(slug: string) {
 
   return product;
 }
+
+/** Dedupes ERP work when generateMetadata and the page both request the same slug in one render. */
+export const fetchProductBySlug = cache(fetchProductBySlugUncached);

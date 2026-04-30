@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
 import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
+import { useRestoreListingScroll } from "@/lib/listScrollRestoration";
 
 interface NecessaryProps {
   companyId: string;
@@ -87,6 +88,8 @@ const Products = ({
   viewMode = "grid",
 }: ProductsProps) => {
   const router = useRouter();
+
+  useRestoreListingScroll(Array.isArray(products) && products.length > 0);
 
   const itemNames = React.useMemo(() => {
     return products?.map((product: any) => product.sku).filter(Boolean) || [];
@@ -180,7 +183,11 @@ const Products = ({
                   href={`/product/${getProductSlug(product)}`}
                   onMouseEnter={() => warmProductNavigation(router, product)}
                   onTouchStart={() => warmProductNavigation(router, product)}
-                  onClick={() => warmProductNavigation(router, product)}
+                  onClick={() =>
+                    warmProductNavigation(router, product, {
+                      recordListScrollForBack: true,
+                    })
+                  }
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />
@@ -212,7 +219,7 @@ const Products = ({
                         {product.product_variations && product.product_variations.length > 0 && (
                           <Badge
                             variant="outline"
-                            className="text-xs font-bold bg-blue-100 text-blue-800 border-blue-300"
+                            className="rounded-full border-blue-200 bg-blue-50/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-blue-900"
                           >
                             {product.product_variations.length} variants
                           </Badge>
@@ -296,7 +303,9 @@ const Products = ({
                         size="sm"
                         onClick={() => {
                           const slug = getProductSlug(product);
-                          warmProductNavigation(router, product);
+                          warmProductNavigation(router, product, {
+                            recordListScrollForBack: true,
+                          });
                           router.push(`/product/${slug}`);
                         }}
                       >
@@ -308,7 +317,9 @@ const Products = ({
                           variant="outline"
                           onClick={() => {
                             const slug = getProductSlug(product);
-                            warmProductNavigation(router, product);
+                            warmProductNavigation(router, product, {
+                              recordListScrollForBack: true,
+                            });
                             router.push(`/product/${slug}`);
                           }}
                         >
@@ -335,7 +346,11 @@ const Products = ({
                   href={`/product/${getProductSlug(product)}`}
                   onMouseEnter={() => warmProductNavigation(router, product)}
                   onTouchStart={() => warmProductNavigation(router, product)}
-                  onClick={() => warmProductNavigation(router, product)}
+                  onClick={() =>
+                    warmProductNavigation(router, product, {
+                      recordListScrollForBack: true,
+                    })
+                  }
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />
@@ -348,7 +363,7 @@ const Products = ({
                     {product.product_variations && product.product_variations.length > 0 && (
                       <Badge
                         variant="outline"
-                        className="text-xs font-bold bg-blue-100 text-blue-800 border-blue-300"
+                        className="rounded-full border-blue-200 bg-blue-50/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-blue-900"
                       >
                         {product.product_variations.length} variants
                       </Badge>

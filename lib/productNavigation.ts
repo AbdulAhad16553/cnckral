@@ -1,9 +1,21 @@
 "use client";
 
+import { saveListingScrollPosition } from "@/lib/listScrollRestoration";
+
 export const getProductSlug = (product: any): string =>
   encodeURIComponent(product?.sku || product?.id || product?.name || "");
 
-const previewKey = (slug: string) => `product-preview:${slug}`;
+/** Same storage key whether Next passes a decoded segment or an encoded one */
+export const canonicalProductSlugKey = (slug: string): string => {
+  if (!slug) return "";
+  try {
+    return encodeURIComponent(decodeURIComponent(slug));
+  } catch {
+    return encodeURIComponent(slug);
+  }
+};
+
+const previewKey = (slug: string) => `product-preview:${canonicalProductSlugKey(slug)}`;
 
 export const buildProductPreview = (product: any) => {
   const itemCode = product?.sku || product?.id || product?.name;
@@ -50,13 +62,20 @@ export const getSavedProductPreview = (slug: string) => {
   }
 };
 
-export const warmProductNavigation = (router: any, product: any) => {
+export const warmProductNavigation = (
+  router: any,
+  product: any,
+  options?: { recordListScrollForBack?: boolean }
+) => {
   const slug = getProductSlug(product);
   if (!slug) return;
+  if (options?.recordListScrollForBack) {
+    saveListingScrollPosition();
+  }
   saveProductPreview(slug, product);
   try {
     router?.prefetch?.(`/product/${slug}`);
   } catch {}
-  fetch(`/api/product/${slug}`, { cache: "force-cache" }).catch(() => undefined);
+  fetch(`/api/product/${slug}`).catch(() => undefined);
 };
 

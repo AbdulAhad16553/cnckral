@@ -264,7 +264,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
 
   useEffect(() => {
     if (initialProduct) {
-      saveProductPreview(encodeURIComponent(slug), initialProduct);
+      saveProductPreview(slug, initialProduct);
     }
   }, [initialProduct, slug]);
 

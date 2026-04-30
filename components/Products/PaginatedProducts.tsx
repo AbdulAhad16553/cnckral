@@ -28,6 +28,7 @@ import ProductSkeleton from "@/common/Skeletons/Products";
 import MachinePageSkeleton from "@/common/Skeletons/MachinePage";
 import PartsPageSkeleton from "@/common/Skeletons/PartsPage";
 import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
+import { useRestoreListingScroll } from "@/lib/listScrollRestoration";
 
 interface PaginatedProductsProps {
   companyId: string;
@@ -87,6 +88,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
   } = paginatedProducts;
 
   // Apply category/search/sort filters (client-side; catalog is fully loaded)
+  useRestoreListingScroll(
+    !loading,
+    `${quoteFilter}|${selectedCategory}|${searchTerm}|${sortBy}`
+  );
+
   const visibleProducts = React.useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
@@ -366,7 +372,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                     href={`/product/${getProductSlug(product)}`}
                     onMouseEnter={() => warmProductNavigation(router, product)}
                     onTouchStart={() => warmProductNavigation(router, product)}
-                    onClick={() => warmProductNavigation(router, product)}
+                    onClick={() =>
+                      warmProductNavigation(router, product, {
+                        recordListScrollForBack: true,
+                      })
+                    }
                     className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                     aria-label={`View ${product.name}`}
                   />
@@ -413,7 +423,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                           {hasVariations && (
                             <Badge
                               variant="outline"
-                              className="text-xs font-semibold bg-blue-50 text-blue-800 border-blue-300"
+                              className="border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-blue-800"
                             >
                               {product.product_variations.length} configurations
                             </Badge>
@@ -534,7 +544,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                   href={`/product/${getProductSlug(product)}`}
                   onMouseEnter={() => warmProductNavigation(router, product)}
                   onTouchStart={() => warmProductNavigation(router, product)}
-                  onClick={() => warmProductNavigation(router, product)}
+                  onClick={() =>
+                      warmProductNavigation(router, product, {
+                        recordListScrollForBack: true,
+                      })
+                    }
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />
@@ -565,7 +579,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                         {hasVariations && (
                           <Badge
                             variant="outline"
-                            className="text-xs font-bold bg-blue-100 text-blue-800 border-blue-300"
+                            className="rounded-full border-blue-200 bg-blue-50/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-blue-900"
                           >
                             {product.product_variations.length} variants
                           </Badge>
@@ -649,7 +663,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                         size="sm"
                         onClick={() => {
                           const slug = getProductSlug(product);
-                          warmProductNavigation(router, product);
+                          warmProductNavigation(router, product, {
+                            recordListScrollForBack: true,
+                          });
                           router.push(`/product/${slug}`);
                         }}
                       >
@@ -661,7 +677,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                           variant="outline"
                           onClick={() => {
                             const slug = getProductSlug(product);
-                            warmProductNavigation(router, product);
+                            warmProductNavigation(router, product, {
+                              recordListScrollForBack: true,
+                            });
                             router.push(`/product/${slug}`);
                           }}
                         >
@@ -688,7 +706,11 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                   href={`/product/${getProductSlug(product)}`}
                   onMouseEnter={() => warmProductNavigation(router, product)}
                   onTouchStart={() => warmProductNavigation(router, product)}
-                  onClick={() => warmProductNavigation(router, product)}
+                  onClick={() =>
+                    warmProductNavigation(router, product, {
+                      recordListScrollForBack: true,
+                    })
+                  }
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />
@@ -699,7 +721,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                     {hasVariations && (
                       <Badge
                         variant="outline"
-                        className="rounded-full border-blue-200 bg-blue-50/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-900 shadow-sm"
+                        className="rounded-full border-blue-200 bg-blue-50/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-blue-900 shadow-sm"
                       >
                         {product.product_variations.length} variants
                       </Badge>

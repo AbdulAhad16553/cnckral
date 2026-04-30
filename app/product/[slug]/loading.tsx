@@ -1,7 +1,7 @@
 import { ProductSkeleton } from "@/components/ui/product-skeleton";
 import Layout from "@/components/Layout";
 
-export default async function ProductSlugLoading() {
+export default function ProductSlugLoading() {
   return (
     <Layout>
       <div className="min-h-screen bg-neutral-50">

@@ -19,6 +19,7 @@ import {
 } from "@/components/Products/ProductCardMarketplace";
 import { subscribeHomeCatalogSearchQuery } from "@/lib/catalogSearchBridge";
 import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
+import { useRestoreListingScroll } from "@/lib/listScrollRestoration";
 import { useRouter } from "next/navigation";
 
 function filterProductsByQuery(products: any[], q: string): any[] {
@@ -95,6 +96,10 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
 
   const [products, setProducts] = useState<any[]>(initialProducts || []);
   const [loading, setLoading] = useState(!(initialProducts && initialProducts.length > 0));
+  useRestoreListingScroll(
+    !loading && products.length > 0,
+    mobileCatalogSearch ? qFromUrl : searchQuery
+  );
   const [error, setError] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(() =>
     mobileInfiniteScroll
@@ -459,7 +464,11 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                   href={`/product/${getProductSlug(product)}`}
                   onMouseEnter={() => warmProductNavigation(router, product)}
                   onTouchStart={() => warmProductNavigation(router, product)}
-                  onClick={() => warmProductNavigation(router, product)}
+                  onClick={() =>
+                    warmProductNavigation(router, product, {
+                      recordListScrollForBack: true,
+                    })
+                  }
                   className="absolute inset-0 z-[1] cursor-pointer touch-manipulation rounded-[inherit] [-webkit-tap-highlight-color:transparent]"
                   aria-label={`View ${product.name}`}
                 />
@@ -480,7 +489,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                     {hasVariations && (
                       <Badge
                         variant="outline"
-                        className="rounded-full border-blue-200 bg-blue-50/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-900 shadow-sm"
+                        className="rounded-full border-blue-200 bg-blue-50/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-blue-900 shadow-sm"
                       >
                         {product.product_variations.length} variants
                       </Badge>

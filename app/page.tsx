@@ -6,6 +6,9 @@ import { NeedHelpSection } from "@/components/NeedHelpSection";
 import { ResourceLinks } from "@/components/ResourceLinks";
 import { NewsletterSection } from "@/components/NewsletterSection";
 import AEOFAQSection from "@/components/AEOFAQSection";
+import MobileGuidesFab from "@/components/MobileGuidesFab";
+import MachineInstallationGuide from "@/components/MachineInstallationGuide";
+import RouterFittingGuide from "@/components/RouterFittingGuide";
 import { headers } from "next/headers";
 import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
 import { Suspense } from "react";
@@ -225,6 +228,7 @@ export default async function Home() {
 
   return (
     <Layout>
+      <MobileGuidesFab />
       {/* Mobile home: site header + product grid */}
       <div className="page-container md:hidden py-4 pb-6">
         <Suspense fallback={<ProductSkeleton />}>
@@ -244,6 +248,15 @@ export default async function Home() {
             mobileCatalogSearch
           />
         </Suspense>
+
+        <div className="mt-8 space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <MachineInstallationGuide compact showPageLink />
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <RouterFittingGuide compact showPageLink />
+          </div>
+        </div>
       </div>
 
       <div className="hidden md:block">
@@ -289,6 +302,11 @@ export default async function Home() {
               <ResourceLinks />
             </div>
           </AnimatedSection>
+        </div>
+
+        <div className="page-container py-12 lg:py-14 bg-white border-b border-[var(--secondary-color)]/10 space-y-16">
+          <MachineInstallationGuide showPageLink />
+          <RouterFittingGuide showPageLink />
         </div>
 
         {/* AEO FAQ - Answer Engine Optimization for AI/LLM visibility */}

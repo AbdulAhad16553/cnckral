@@ -168,6 +168,16 @@ const Footer = async ({ storeData }: FooterProps) => {
                   <Link href="/machine" className="text-white/90 hover:text-white transition-colors text-sm">Machines</Link>
                 </li>
                 <li>
+                  <Link href="/machine-installation" className="text-white/90 hover:text-white transition-colors text-sm">
+                    Machine Installation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/router-fitting" className="text-white/90 hover:text-white transition-colors text-sm">
+                    Router Fitting
+                  </Link>
+                </li>
+                <li>
                   <Link href="/parts" className="text-white/90 hover:text-white transition-colors text-sm">Parts & Accessories</Link>
                 </li>
                 <li>

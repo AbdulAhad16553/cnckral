@@ -13,6 +13,8 @@ const STATIC_ROUTES = [
   "/about-us",
   "/contact",
   "/blog",
+  "/careers",
+  "/careers/apply",
   "/privacy-policy",
   "/terms-conditions",
 ];

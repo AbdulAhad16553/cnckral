@@ -13,6 +13,7 @@ import { OPEN_MOBILE_CATEGORY_DRAWER } from "@/lib/mobileCategoryDrawerEvent";
 import Cart from "@/components/Cart";
 import HeaderMobileSearch from "@/components/Header/HeaderMobileSearch";
 import HeaderDesktopSearch from "@/components/Header/HeaderDesktopSearch";
+import HeaderMobileCareersButton from "@/components/Header/HeaderMobileCareersButton";
 import MobileCategoryDrawer from "@/components/Header/MobileCategoryDrawer";
 import { getAllCategories } from "@/hooks/getCategories";
 interface StoreData {
@@ -169,13 +170,16 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                   priority
                 />
               </Link>
-              <Link
-                href="/orders"
-                className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-900 active:bg-neutral-100"
-                aria-label="Orders and notifications"
-              >
-                <Bell className="h-6 w-6" strokeWidth={1.75} aria-hidden />
-              </Link>
+              <div className="flex items-center gap-2 shrink-0">
+                <HeaderMobileCareersButton />
+                <Link
+                  href="/orders"
+                  className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-900 active:bg-neutral-100"
+                  aria-label="Orders and notifications"
+                >
+                  <Bell className="h-6 w-6" strokeWidth={1.75} aria-hidden />
+                </Link>
+              </div>
             </div>
             <Suspense
               fallback={
@@ -281,6 +285,12 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 className="flex-shrink-0 text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base py-1.5"
               >
                 About
+              </Link>
+              <Link
+                href="/careers"
+                className="flex-shrink-0 text-white/90 hover:text-white font-medium transition-colors text-sm sm:text-base py-1.5"
+              >
+                Talent Board
               </Link>
               <Link
                 href="/contact"

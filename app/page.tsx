@@ -4,10 +4,7 @@ import HeroAnimationWrapper from "@/components/HeroAnimationWrapper";
 import AnimatedSection from "@/components/AnimatedSection";
 import { CategoryStrip } from "@/components/CategoryStrip";
 import MobileGuidesFab from "@/components/MobileGuidesFab";
-import {
-  HomeDesktopDeferredSections,
-  HomeMobileDeferredGuides,
-} from "@/components/HomeDeferredSections";
+import { HomeDesktopDeferredSections } from "@/components/HomeDeferredSections";
 import { getRequestOrigin } from "@/lib/requestOrigin";
 import { Suspense } from "react";
 import Layout from "@/components/Layout";
@@ -205,7 +202,6 @@ export default async function Home() {
             mobileCatalogSearch
           />
         </Suspense>
-        <HomeMobileDeferredGuides />
       </div>
 
       <div className="hidden md:block">

@@ -102,7 +102,7 @@ export default function MobileGuidesFab() {
 
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 pb-6">
               {tab === "install" ? (
-                <MachineInstallationGuide compact />
+                <MachineInstallationGuide />
               ) : (
                 <RouterFittingGuide compact />
               )}

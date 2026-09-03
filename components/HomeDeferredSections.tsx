@@ -52,16 +52,3 @@ export function HomeDesktopDeferredSections() {
     </>
   );
 }
-
-export function HomeMobileDeferredGuides() {
-  return (
-    <div className="mt-8 space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <MachineInstallationGuide compact showPageLink />
-      </div>
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <RouterFittingGuide compact showPageLink />
-      </div>
-    </div>
-  );
-}

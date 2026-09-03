@@ -24,7 +24,7 @@ const Layout = ({ children, showFooter = true }: LayoutProps) => {
         company_id: "CNC KRAL",
         store_components: [],
     };
-    const contact = "";
+    const contact = "03103170270";
     const whatsappLink = contact ? `https://wa.me/${normalizePhoneNumber(contact).replace('+', '')}` : null
 
     const storeDataWithLogo = {
@@ -51,7 +51,8 @@ const Layout = ({ children, showFooter = true }: LayoutProps) => {
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="fixed z-50 w-12 h-12 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] right-4 md:bottom-6 md:right-6"
+                    aria-label="Chat on WhatsApp 03103170270"
+                    className="fixed z-[55] w-14 h-14 bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))] right-4 md:bottom-6 md:right-6 active:scale-95 transition-transform"
                 >
                     <Image
                         src="/whatsapp-icon.svg" // place the file in your `public/` folder

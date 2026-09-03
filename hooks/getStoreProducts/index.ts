@@ -35,7 +35,7 @@ export const useStoreProducts = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/fetchStore');
+      const response = await fetch('/api/fetchStore?includeTemplates=1');
       const data: StoreProductsResponse = await response.json();
       
       if (data.success) {
@@ -127,7 +127,7 @@ export const transformStoreTemplateToProduct = (template: StoreTemplate) => {
 // Fetch a specific template product by slug (client-side version)
 export const getStoreTemplateProduct = async (slug: string) => {
   try {
-    const response = await fetch('/api/fetchStore');
+    const response = await fetch('/api/fetchStore?includeTemplates=1');
     const data: StoreProductsResponse = await response.json();
     
     if (data.success) {

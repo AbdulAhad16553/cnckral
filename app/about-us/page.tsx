@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Hero from "@/modules/Hero";
 import Layout from "@/components/Layout";
 import AboutUsContent from "@/components/AboutUsContent";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
-import { headers } from "next/headers";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import { getAllCategories } from "@/hooks/getCategories";
 import { getProducts } from "@/hooks/getProducts";
 
@@ -14,14 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutUsPage() {
-  const Headers = await headers();
-  const host = Headers.get("host");
-
-  if (!host) {
-    throw new Error("Host header is missing or invalid");
-  }
-
-  const fullStoreUrl = getUrlWithScheme(host);
+  const fullStoreUrl = await getRequestOrigin();
   const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
   const data = await response.json();
   const storeId = data?.store?.stores[0].id;

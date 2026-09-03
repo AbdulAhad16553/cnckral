@@ -1,84 +1,51 @@
+import type { Metadata } from "next";
 import Hero from "@/modules/Hero";
 import HeroAnimationWrapper from "@/components/HeroAnimationWrapper";
 import AnimatedSection from "@/components/AnimatedSection";
 import { CategoryStrip } from "@/components/CategoryStrip";
-import { NeedHelpSection } from "@/components/NeedHelpSection";
-import { ResourceLinks } from "@/components/ResourceLinks";
-import { NewsletterSection } from "@/components/NewsletterSection";
-import AEOFAQSection from "@/components/AEOFAQSection";
 import MobileGuidesFab from "@/components/MobileGuidesFab";
-import MachineInstallationGuide from "@/components/MachineInstallationGuide";
-import RouterFittingGuide from "@/components/RouterFittingGuide";
-import { headers } from "next/headers";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
+import {
+  HomeDesktopDeferredSections,
+  HomeMobileDeferredGuides,
+} from "@/components/HomeDeferredSections";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import { Suspense } from "react";
 import Layout from "@/components/Layout";
 import HomeProducts from "@/components/Products/HomeProducts";
 import ProductSkeleton from "@/common/Skeletons/Products";
 import { getCategories } from "@/hooks/getCategories";
-import { getStorePage } from "@/hooks/getStorePage";
 
-export async function generateMetadata() {
-  const Headers = await headers();
-  const host = Headers.get("host");
-  if (!host) {
-    throw new Error("Host header is missing or invalid");
-  }
+export const revalidate = 60;
 
-  const fullStoreUrl = getUrlWithScheme(host);
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
-  const data = await response.json();
-
-  const { page } = await getStorePage(data?.store?.stores[0].id, "home");
-  const rawTitle = page?.meta_title?.trim();
-  const rawDescription = page?.meta_description?.trim();
-  const isGenericHomeTitle =
-    !rawTitle ||
-    /^home\s*-\s*store\s*page$/i.test(rawTitle) ||
-    /^home$/i.test(rawTitle);
-  const isGenericHomeDescription =
-    !rawDescription ||
-    /^home\s*-\s*store\s*page$/i.test(rawDescription);
-
-  const title = isGenericHomeTitle
-    ? "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan"
-    : rawTitle;
-  const description = isGenericHomeDescription
-    ? "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore."
-    : rawDescription;
-
-  return {
-    title,
-    description,
-    generator: data?.store?.stores?.[0]?.store_name || "CNC KRAL",
-    applicationName: data?.store?.stores?.[0]?.store_name || "CNC KRAL",
-    keywords: "best CNC supplier Pakistan, best CNC machine Pakistan, best CNC router Pakistan, CNC bits, marble tools",
-    openGraph: {
-      title,
-      description,
-      url: "https://cnckral.com",
-      siteName: "CNC KRAL",
-      type: "website",
-      locale: "en_PK",
-    },
-    twitter: {
-      card: "summary",
-      title,
-      description,
-    },
-  };
-}
+export const metadata: Metadata = {
+  title: "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan",
+  description:
+    "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore.",
+  keywords:
+    "best CNC supplier Pakistan, best CNC machine Pakistan, best CNC router Pakistan, CNC bits, marble tools",
+  openGraph: {
+    title: "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan",
+    description:
+      "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore.",
+    url: "https://cnckral.com",
+    siteName: "CNC KRAL",
+    type: "website",
+    locale: "en_PK",
+  },
+  twitter: {
+    card: "summary",
+    title: "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan",
+    description:
+      "CNC KRAL is the best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore.",
+  },
+};
 
 export default async function Home() {
-  const Headers = await headers();
-  const host = Headers.get("host");
-  if (!host) {
-    throw new Error("Host header is missing or invalid");
-  }
+  const fullStoreUrl = await getRequestOrigin();
 
-  const fullStoreUrl = getUrlWithScheme(host);
-
-  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
+  const response = await fetch(`${fullStoreUrl}/api/fetchStore`, {
+    next: { revalidate: 300 },
+  });
   const data = await response.json();
   const storeId = data?.store?.stores[0].id;
   const companyId = data?.store?.stores[0].company_id;
@@ -88,7 +55,6 @@ export default async function Home() {
     : "Rs.";
 
   const { categories } = await getCategories(storeId);
-  const { page } = await getStorePage(storeId, "home");
 
   const normalizeImagePath = (path?: string | null) => {
     if (!path) return undefined;
@@ -107,10 +73,7 @@ export default async function Home() {
   };
 
   const buildVariations = (product: any) => {
-    const variants =
-      product?.product_variations ||
-      product?.variants ||
-      [];
+    const variants = product?.product_variations || product?.variants || [];
     if (!variants || variants.length === 0) return [];
 
     return variants.map((variant: any) => {
@@ -149,9 +112,7 @@ export default async function Home() {
       Number(product?.sale_price) ||
       0;
 
-    let product_images =
-      normalizeImages(product?.product_images) ||
-      [];
+    let product_images = normalizeImages(product?.product_images) || [];
     if (product_images.length === 0 && (product?.website_image || product?.image)) {
       const singlePath = normalizeImagePath(product.website_image || product.image);
       if (singlePath) {
@@ -172,12 +133,13 @@ export default async function Home() {
       currency: product?.currency || storeCurrency,
       product_variations,
       product_images,
-      /** From /api/products — use for instant card preview (no batch-image API) */
       image_url: product?.image_url,
+      thumbnail_url: product?.thumbnail_url,
     };
   };
 
-  const catalogLimit = 100;
+  // First paint only needs one page of products; infinite scroll loads more client-side.
+  const catalogLimit = 24;
   let featuredProduct = null;
   const homeProducts: any[] = [];
   let homeCatalogTotalProducts = 0;
@@ -196,17 +158,13 @@ export default async function Home() {
       const normalizedProducts = products.map(buildFeaturedProductPayload);
       homeProducts.push(...normalizedProducts);
       if (normalizedProducts.length > 0) {
-        featuredProduct =
-          normalizedProducts[
-            Math.floor(Math.random() * normalizedProducts.length)
-          ];
+        featuredProduct = normalizedProducts[0];
       }
     }
   } catch (error) {
     console.error("Error fetching home catalog:", error);
   }
 
-  // Fallback to empty product if nothing found
   if (!featuredProduct) {
     featuredProduct = {
       id: "no-product",
@@ -222,14 +180,13 @@ export default async function Home() {
       product_images: [],
     };
   }
-  // Ensure we always have something to show in the products grid
+
   const initialHomeProducts =
     homeProducts.length > 0 ? homeProducts : featuredProduct ? [featuredProduct] : [];
 
   return (
     <Layout>
       <MobileGuidesFab />
-      {/* Mobile home: site header + product grid */}
       <div className="page-container md:hidden py-4 pb-6">
         <Suspense fallback={<ProductSkeleton />}>
           <HomeProducts
@@ -238,7 +195,7 @@ export default async function Home() {
             storeCurrency={storeCurrency}
             initialProducts={initialHomeProducts}
             className="w-full"
-            productLimit={100}
+            productLimit={catalogLimit}
             sectionTitle="All products"
             sectionSubtitle="Browse our catalog"
             mobileInfiniteScroll
@@ -248,15 +205,7 @@ export default async function Home() {
             mobileCatalogSearch
           />
         </Suspense>
-
-        <div className="mt-8 space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <MachineInstallationGuide compact showPageLink />
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <RouterFittingGuide compact showPageLink />
-          </div>
-        </div>
+        <HomeMobileDeferredGuides />
       </div>
 
       <div className="hidden md:block">
@@ -264,7 +213,8 @@ export default async function Home() {
           <Hero
             content={{
               title: "Laser Technology That Defines Excellence",
-              content: "At CNC KRAL, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
+              content:
+                "At CNC KRAL, we combine cutting-edge technology with unmatched craftsmanship to deliver precise, flawless laser cutting for metal, wood, acrylic, and more.",
               heroImage: undefined,
             }}
             storeData={data?.store?.stores[0]}
@@ -281,41 +231,18 @@ export default async function Home() {
           />
         </HeroAnimationWrapper>
 
-        {/* Category strip - CNC Tooling Shop style */}
         <div className="bg-white page-container py-12 lg:py-14 border-b border-[var(--secondary-color)]/10">
           <AnimatedSection delay={0.05}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Shop by Category</h2>
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Shop by Category
+              </h2>
             </div>
             <CategoryStrip categories={categories || []} />
           </AnimatedSection>
         </div>
 
-        {/* Need help + Resource links */}
-        <div className="bg-brand-tint page-container py-12 lg:py-14">
-          <AnimatedSection delay={0.08}>
-            <NeedHelpSection />
-          </AnimatedSection>
-          <AnimatedSection delay={0.1}>
-            <div className="mt-12">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Resources</h2>
-              <ResourceLinks />
-            </div>
-          </AnimatedSection>
-        </div>
-
-        <div className="page-container py-12 lg:py-14 bg-white border-b border-[var(--secondary-color)]/10 space-y-16">
-          <MachineInstallationGuide showPageLink />
-          <RouterFittingGuide showPageLink />
-        </div>
-
-        {/* AEO FAQ - Answer Engine Optimization for AI/LLM visibility */}
-        <AEOFAQSection />
-
-        {/* Newsletter */}
-        <div className="page-container py-12 lg:py-14">
-          <NewsletterSection />
-        </div>
+        <HomeDesktopDeferredSections />
       </div>
     </Layout>
   );

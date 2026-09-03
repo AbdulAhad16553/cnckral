@@ -21,9 +21,9 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Image configuration (unoptimized for Vercel free plan)
+  // Image optimization enabled (self-hosted / PM2 — not Vercel free-plan limited)
   images: {
-    unoptimized: true,
+    unoptimized: false,
     remotePatterns: [
       {
         protocol: "https",
@@ -57,8 +57,8 @@ const nextConfig: NextConfig = {
     ],
     dangerouslyAllowSVG: true,
     formats: ["image/webp", "image/avif"],
-    minimumCacheTTL: 60,
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    minimumCacheTTL: 31536000,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
@@ -91,7 +91,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/api/(.*)",
+        source: "/api/((?!optimized-image|batch-optimized-images).*)",
         headers: [
           {
             key: "Cache-Control",
@@ -100,7 +100,43 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/api/optimized-image",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/api/batch-optimized-images",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
         source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/image(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/:path*.(ico|png|jpg|jpeg|webp|avif|svg|gif|woff2)",
         headers: [
           {
             key: "Cache-Control",

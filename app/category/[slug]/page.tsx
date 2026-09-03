@@ -1,6 +1,5 @@
 import Layout from '@/components/Layout';
-import { headers } from 'next/headers';
-import { getUrlWithScheme } from '@/lib/getUrlWithScheme';
+import { getRequestOrigin } from '@/lib/requestOrigin';
 import { getCatProducts } from '@/hooks/getCatProducts';
 import CategoriesContent from '@/modules/CategoriesContent';
 import Link from 'next/link';
@@ -14,13 +13,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
         notFound();
     }
 
-    const Headers = await headers();
-    const host = Headers.get("host");
-    if (!host) {
-        throw new Error("Host header is missing or invalid");
-    }
-
-    const fullStoreUrl = getUrlWithScheme(host);
+    const fullStoreUrl = await getRequestOrigin();
     const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
     const data = await response.json().catch(() => ({}));
     const store = data?.store?.stores?.[0];

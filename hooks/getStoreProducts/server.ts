@@ -3,7 +3,7 @@ import { StoreTemplate, StoreProductsResponse, transformStoreTemplateToProduct }
 // Server-side version of getStoreTemplateProduct
 export const getStoreTemplateProductServer = async (slug: string, baseUrl: string) => {
   try {
-    const response = await fetch(`${baseUrl}/api/fetchStore`);
+    const response = await fetch(`${baseUrl}/api/fetchStore?includeTemplates=1`);
     const data: StoreProductsResponse = await response.json();
     
     if (data.success) {

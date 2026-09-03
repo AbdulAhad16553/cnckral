@@ -19,6 +19,9 @@ interface ProductImagePreviewProps {
   objectFit?: 'cover' | 'contain';
   /** When true, image fills container (use with objectFit="contain" to fit inside a fixed frame) */
   fill?: boolean;
+  /** Responsive sizes hint for next/image (critical for LCP) */
+  sizes?: string;
+  priority?: boolean;
 }
 
 export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
@@ -33,7 +36,9 @@ export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
   showPreview = true,
   onClick,
   objectFit = 'cover',
-  fill = false
+  fill = false,
+  sizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px',
+  priority = false,
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [previewAlt, setPreviewAlt] = useState<string>('');
@@ -59,14 +64,15 @@ export const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({
     return (
     <>
       <div className={`relative group ${className}`}>
-        <div className="relative w-full h-full">
+        <div className={fill ? "absolute inset-0" : "relative w-full h-full"}>
           <Image
             src={imageUrl}
             alt={productName}
             {...(fill
-              ? { fill: true, sizes: '100vw' }
-              : { width, height }
+              ? { fill: true, sizes }
+              : { width, height, sizes }
             )}
+            priority={priority}
             className={`${objectFit === 'contain' ? 'object-contain' : 'object-cover'} cursor-pointer transition-transform group-hover:scale-105`}
             onClick={() => openImagePreview(imageUrl, productName)}
           />

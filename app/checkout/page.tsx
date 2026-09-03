@@ -1,17 +1,9 @@
 import Layout from "@/components/Layout"
 import CheckOut from "@/modules/Checkout";
-import { headers } from "next/headers";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 
 export default async function CheckoutPage() {
-
-    const Headers = await headers()
-    const host = Headers.get("host");
-    if (!host) {
-        throw new Error("Host header is missing or invalid");
-    }
-
-    const fullStoreUrl = getUrlWithScheme(host);
+    const fullStoreUrl = await getRequestOrigin();
 
     const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
     const data = await response.json();

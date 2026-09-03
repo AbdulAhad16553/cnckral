@@ -35,9 +35,12 @@ export const metadata: Metadata = {
     "CNC router Lahore",
   ],
   icons: {
-    icon: "/cnc_kral.png",
-    shortcut: "/cnc_kral.png",
-    apple: "/cnc_kral.png",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/cnc_kral-48.png", sizes: "48x48", type: "image/png" },
+    ],
+    shortcut: "/favicon-32.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -47,7 +50,7 @@ export const metadata: Metadata = {
     title: "CNC KRAL | Best CNC Supplier, CNC Machine, Router, Bits & Marble Tools in Pakistan",
     description:
       "Best CNC supplier in Pakistan. CNC machines, CNC routers, CNC bits, marble tools. Lahore.",
-    images: [{ url: "/cnc_kral.png", width: 512, height: 512, alt: "CNC KRAL" }],
+    images: [{ url: "/apple-touch-icon.png", width: 180, height: 180, alt: "CNC KRAL" }],
   },
   twitter: {
     card: "summary",
@@ -83,7 +86,7 @@ export default async function RootLayout({
                 "@type": "Organization",
                 name: "CNC KRAL",
                 url: SITE_URL,
-                logo: `${SITE_URL}/cnc_kral.png`,
+                logo: `${SITE_URL}/apple-touch-icon.png`,
                 description:
                   "Best CNC supplier in Pakistan. Suppliers of CNC machines, CNC routers, CNC bits, marble tools, and precision cutting tools for woodworking, metalworking, and stone carving.",
                 areaServed: { "@type": "Country", name: "Pakistan" },
@@ -112,9 +115,9 @@ export default async function RootLayout({
               }),
             }}
           />
-            <link rel="icon" href="/cnc_kral.png" type="image/png" />
-          <link rel="shortcut icon" href="/cnc_kral.png" type="image/png" />
-          <link rel="apple-touch-icon" href="/cnc_kral.png" />
+            <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+          <link rel="shortcut icon" href="/favicon-32.png" type="image/png" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           {/* Preconnect to Google Fonts for faster loading */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
@@ -155,9 +158,9 @@ export default async function RootLayout({
         {/* PWA disabled - uncomment these to re-enable installable app */}
         {/* <meta name="theme-color" content="#0368E5" /> */}
         {/* <link rel="manifest" href="/manifest.webmanifest" /> */}
-        <link rel="icon" href="/cnc_kral.png" type="image/png" />
-        <link rel="shortcut icon" href="/cnc_kral.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/cnc_kral.png" />
+        <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+        <link rel="shortcut icon" href="/favicon-32.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

@@ -1,20 +1,12 @@
 import Cart from '@/modules/Cart';
 import OrderSummary from '@/modules/OrderSummary';
-import { headers } from 'next/headers';
-import { getUrlWithScheme } from '@/lib/getUrlWithScheme';
+import { getRequestOrigin } from '@/lib/requestOrigin';
 import Layout from '@/components/Layout';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 export default async function CartPage() {
-  const Headers = await headers();
-  const host = Headers.get('host');
-
-  if (!host) {
-    throw new Error('Host header is missing or invalid');
-  }
-
-  const fullStoreUrl = getUrlWithScheme(host);
+  const fullStoreUrl = await getRequestOrigin();
   const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
   const data = await response.json();
 

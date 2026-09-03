@@ -418,10 +418,13 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
       >
         {productsToShow.map((product: any, index: number) => {
           const imageUrl =
+            product.thumbnail_url ||
             product.image_url ||
             (needsBatchImages ? getImageUrl(product.sku) : "/placeholder.svg");
           const productHasImage =
-            !!product.image_url || (needsBatchImages && hasImage(product.sku));
+            !!product.thumbnail_url ||
+            !!product.image_url ||
+            (needsBatchImages && hasImage(product.sku));
 
           const productStock = calculateProductStock(product);
           const isOutOfStock = product.type === "variable" ? false : productStock <= 0;
@@ -510,10 +513,11 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
                     imageUrl={imageUrl}
                     hasImage={productHasImage}
                     isLoading={needsBatchImages ? isImageLoading : false}
-                    width={400}
-                    height={400}
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 280px"
                     className="w-full h-full"
                     showPreview={false}
+                    priority={index < 4}
                   />
 
                   {/* Quick Actions */}

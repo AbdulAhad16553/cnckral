@@ -162,7 +162,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
             <div className="flex items-center justify-between gap-3">
               <Link href="/" className="group min-w-0 shrink-0">
                 <Image
-                  src="/HORIZONTAL Logo CNC KRAL.png"
+                  src="/logo-horizontal.webp"
                   alt={`${storeName || "Store"} Logo`}
                   width={160}
                   height={50}
@@ -198,7 +198,7 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
             <div className="flex shrink-0 items-center gap-4">
               <Link href="/" className="group min-w-0">
                 <Image
-                  src="/HORIZONTAL Logo CNC KRAL.png"
+                  src="/logo-horizontal.webp"
                   alt={`${storeName || "Store"} Logo`}
                   width={132}
                   height={42}

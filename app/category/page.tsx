@@ -1,22 +1,14 @@
 import Categories from "@/modules/Categories";
 import Layout from "@/components/Layout";
 import { getAllCategories } from "@/hooks/getCategories";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
-import { headers } from "next/headers";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import React from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const AllCategories = async () => {
-  const Headers = await headers();
-  const host = Headers.get("host");
-
-  if (!host) {
-    throw new Error("Host header is missing or invalid");
-  }
-
-  const fullStoreUrl = getUrlWithScheme(host);
+  const fullStoreUrl = await getRequestOrigin();
   const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
   const data = await response.json();
   const storeId = data?.store?.stores[0].id;

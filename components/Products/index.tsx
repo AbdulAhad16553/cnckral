@@ -146,10 +146,13 @@ const Products = ({
           );
           
           const imageUrl =
+            product.thumbnail_url ||
             product.image_url ||
             (needsBatchImages ? getImageUrl(product.sku) : "/placeholder.svg");
           const productHasImage =
-            !!product.image_url || (needsBatchImages && hasImage(product.sku));
+            !!product.thumbnail_url ||
+            !!product.image_url ||
+            (needsBatchImages && hasImage(product.sku));
 
           // Calculate real stock for this product
           const productStock = calculateProductStock(product, currentStock);
@@ -381,8 +384,8 @@ const Products = ({
                     imageUrl={imageUrl}
                     hasImage={productHasImage}
                     isLoading={needsBatchImages ? isImageLoading : false}
-                    width={400}
-                    height={400}
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 280px"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     showPreview={false}
                   />

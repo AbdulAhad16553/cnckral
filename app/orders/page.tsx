@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import AllOrders from "@/modules/AllOrders"
-import { headers } from "next/headers";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import Layout from "@/components/Layout";
 
 export const metadata: Metadata = {
@@ -10,15 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Orders() {
-
-    const Headers = await headers();
-    const host = Headers.get("host");
-
-    if (!host) {
-        throw new Error("Host header is missing or invalid");
-    }
-
-    const fullStoreUrl = getUrlWithScheme(host);
+    const fullStoreUrl = await getRequestOrigin();
 
     const response = await fetch(`${fullStoreUrl}/api/fetchStore`);
     const data = await response.json();

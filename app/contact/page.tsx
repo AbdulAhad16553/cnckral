@@ -1,6 +1,5 @@
 import Layout from "@/components/Layout";
-import { getUrlWithScheme } from "@/lib/getUrlWithScheme";
-import { headers } from "next/headers";
+import { getRequestOrigin } from "@/lib/requestOrigin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,14 +8,7 @@ import { Mail, Phone, MapPin, Clock, Send, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 const ContactPage = async () => {
-  const Headers = await headers();
-  const host = Headers.get("host");
-
-  if (!host) {
-    throw new Error("Host header is missing or invalid");
-  }
-
-  const fullStoreUrl = getUrlWithScheme(host);
+  const fullStoreUrl = await getRequestOrigin();
   const response = await fetch(`${fullStoreUrl}/api/fetchStore`, { next: { revalidate: 300 } });
   const data = await response.json();
   const storeData = data?.store?.stores[0];

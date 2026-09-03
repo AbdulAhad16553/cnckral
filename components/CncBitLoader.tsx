@@ -14,14 +14,12 @@ export function CncBitLoader({ fullScreen = false }: CncBitLoaderProps) {
       } flex items-center justify-center bg-white`}
     >
       <div className="flex items-center justify-center">
-        <div
-          className="relative animate-spin"
-          style={{ width: 40, height: 40 }}
-        >
+        <div className="animate-spin" style={{ width: 40, height: 40 }}>
           <Image
-            src="/cnc_kral.png"
+            src="/cnc_kral-48.png"
             alt="CNC loader"
-            fill
+            width={40}
+            height={40}
             className="object-contain"
             priority
           />
@@ -30,4 +28,3 @@ export function CncBitLoader({ fullScreen = false }: CncBitLoaderProps) {
     </div>
   );
 }
-

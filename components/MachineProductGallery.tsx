@@ -354,12 +354,12 @@ export default function MachineProductGallery({
                   className="w-full lg:w-1/2"
                 >
                   {row.image ? (
-                    <div className="relative group aspect-video lg:aspect-square max-h-[400px] overflow-hidden rounded-xl bg-white border border-slate-200 shadow-md">
+                    <div className="relative group aspect-video lg:aspect-[4/3] max-h-[480px] overflow-hidden rounded-xl bg-white border border-slate-200 shadow-md">
                       <Image
                         src={row.image.url}
                         alt={row.image.alt}
                         fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="object-contain p-4 transition-transform duration-700 group-hover:scale-[1.02]"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                       />
                     </div>

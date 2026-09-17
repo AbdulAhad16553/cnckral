@@ -531,20 +531,21 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
             className="relative w-full overflow-hidden rounded-2xl bg-neutral-100 shadow-xl ring-1 ring-neutral-200/50"
           >
             {galleryImages.length > 0 ? (
-              <div className="relative aspect-[21/9] w-full min-h-[200px] sm:min-h-[240px] bg-neutral-100">
+              <div className="relative aspect-[4/3] sm:aspect-[16/10] w-full min-h-[240px] sm:min-h-[320px] bg-white">
                 <Image
                   src={galleryImages[0].url}
                   alt={galleryImages[0].alt}
                   fill
-                  className="object-cover cursor-zoom-in transition-transform duration-500 hover:scale-[1.02]"
+                  className="object-contain p-3 sm:p-6 cursor-zoom-in"
                   onClick={() => openImagePreview(0)}
                   sizes="100vw"
                   priority
                 />
                 {galleryImages.length > 1 && (
                   <button
+                    type="button"
                     onClick={() => openImagePreview(0)}
-                    className="absolute bottom-4 right-4 rounded-full bg-white/90 backdrop-blur-sm px-4 py-2 text-sm font-medium text-neutral-800 shadow-lg hover:bg-white transition-colors flex items-center gap-2"
+                    className="absolute bottom-4 right-4 rounded-full bg-white/95 backdrop-blur-sm px-4 py-2 text-sm font-medium text-neutral-800 shadow-lg hover:bg-white transition-colors flex items-center gap-2"
                   >
                     <ZoomIn className="h-4 w-4" />
                     View gallery ({galleryImages.length})
@@ -552,7 +553,7 @@ export default function ProductDetailContent({ slug, initialProduct }: ProductDe
                 )}
               </div>
             ) : (
-              <div className="flex aspect-[21/9] min-h-[200px] w-full items-center justify-center bg-neutral-100 text-neutral-400">
+              <div className="flex aspect-[4/3] sm:aspect-[16/10] min-h-[240px] w-full items-center justify-center bg-white text-neutral-400">
                 <Package className="h-16 w-16 opacity-40" />
                 <span className="ml-3 text-sm font-medium">No image available</span>
               </div>

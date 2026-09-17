@@ -25,7 +25,11 @@ const Layout = ({ children, showFooter = true }: LayoutProps) => {
         store_components: [],
     };
     const contact = "03103170270";
-    const whatsappLink = contact ? `https://wa.me/${normalizePhoneNumber(contact).replace('+', '')}` : null
+    const whatsappMessage =
+      "Hi CNC KRAL, I visited cnckral.com and I need detail/query about your CNC machines and tools.";
+    const whatsappLink = contact
+      ? `https://wa.me/${normalizePhoneNumber(contact).replace("+", "")}?text=${encodeURIComponent(whatsappMessage)}`
+      : null;
 
     const storeDataWithLogo = {
         ...storeBase,

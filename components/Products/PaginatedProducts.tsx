@@ -29,6 +29,7 @@ import MachinePageSkeleton from "@/common/Skeletons/MachinePage";
 import PartsPageSkeleton from "@/common/Skeletons/PartsPage";
 import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
 import { useRestoreListingScroll } from "@/lib/listScrollRestoration";
+import { stripHtmlForPreview } from "@/lib/utils";
 
 interface PaginatedProductsProps {
   companyId: string;
@@ -97,7 +98,7 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     const searchBlob = (p: any) => {
-      const raw = [p.name, p.sku, p.short_description, p.detailed_desc]
+      const raw = [p.name, p.sku, p.item_group]
         .filter((x) => typeof x === "string")
         .join(" ");
       const tags = Array.isArray(p.tags) ? p.tags.join(" ") : "";
@@ -597,9 +598,9 @@ const PaginatedProducts: React.FC<PaginatedProductsProps> = ({
                       </div>
                     </div>
 
-                    {product.short_description && (
+                    {stripHtmlForPreview(product.short_description, 140) && (
                       <p className="text-gray-600 text-sm line-clamp-2 mb-2">
-                        {product.short_description}
+                        {stripHtmlForPreview(product.short_description, 140)}
                       </p>
                     )}
                   </div>

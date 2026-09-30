@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
 import { getProductSlug, warmProductNavigation } from "@/lib/productNavigation";
 import { useRestoreListingScroll } from "@/lib/listScrollRestoration";
+import { stripHtmlForPreview } from "@/lib/utils";
 
 interface NecessaryProps {
   companyId: string;
@@ -240,9 +241,9 @@ const Products = ({
                       </div>
                     </div>
 
-                    {product.short_description && (
+                    {stripHtmlForPreview(product.short_description, 140) && (
                       <p className="text-gray-600 text-sm line-clamp-2 mb-2">
-                        {product.short_description}
+                        {stripHtmlForPreview(product.short_description, 140)}
                       </p>
                     )}
                   </div>

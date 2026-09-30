@@ -6,6 +6,7 @@ import { HeroImageCarousel } from "@/components/HeroImageCarousel";
 import { FeaturedProductImageCarousel } from "@/components/FeaturedProductImageCarousel";
 import { HeroInfoCards } from "@/components/HeroInfoCards";
 import HomeProducts from "@/components/Products/HomeProducts";
+import { stripHtmlForPreview } from "@/lib/utils";
 
 interface HeroProps {
   content: {
@@ -154,9 +155,9 @@ const Hero = async ({
                   <h2 className="text-lg sm:text-xl font-semibold text-slate-900 line-clamp-1">
                     {featuredProduct.name}
                   </h2>
-                  {featuredProduct.short_description && (
+                  {stripHtmlForPreview(featuredProduct.short_description, 160) && (
                     <p className="mt-1 text-xs sm:text-sm text-slate-600 line-clamp-2">
-                      {featuredProduct.short_description}
+                      {stripHtmlForPreview(featuredProduct.short_description, 160)}
                     </p>
                   )}
                 </div>

@@ -11,6 +11,7 @@ import Layout from "@/components/Layout";
 import HomeProducts from "@/components/Products/HomeProducts";
 import ProductSkeleton from "@/common/Skeletons/Products";
 import { getCategories } from "@/hooks/getCategories";
+import { stripHtmlForPreview } from "@/lib/utils";
 
 export const revalidate = 60;
 
@@ -121,7 +122,10 @@ export default async function Home() {
       ...product,
       id: product?.id || product?.name,
       name: product?.item_name || product?.name,
-      short_description: product?.short_description || product?.description,
+      short_description: stripHtmlForPreview(
+        product?.short_description || product?.description,
+        200
+      ),
       description: product?.description,
       slug: product?.slug || product?.item_code || product?.name,
       sku: product?.sku || product?.item_code || product?.name,
@@ -143,7 +147,7 @@ export default async function Home() {
 
   try {
     const firstResponse = await fetch(
-      `${fullStoreUrl}/api/products?page=1&limit=${catalogLimit}`,
+      `${fullStoreUrl}/api/products?page=1&limit=${catalogLimit}&light=1`,
       { next: { revalidate: 60 } }
     );
 

@@ -83,7 +83,7 @@ export const usePaginatedProducts = (
 
       while (true) {
         const response = await fetch(
-          `/api/products?page=${page}&limit=${BATCH_LIMIT}${modeParam}${nocacheParam}`
+          `/api/products?page=${page}&limit=${BATCH_LIMIT}&light=1${modeParam}${nocacheParam}`
         );
         const data = await response.json();
 
@@ -129,7 +129,7 @@ export const usePaginatedProducts = (
         setLoading(true);
         setError(null);
 
-        const cacheKey = `products-v2-page-${page}-limit-${pageSize}-mode-${mode}`;
+        const cacheKey = `products-v3-light-page-${page}-limit-${pageSize}-mode-${mode}`;
         const cachedData = productsCache.get(cacheKey);
         if (cachedData) {
           setProducts(cachedData.products);
@@ -142,7 +142,7 @@ export const usePaginatedProducts = (
         const nocacheParam =
           process.env.NODE_ENV === "development" ? "&nocache=1" : "";
         const response = await fetch(
-          `/api/products?page=${page}&limit=${pageSize}${modeParam}${nocacheParam}`
+          `/api/products?page=${page}&limit=${pageSize}&light=1${modeParam}${nocacheParam}`
         );
         const data = await response.json();
 
@@ -175,7 +175,7 @@ export const usePaginatedProducts = (
       setError(null);
 
       const nextPage = pagination.currentPage + 1;
-      const cacheKey = `products-v2-page-${nextPage}-limit-${pageSize}-mode-${mode}`;
+      const cacheKey = `products-v3-light-page-${nextPage}-limit-${pageSize}-mode-${mode}`;
 
       const cachedData = productsCache.get(cacheKey);
       if (cachedData) {
@@ -189,7 +189,7 @@ export const usePaginatedProducts = (
       const nocacheParam =
         process.env.NODE_ENV === "development" ? "&nocache=1" : "";
       const response = await fetch(
-        `/api/products?page=${nextPage}&limit=${pageSize}${modeParam}${nocacheParam}`
+        `/api/products?page=${nextPage}&limit=${pageSize}&light=1${modeParam}${nocacheParam}`
       );
       const data = await response.json();
 
@@ -225,7 +225,7 @@ export const usePaginatedProducts = (
       return;
     }
     if (pagination) {
-      const cacheKey = `products-v2-page-${pagination.currentPage}-limit-${pageSize}-mode-${mode}`;
+      const cacheKey = `products-v3-light-page-${pagination.currentPage}-limit-${pageSize}-mode-${mode}`;
       productsCache.delete(cacheKey);
     }
     if (pagination) {
@@ -283,7 +283,7 @@ export const useInfiniteProducts = (
       const nextPage = currentPage + 1;
 
       const response = await fetch(
-        `/api/products?page=${nextPage}&limit=${pageSize}`
+        `/api/products?page=${nextPage}&limit=${pageSize}&light=1`
       );
       const data = await response.json();
 
@@ -311,7 +311,7 @@ export const useInfiniteProducts = (
         setError(null);
 
         const response = await fetch(
-          `/api/products?page=${page}&limit=${pageSize}`
+          `/api/products?page=${page}&limit=${pageSize}&light=1`
         );
         const data = await response.json();
 

@@ -14,12 +14,15 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const mode = searchParams.get('mode') || 'all'; // machine | parts | all
+    // List payloads are light by default (id/name/price/image/stock). Use ?full=1 for descriptions.
+    const light =
+      searchParams.get('full') !== '1' && searchParams.get('light') !== '0';
     const nocache = searchParams.get('nocache') === '1' || searchParams.get('bust') === '1';
     const offset = (page - 1) * limit;
 
     const quoteFilter = mode === 'machine' ? 1 : mode === 'parts' ? 0 : undefined;
     
-    const cacheKey = `products-page-${page}-limit-${limit}-mode-${mode}`;
+    const cacheKey = `products-page-${page}-limit-${limit}-mode-${mode}-light-${light ? '1' : '0'}`;
     const cachedProducts = nocache ? null : productCache.get(cacheKey);
     
     if (cachedProducts) {
@@ -128,6 +131,18 @@ export async function GET(request: NextRequest) {
 
           // Get variant stock from lookup map
           const variantStockInfo = stockMap.get(variant.name) || null;
+
+          if (light) {
+            return {
+              id: variant.name,
+              sale_price: variantPrice,
+              base_price: variantPrice,
+              sku: variant.name,
+              name: variant.item_name,
+              thumbnail_url: getCatalogThumbnailSrc(variant.image ?? undefined),
+              stock: variantStockInfo,
+            };
+          }
           
           return {
             id: variant.name,
@@ -175,19 +190,18 @@ export async function GET(request: NextRequest) {
 
       const imagePath = product.website_image || product.image;
       const tags = parseErpTags((product as any)._user_tags);
-      return {
+      const sku = product.item_code || product.name || `item-${index}`;
+      const base = {
         id: product.name,
         name: product.item_name,
-        short_description: product.description,
-        detailed_desc: product.description,
         item_group: product.item_group,
         type: product.has_variants ? 'variable' : 'simple',
         currency: currency,
         base_price: displayPrice,
         status: product.disabled ? 'inactive' : 'active',
         sale_price: displayPrice,
-        sku: product.item_code || product.name || `item-${index}`,
-        slug: (product.item_code || product.name || `item-${index}`).toLowerCase().replace(/\s+/g, '-'),
+        sku,
+        slug: sku.toLowerCase().replace(/\s+/g, '-'),
         custom_quotation_item: rawEnableQuote,
         enable_quote_request: enableQuoteRequest,
         product_images: imagePath ? [{
@@ -202,6 +216,17 @@ export async function GET(request: NextRequest) {
         stock: stockInfo,
         tags,
         ...(priceRange && { price_range: priceRange })
+      };
+
+      // Light list: essentials for cards/filters only. Full HTML lives on PDP (/api/product/[slug]).
+      if (light) {
+        return base;
+      }
+
+      return {
+        ...base,
+        short_description: product.description,
+        detailed_desc: product.description,
       };
     });
 
@@ -235,7 +260,7 @@ export async function GET(request: NextRequest) {
     const loadTime = Date.now() - startTime;
     const withPrice = transformedProducts.filter((p) => (p.base_price || p.sale_price) > 0).length;
     const withStock = transformedProducts.filter((p) => p.stock?.totalStock > 0 || (p.product_variations || []).some((v: any) => v.stock?.totalStock > 0)).length;
-    console.log(`✅ Products page ${page} loaded in ${loadTime}ms | ${transformedProducts.length} items | ${withPrice} with price | ${withStock} with stock`);
+    console.log(`✅ Products page ${page} loaded in ${loadTime}ms | ${transformedProducts.length} items | light=${light} | ${withPrice} with price | ${withStock} with stock`);
     
     // Track performance metrics
     trackPaginationPerformance(loadTime, false);

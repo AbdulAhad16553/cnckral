@@ -37,6 +37,7 @@ async function buildCatalogPayload(req: NextRequest) {
       url.searchParams.set("page", "1");
       url.searchParams.set("limit", "5000");
       url.searchParams.set("mode", "all");
+      url.searchParams.set("light", "1");
       const inner = new NextRequest(url, { headers: req.headers });
       const catalogRes = await getProductsCatalog(inner);
       const catalogJson = await catalogRes.json();

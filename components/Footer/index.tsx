@@ -22,7 +22,6 @@ import {
   Heart,
   Zap
 } from "lucide-react"
-import { getStorePage } from "@/hooks/getStorePage"
 import { getSocialLink } from "@/hooks/getSocialLinks"
 import type { ReactElement } from "react"
 interface FooterProps {
@@ -64,20 +63,10 @@ const Footer = async ({ storeData }: FooterProps) => {
   const secondaryColor = storeData?.store_detail?.secondary_color || "#363E47"
   const currency = storeData?.store_detail?.currency || "$"
 
-  const { page } = await getStorePage(storeId, "about-us")
-  const { socialLinks } = await getSocialLink(storeId)
-
-  let companyContactDetails = {
-    email: "cnckral@gmail.com",
-    phone: "0322 4414443",
-    address: storeData?.store_contact_detail?.address,
-  }
-
-  // Use the short description from the page or a fallback description
+  // Prefer store tagline — never show CMS mock placeholders in the footer.
   const description =
-    page?.content ||
-    tagline ||
-    `${storeName} is your trusted partner for high-quality products and exceptional service.`
+    (typeof tagline === "string" && tagline.trim()) ||
+    `${storeName || "CNC KRAL"} is your trusted partner for CNC machines, routers, bits, and precision tooling in Pakistan.`
 
   const socialIcons: Record<string, ReactElement> = {
     facebook: <Facebook size={20} />,

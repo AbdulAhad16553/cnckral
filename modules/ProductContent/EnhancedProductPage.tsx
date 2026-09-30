@@ -38,6 +38,7 @@ import { createMetaEvent } from "@/sub/event/CreateMetaEvent";
 import { fetchGeoData } from "@/lib/fetchGeoData";
 import { useSearchParams } from "next/navigation";
 import { formatPrice, getEffectivePrice } from "@/lib/currencyUtils";
+import { stripHtmlForPreview } from "@/lib/utils";
 
 // Helper function to calculate stock from current_stock data (from your existing code)
 const calculateStockFromCurrentStock = (
@@ -903,9 +904,11 @@ const EnhancedProductPage = ({
                   <h3 className="text-xl font-semibold mb-4">
                     Product Overview
                   </h3>
-                  <p className="text-muted-foreground mb-4">
-                    {productContent?.short_description}
-                  </p>
+                  {stripHtmlForPreview(productContent?.short_description) && (
+                    <p className="text-muted-foreground mb-4">
+                      {stripHtmlForPreview(productContent?.short_description, 400)}
+                    </p>
+                  )}
 
                   <div className="space-y-4">
                     <div>

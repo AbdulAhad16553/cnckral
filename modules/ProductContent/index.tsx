@@ -12,6 +12,7 @@ import { MetaEvent } from "@/sub/event/Types";
 import { createMetaEvent } from "@/sub/event/CreateMetaEvent";
 import { fetchGeoData } from "@/lib/fetchGeoData";
 import { useSearchParams } from "next/navigation";
+import { stripHtmlForPreview } from "@/lib/utils";
 
 // Helper function to calculate stock from current_stock data
 const calculateStockFromCurrentStock = (currentStockData: any[], sku: string) => {
@@ -224,7 +225,11 @@ const ProductContent = ({ productContent, necessary }: any) => {
     return (
         <div>
             <h1 className="text-3xl font-bold mb-4">{productContent.name}</h1>
-            <p className="text-gray-600 mb-6">{productContent.short_description}</p>
+            {stripHtmlForPreview(productContent.short_description) && (
+              <p className="text-gray-600 mb-6">
+                {stripHtmlForPreview(productContent.short_description, 300)}
+              </p>
+            )}
             <div className="text-gray-600 mb-6">
                 {/* Ensure bullets appear in lists */}
                 <div

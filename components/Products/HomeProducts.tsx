@@ -26,10 +26,11 @@ function filterProductsByQuery(products: any[], q: string): any[] {
   const needle = q.trim().toLowerCase();
   if (!needle) return products;
   return products.filter((p) => {
-    const raw = [p.name, p.sku, p.short_description, p.detailed_desc]
+    const raw = [p.name, p.sku, p.item_group]
       .filter((x) => typeof x === "string")
       .join(" ");
-    const blob = raw.replace(/<[^>]*>/g, " ").toLowerCase();
+    const tags = Array.isArray(p.tags) ? p.tags.join(" ") : "";
+    const blob = `${raw} ${tags}`.replace(/<[^>]*>/g, " ").toLowerCase();
     return blob.includes(needle);
   });
 }
@@ -152,7 +153,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/products?page=1&limit=8`);
+        const response = await fetch(`/api/products?page=1&limit=8&light=1`);
         const data = await response.json();
 
         if (!response.ok) throw new Error(data.error || 'Failed to fetch products');
@@ -230,7 +231,7 @@ const HomeProducts: React.FC<HomeProductsProps> = ({
     try {
       const page = nextCatalogPageRef.current;
       const res = await fetch(
-        `/api/products?page=${page}&limit=${catalogFetchLimit}`
+        `/api/products?page=${page}&limit=${catalogFetchLimit}&light=1`
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load more");

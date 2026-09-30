@@ -63,6 +63,14 @@ const Footer = async ({ storeData }: FooterProps) => {
   const secondaryColor = storeData?.store_detail?.secondary_color || "#363E47"
   const currency = storeData?.store_detail?.currency || "$"
 
+  const { socialLinks } = await getSocialLink(storeId)
+
+  const companyContactDetails = {
+    email: "cnckral@gmail.com",
+    phone: "0322 4414443",
+    address: storeData?.store_contact_detail?.address,
+  }
+
   // Prefer store tagline — never show CMS mock placeholders in the footer.
   const description =
     (typeof tagline === "string" && tagline.trim()) ||

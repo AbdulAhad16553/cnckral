@@ -101,6 +101,13 @@ export default function AboutUsContent() {
             >
               +92 321 4198406
             </Link>
+            {" / "}
+            <Link
+              href="tel:+923103170270"
+              className="text-primary hover:underline"
+            >
+              +92 310 3170270
+            </Link>
           </li>
           <li>
             <strong>Website:</strong>{" "}

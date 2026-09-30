@@ -99,13 +99,22 @@ export default async function RootLayout({
                   addressRegion: "Punjab",
                   addressCountry: "PK",
                 },
-                contactPoint: {
-                  "@type": "ContactPoint",
-                  telephone: "+92-321-4198406",
-                  contactType: "sales",
-                  areaServed: "PK",
-                  availableLanguage: "English, Urdu",
-                },
+                contactPoint: [
+                  {
+                    "@type": "ContactPoint",
+                    telephone: "+92-321-4198406",
+                    contactType: "sales",
+                    areaServed: "PK",
+                    availableLanguage: "English, Urdu",
+                  },
+                  {
+                    "@type": "ContactPoint",
+                    telephone: "+92-310-3170270",
+                    contactType: "sales",
+                    areaServed: "PK",
+                    availableLanguage: "English, Urdu",
+                  },
+                ],
                 knowsAbout: [
                   "CNC machinery",
                   "CNC machines",

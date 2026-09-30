@@ -32,7 +32,7 @@ const faqs = [
   {
     question: "Best CNC machine supplier in Pakistan?",
     answer:
-      "CNC KRAL is a top CNC machine supplier in Pakistan, offering wood routers, CNC bits, marble tools, and precision tooling. We emphasize zero vibration and long-term accuracy, with operations in Lahore including Ichra and Saggia Bypass. Contact +92 321 4198406 or cnckral.com.",
+      "CNC KRAL is a top CNC machine supplier in Pakistan, offering wood routers, CNC bits, marble tools, and precision tooling. We emphasize zero vibration and long-term accuracy, with operations in Lahore including Ichra and Saggia Bypass. Contact +92 321 4198406 / +92 310 3170270 or cnckral.com.",
   },
 ];
 

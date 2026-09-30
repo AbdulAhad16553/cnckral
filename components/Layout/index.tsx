@@ -56,13 +56,14 @@ const Layout = ({ children, showFooter = true }: LayoutProps) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Chat on WhatsApp 03103170270"
-                    className="fixed z-[55] w-14 h-14 bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))] right-4 md:bottom-6 md:right-6 active:scale-95 transition-transform"
+                    className="fixed z-[55] w-14 h-14 bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))] right-4 md:bottom-6 md:right-6 active:scale-95 transition-transform animate-whatsapp-bounce hover:[animation-play-state:paused]"
                 >
                     <Image
-                        src="/whatsapp-icon.svg" // place the file in your `public/` folder
+                        src="/whatsapp-icon.svg"
                         alt="Chat on WhatsApp"
                         width={50}
                         height={50}
+                        className="drop-shadow-md"
                     />
                 </a>
             )}

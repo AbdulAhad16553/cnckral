@@ -6,13 +6,11 @@ import Image from "next/image";
 import {
   Mail,
   Phone,
-  Heart,
   Bell,
 } from "lucide-react";
 import { OPEN_MOBILE_CATEGORY_DRAWER } from "@/lib/mobileCategoryDrawerEvent";
 import Cart from "@/components/Cart";
 import HeaderMobileSearch from "@/components/Header/HeaderMobileSearch";
-import HeaderDesktopSearch from "@/components/Header/HeaderDesktopSearch";
 import HeaderMobileCareersButton from "@/components/Header/HeaderMobileCareersButton";
 import MobileCategoryDrawer from "@/components/Header/MobileCategoryDrawer";
 import { getAllCategories } from "@/hooks/getCategories";
@@ -307,23 +305,6 @@ const Header = ({ storeData }: { storeData: StoreData }) => {
                 aria-label="Orders and notifications"
               >
                 <Bell className="h-6 w-6" />
-              </Link>
-              <Suspense
-                fallback={
-                  <div
-                    className="hidden md:block h-9 w-full max-w-xs rounded-lg bg-white/10 border border-white/20"
-                    aria-hidden
-                  />
-                }
-              >
-                <HeaderDesktopSearch />
-              </Suspense>
-              <Link
-                href="/wishlist"
-                className="relative p-2 text-white/90 transition-all duration-300 hover:text-red-300 hover:scale-110 active:scale-95 group"
-              >
-                <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-red-400/20 blur-xl transition-opacity duration-300" />
-                <Heart className="w-6 h-6 relative z-10 transition-all duration-300 group-hover:fill-red-300 group-hover:text-red-300 group-hover:animate-pulse" />
               </Link>
               <Cart />
             </div>
